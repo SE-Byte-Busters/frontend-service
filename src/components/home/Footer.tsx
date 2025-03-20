@@ -25,7 +25,7 @@ export default function Footer() {
           {/* Links */}
           <nav className="flex flex-row-reverse gap-x-5">
             {navItems.map((item) => (
-              <Link href={item.href}>
+              <Link key={item.name} href={item.href}>
                 <div className="flex flex-row-reverse items-center text-black">
                   <MaterialSymbol
                     name={item.logo}
