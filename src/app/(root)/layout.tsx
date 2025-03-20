@@ -1,5 +1,8 @@
 import type { Metadata } from "next";
 // import { Geist, Geist_Mono } from "next/font/google";
+
+import Header from "@/components/home/Header";
+import Footer from "@/components/home/Footer";
 import "../globals.css";
 
 export const metadata: Metadata = {
@@ -15,10 +18,11 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
-        <header>Header</header>
+        <Header />
+
         <main>{children}</main>
 
-        <footer>Footer</footer>
+        <Footer />
       </body>
     </html>
   );
