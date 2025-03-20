@@ -51,9 +51,77 @@ const StepsSection = () => {
 };
 
 const RankingSection = () => {
+  const router = useRouter();
+
+  const users = [
+    {
+      rank: 1,
+      picture: "/next.svg",
+      username: "علی رضایی",
+      score: 110,
+      medal: "قهرمان محیط‌زیست و فعال‌ترین گزارش‌دهنده",
+      lastActivity: "۲۳ اسفند ۱۴۰۳",
+    },
+    {
+      rank: 2,
+      picture: "/next.svg",
+      username: "سارا محمدی",
+      score: 88,
+      medal: "فعال‌ترین گزارش‌دهنده",
+      lastActivity: "۲۵ اسفند ۱۴۰۳",
+    },
+    {
+      rank: 3,
+      picture: "/next.svg",
+      username: "محمد امیری",
+      score: 58,
+      medal: "فعال برتر",
+      lastActivity: "۲۰ اسفند ۱۴۰۳",
+    },
+  ];
+
   return (
-    <></>
-  );
+    <div className="bg-dark h-screen">
+      <div className="flex items-center flex-row-reverse">
+        <Image src="/ranking-icon.png" width={500} height={500} alt="Ranking Icon" className="h-20 w-20" />
+        <h1 className="font-bold text-white rtl">با فعالیت در CleanCity، قهرمان محیط‌زیست شوید!</h1>
+      </div>
+      <div className="bg-light">
+        <div className="bg-gray-200 rounded text-center text-black grid grid-cols-6">
+          <div>رتبه</div>
+          <div>عکس کاربر</div>
+          <div>نام کاربر</div>
+          <div>امتیاز کل</div>
+          <div>نشان دریافتی</div>
+          <div>آخرین فعالیت</div>
+        </div>
+        {users.map((user, index) => (
+          <div
+            key={index}
+            className="grid grid-cols-6 items-center border-b border-black text-black"
+          >
+            <div className="text-center">{user.rank}</div>
+            <div className="text-center">
+              <Image
+                src={user.picture}
+                width={256}
+                height={256}
+                alt={`${user.username}'s picture`}
+                className="w-10 h-10 rounded-full mx-auto" />
+            </div>
+            <div className="text-center">{user.username}</div>
+            <div className="text-center">{user.score}</div>
+            <div className="text-center">{user.medal}</div>
+            <div className="text-center">{user.lastActivity}</div>
+          </div>
+        ))}
+      </div>
+      <button
+        className="bg-accent text-white rounded hover:brightness-90"
+        onClick={() => router.push("/leaderboard")}>
+        مشاهده تابلوی برترین‌ها
+      </button>
+    </div>);
 };
 
 const ReviewsSection = () => {
