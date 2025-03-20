@@ -7,11 +7,22 @@
 :root {
   --background: #ffffff;
   --foreground: #171717;
+
+  --primary: #997C70;
+  --dark: #685752;
+  --light: #FDF7F4;
+  --accent: #8EB486;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+
+  --color-primary: var(--primary);
+  --color-dark: var(--dark);
+  --color-light: var(--light);
+  --color-accent: var(--accent);
+
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
