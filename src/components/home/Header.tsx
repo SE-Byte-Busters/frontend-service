@@ -11,7 +11,7 @@ export default function Header() {
     { name: "صفحه اصلی", href: "/", logo: "home" },
     { name: "گزارشات شهری", href: "/reports", logo: "description" },
     { name: "نقشه", href: "/map", logo: "pin_drop" },
-    { name: "تابلوی بهترین‌ها", href: "/scoreboard", logo: "leaderboard" },
+    { name: "تابلوی بهترین‌ها", href: "/leaderboard", logo: "leaderboard" },
   ];
 
   return (
