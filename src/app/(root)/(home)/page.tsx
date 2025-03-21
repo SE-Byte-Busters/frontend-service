@@ -13,7 +13,7 @@ const HeroSection = () => {
     <div className="relative flex min-h-screen">
       {/* Background */}
       <div
-        className="absolute inset-0 -z-10 pointer-events-none bg-[url('/back-auth.jpg')] bg-cover bg-center"
+        className="absolute inset-0 -z-10 pointer-events-none bg-[url('/homepage.jpg')] bg-cover bg-center"
       >
         <div className="absolute inset-0 bg-gradient-to-b from-white via-white/25 to-transparent" />
       </div>
