@@ -19,20 +19,49 @@ const HeroSection = () => {
   const router = useRouter();
 
   return (
-    <div className="relative bg-cover bg-center h-screen" style={{ backgroundImage: "url('/back-auth.jpg')" }}>
-      <div className="flex flex-col justify-center items-center text-center py-25">
-        <div className="flex items-center flex-row-reverse">
-          <Image src="/hero-icon.png" width={500} height={500} alt="Title Icon" className="h-20 w-20" />
-          <h1 className="font-bold text-black">شهر خود را پاک‌تر کنید</h1>
+    <div className="relative flex h-screen">
+      {/* Background */}
+      <div
+        className="absolute inset-0 -z-10 pointer-events-none bg-[url('/back-auth.jpg')] bg-cover bg-center"
+      >
+        <div className="absolute inset-0 bg-gradient-to-b from-white via-white/25 to-transparent" />
+      </div>
+
+      <div
+        className="container mx-auto flex flex-col text-right py-10 px-40 mt-15"
+        dir="rtl"
+      >
+        {/* Title and Description */}
+        <div>
+          <div className="flex items-center justify-right mb-6">
+            <Image
+              src="/hero-icon.png"
+              width={80}
+              height={80}
+              alt="Hero Icon"
+              className="ml-4"
+            />
+            <h1 className="text-5xl font-bold text-black">
+              شهر خود را پاک‌تر کنید
+            </h1>
+          </div>
+          <p className="text-2xl text-black mb-8 leading-relaxed">
+            کلین سیتی CleanCity، یک پلتفرم هوشمند برای گزارش مشکلات شهری است. با ثبت
+            گزارش جدید، موقعیت و نوع مشکل را مشخص کنید تا نهادهای مرتبط برای حل آن اقدام
+            کنند.<br />
+            با مشارکت شما، شهر پاک‌تر و هوشمندتر خواهد شد!
+          </p>
         </div>
-        <p className="text-lg rtl text-black">
-          کلین سیتی CleanCity، یک پلتفرم هوشمند برای گزارش مشکلات شهری است. با ثبت گزارش جدید، موقعیت و نوع مشکل را مشخص کنید تا نهادهای مرتبط برای حل آن اقدام کنند.
-        </p>
-        <button
-          className="bg-accent text-white rounded hover:brightness-90"
-          onClick={() => router.push("/new-report")}>
-          ثبت گزارش جدید
-        </button>
+
+        {/* Button */}
+        <div className="flex justify-center">
+          <button
+            className="bg-accent text-white text-2xl rounded-lg px-6 py-3 transition duration-300 hover:text-black"
+            onClick={() => router.push('/new-report')}
+          >
+            ثبت گزارش جدید
+          </button>
+        </div>
       </div>
     </div>
   );
