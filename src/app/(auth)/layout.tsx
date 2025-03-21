@@ -24,10 +24,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="fa">
-      <body className="min-h-screen h-full relative">
+      <body className="bg-[url('/back-auth.jpg')] bg-no-repeat bg-cover bg-center">
         {/* inset-0 means top: 0;right: 0;bottom: 0;left: 0; */}
-        <div className=" absolute  inset-0 w-full h-full  bg-[url('/back-auth.jpg')] bg-cover bg-center bg-no-repeat "></div>
-        <div className="relative z-10">{children}</div>
+        <div>{children}</div>
       </body>
     </html>
   );

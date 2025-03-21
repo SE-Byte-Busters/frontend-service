@@ -6,7 +6,7 @@ export default function page({ params }: { params: { username?: string } }) {
       <div className="w-[568px] h-[672px] bg-[#FDF7F4] opacity-[95%] rounded-[80px] flex flex-col justify-center items-center text-center">
         <div className="w-[416px] h-[62px]  ">
           {/* add font  */}
-          <label className="block text-right text-[18px] font-semibold text-[#685752] uppercase">
+          <label className="block text-right text-[18px] font-vazirmatn text-[#685752] uppercase">
             نام کاربری
           </label>
 
