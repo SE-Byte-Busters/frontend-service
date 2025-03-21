@@ -10,7 +10,7 @@ const HeroSection = () => {
   const router = useRouter();
 
   return (
-    <div className="relative flex min-h-screen">
+    <div className="relative flex min-h-screen pt-20">
       {/* Background */}
       <div
         className="absolute inset-0 -z-10 pointer-events-none bg-[url('/homepage.jpg')] bg-cover bg-center"
@@ -425,7 +425,7 @@ const ReviewsSection = () => {
       </div>
 
       {/* Pagination */}
-      <div className="flex justify-center mt-10 space-x-2">
+      <div className="flex justify-center mt-10">
         {Array(totalPages)
           .fill(0)
           .map((_, index) => (
@@ -433,7 +433,7 @@ const ReviewsSection = () => {
               key={index}
               onClick={() => handleDotClick(index)}
               className={`
-                w-4 h-4 rounded-full transition-colors hover:bg-gray-400
+                w-4 h-4 rounded-full transition-colors hover:bg-gray-400 mr-2
                 ${currentIndex === index ? "bg-accent" : "bg-gray-300"}
               `}
             ></button>
