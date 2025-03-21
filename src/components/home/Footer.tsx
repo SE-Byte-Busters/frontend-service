@@ -18,8 +18,14 @@ export default function Footer() {
       <div className="container mx-auto">
         <div className="flex flex-col md:flex-row justify-between items-center mb-6">
           {/* Logo */}
-          <div className="flex items-center mb-4 md:mb-0">
-            <Image src="/logo.png" width={256} height={256} alt="CleanCity Logo" className="bg-white rounded-xl h-20 w-20 p-1 mx-5" />
+          <div className="flex items-center mb-6 md:mb-0">
+            <Image
+              src="/logo.png"
+              width={256}
+              height={256}
+              alt="CleanCity Logo"
+              className="bg-light rounded-xl h-20 w-20 p-1 mr-5"
+            />
             <span className="text-black font-bold text-2xl">CleanCity</span>
           </div>
 
@@ -28,7 +34,10 @@ export default function Footer() {
             {navItems.map((item) => (
               <Link key={item.name} href={item.href}>
                 <div className="flex items-center text-black font-bold">
-                  <MaterialSymbol name={item.logo} className="mx-2 !text-[48px]" />
+                  <MaterialSymbol
+                    name={item.logo}
+                    className="mx-2 !text-[48px]"
+                  />
                   <span className="text-base">{item.name}</span>
                 </div>
               </Link>
