@@ -4,7 +4,7 @@ module.exports = {
   theme: {
     extend: {
       fontFamily: {
-        vazirmatn: "var(--font-vazirmatn)",
+        vazirmatn: ["Vazirmatn", "sans-serif"],
       },
       colors: {
         'primary': '#997C70',
