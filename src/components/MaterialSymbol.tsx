@@ -1,13 +1,17 @@
-import React from 'react';
+import React, { CSSProperties } from 'react';
 
 interface MaterialSymbolProps {
   name: string;
+  type?: string;
   className?: string;
+  style?: CSSProperties;
 }
 
-const MaterialSymbol: React.FC<MaterialSymbolProps> = ({ name, className = '' }) => {
+const MaterialSymbol: React.FC<MaterialSymbolProps> = ({ name, type = 'outlined', className = '', style = {} }) => {
   return (
-    <span className={`material-symbols-outlined ${className}`}>{name}</span>
+    <span className={`material-symbols-${type} ${className}`} style={style}>
+      {name}
+    </span>
   );
 };
 
