@@ -23,11 +23,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <body className="h-full">
-        <div className="min-h-screen bg-[url('/back-auth.jpg')] bg-cover bg-center bg-no-repeat">
-          {children}
-        </div>
+    <html lang="fa">
+      <body className="min-h-screen h-full relative">
+        {/* inset-0 means top: 0;right: 0;bottom: 0;left: 0; */}
+        <div className=" absolute  inset-0 w-full h-full  bg-[url('/back-auth.jpg')] bg-cover bg-center bg-no-repeat "></div>
+        <div className="relative z-10">{children}</div>
       </body>
     </html>
   );
