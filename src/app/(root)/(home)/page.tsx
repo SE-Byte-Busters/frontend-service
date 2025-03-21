@@ -15,28 +15,28 @@ const HeroSection = () => {
       <div
         className="absolute inset-0 -z-10 pointer-events-none bg-[url('/homepage.jpg')] bg-cover bg-center"
       >
-        <div className="absolute inset-0 bg-gradient-to-b from-white via-white/25 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-b from-white via-white/65 to-transparent" />
       </div>
 
       <div
-        className="container mx-auto flex flex-col text-right py-10 px-40 mt-15"
+        className="flex flex-col mx-auto py-10 px-20 mt-15"
         dir="rtl"
       >
         {/* Title and Description */}
         <div>
-          <div className="flex items-center justify-right mb-6">
+          <div className="flex items-center text-right mb-6">
             <Image
               src="/hero-icon.png"
-              width={80}
-              height={80}
+              width={256}
+              height={256}
               alt="Hero Icon"
-              className="ml-4"
+              className="h-20 w-20 ml-4"
             />
             <h1 className="text-5xl font-bold text-black">
               شهر خود را پاک‌تر کنید
             </h1>
           </div>
-          <p className="text-2xl text-black mb-8 leading-relaxed">
+          <p className="text-2xl text-black text-justify mb-8 leading-relaxed">
             کلین سیتی CleanCity، یک پلتفرم هوشمند برای گزارش مشکلات شهری است. با ثبت
             گزارش جدید، موقعیت و نوع مشکل را مشخص کنید تا نهادهای مرتبط برای حل آن اقدام
             کنند.<br />
@@ -47,7 +47,8 @@ const HeroSection = () => {
         {/* Button */}
         <div className="flex justify-center">
           <button
-            className="bg-accent text-white text-2xl rounded-lg px-6 py-3 transition duration-300 hover:text-black"
+            className="bg-accent text-white text-2xl rounded-lg px-6 py-3
+            transition duration-300 hover:text-black"
             onClick={() => router.push('/new-report')}
           >
             ثبت گزارش جدید
@@ -66,14 +67,14 @@ const MapSection = () => {
 
 const StepsSection = () => {
   return (
-    <div className="bg-accent min-h-screen px-4 py-8" dir="rtl">
+    <div className="bg-accent py-10 px-20" dir="rtl">
       {/* Title */}
-      <div className="flex items-center space-x-4 rtl:space-x-reverse mb-8">
+      <div className="flex items-center mb-6">
         <Image
           src="/steps-icon.png"
           width={256}
           height={256}
-          alt="Title Icon"
+          alt="Steps Icon"
           className="h-20 w-20 ml-4"
         />
         <h1 className="font-bold text-5xl text-white">
@@ -187,9 +188,9 @@ const RankingSection = () => {
   ];
 
   return (
-    <div className="flex flex-col items-center bg-dark min-h-screen px-25 py-8" dir="rtl">
+    <div className="flex flex-col items-center bg-dark px-20 py-10" dir="rtl">
       {/* Title */}
-      <div className="flex items-center mb-8 justify-right w-full">
+      <div className="flex items-center mb-6 justify-right w-full">
         <Image
           src="/ranking-icon.png"
           width={256}
@@ -203,9 +204,10 @@ const RankingSection = () => {
       </div>
 
       {/* Table */}
-      <div className="bg-light w-full max-w-6xl rounded-lg px-5 py-4">
+      <div className="bg-light w-full rounded-lg px-5 py-4">
         {/* Table Head */}
-        <div className="grid grid-cols-6 bg-gray-200 text-black text-lg text-center rounded-lg font-semibold py-3">
+        <div className="grid grid-cols-6 bg-gray-200 rounded-lg py-3
+        text-black text-lg text-center font-bold">
           <div className="flex justify-center items-center">رتبه</div>
           <div className="flex justify-center items-center">عکس کاربر</div>
           <div className="flex justify-center items-center">نام کاربر</div>
@@ -218,18 +220,18 @@ const RankingSection = () => {
           <div
             key={index}
             className={
-              `grid grid-cols-6 items-center text-center py-3 px-4 bg-light
+              `grid grid-cols-6 items-center text-center py-3 bg-light
               ${index < users.length - 1 ? "border-b" : ""} border-black
             `}
           >
-            <div className="flex justify-center items-center text-sm text-black">{user.rank}</div>
+            <div className="flex justify-center items-center text-black">{user.rank}</div>
             <div className="flex justify-center">
               <Image
                 src={user.picture}
                 width={64}
                 height={64}
                 alt={`${user.username}'s picture`}
-                className="rounded-full border border-gray-300 h-10 w-10"
+                className="bg-white rounded-full border border-gray-300 h-10 w-10"
               />
             </div>
             <div className="flex justify-center items-center text-sm text-black">{user.username}</div>
@@ -243,7 +245,7 @@ const RankingSection = () => {
       {/* Button */}
       <div className="flex w-full">
         <button
-          className=" bg-accent text-white font-semibold text-lg rounded-lg mt-6 px-6 py-3
+          className=" bg-accent text-white font-bold text-lg rounded-lg mt-6 px-6 py-3
         transition duration-300 hover:text-black"
           onClick={() => router.push("/leaderboard")}
         >
@@ -374,9 +376,9 @@ const ReviewsSection = () => {
   };
 
   return (
-    <div className="bg-light min-h-screen py-10 px-20 sm:px-40" dir="rtl">
+    <div className="bg-light py-10 px-20" dir="rtl">
       {/* Title */}
-      <div className="flex items-center justify-right mb-10 text-right">
+      <div className="flex items-center text-right mb-6">
         <Image
           src="/review-icon.png"
           width={256}
@@ -384,13 +386,13 @@ const ReviewsSection = () => {
           alt="Review Icon"
           className="h-20 w-20 ml-4"
         />
-        <div className="flex flex-col items-right space-y-1">
-          <h5 className="text-4xl font-bold text-black">
+        <div className="flex flex-col items-right">
+          <h1 className="text-5xl font-bold text-black">
             نظرات کاربران
-          </h5>
-          <h6 className="text-xl text-black">
+          </h1>
+          <h2 className="text-xl text-black">
             نمایش چند نقل قول از کاربران درباره‌ی تجربه استفاده از CleanCity
-          </h6>
+          </h2>
         </div>
       </div>
 
@@ -401,7 +403,7 @@ const ReviewsSection = () => {
             key={index}
             className="flex flex-col bg-accent rounded-3xl p-6"
           >
-            <div className="flex flex-row items-center space-x-4">
+            <div className="flex flex-row items-center">
               <div className="flex flex-col text-right grow">
                 <p className="text-lg font-semibold text-black">{review.name}</p>
                 <p className="text-sm text-black">{review.date}</p>
@@ -414,7 +416,7 @@ const ReviewsSection = () => {
                 alt={`${review.name}'s photo`}
                 width={64}
                 height={64}
-                className="rounded-full bg-light border border-gray-300 h-20 w-20"
+                className="rounded-full bg-white border border-gray-300 h-20 w-20"
               />
             </div>
             <p className="text-black pt-4 text-justify leading-5">"{review.body}"</p>
