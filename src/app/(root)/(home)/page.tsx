@@ -19,7 +19,7 @@ const HeroSection = () => {
   const router = useRouter();
 
   return (
-    <div className="relative flex h-screen">
+    <div className="relative flex min-h-screen">
       {/* Background */}
       <div
         className="absolute inset-0 -z-10 pointer-events-none bg-[url('/back-auth.jpg')] bg-cover bg-center"
@@ -110,47 +110,71 @@ const RankingSection = () => {
   ];
 
   return (
-    <div className="bg-dark h-screen">
-      <div className="flex items-center flex-row-reverse">
-        <Image src="/ranking-icon.png" width={500} height={500} alt="Ranking Icon" className="h-20 w-20" />
-        <h1 className="font-bold text-white rtl">با فعالیت در CleanCity، قهرمان محیط‌زیست شوید!</h1>
+    <div className="flex flex-col items-center bg-dark min-h-screen px-25 py-8" dir="rtl">
+      {/* Title */}
+      <div className="flex items-center mb-8 justify-right w-full">
+        <Image
+          src="/ranking-icon.png"
+          width={256}
+          height={256}
+          alt="Ranking Icon"
+          className="h-20 w-20 ml-4"
+        />
+        <h1 className="text-5xl font-bold text-white ml-4">
+          با فعالیت در CleanCity، قهرمان محیط‌زیست شوید!
+        </h1>
       </div>
-      <div className="bg-light">
-        <div className="bg-gray-200 rounded text-center text-black grid grid-cols-6">
-          <div>رتبه</div>
-          <div>عکس کاربر</div>
-          <div>نام کاربر</div>
-          <div>امتیاز کل</div>
-          <div>نشان دریافتی</div>
-          <div>آخرین فعالیت</div>
+
+      {/* Table */}
+      <div className="bg-light w-full max-w-6xl rounded-lg px-5 py-4">
+        {/* Table Head */}
+        <div className="grid grid-cols-6 bg-gray-200 text-black text-lg text-center rounded-lg font-semibold py-3">
+          <div className="flex justify-center items-center">رتبه</div>
+          <div className="flex justify-center items-center">عکس کاربر</div>
+          <div className="flex justify-center items-center">نام کاربر</div>
+          <div className="flex justify-center items-center">امتیاز کل</div>
+          <div className="flex justify-center items-center">نشان دریافتی</div>
+          <div className="flex justify-center items-center">آخرین فعالیت</div>
         </div>
+        {/* Table Rows */}
         {users.map((user, index) => (
           <div
             key={index}
-            className="grid grid-cols-6 items-center border-b border-black text-black"
+            className={
+              `grid grid-cols-6 items-center text-center py-3 px-4 bg-light
+              ${index < users.length - 1 ? "border-b" : ""} border-black
+            `}
           >
-            <div className="text-center">{user.rank}</div>
-            <div className="text-center">
+            <div className="flex justify-center items-center text-sm text-black">{user.rank}</div>
+            <div className="flex justify-center">
               <Image
                 src={user.picture}
-                width={256}
-                height={256}
+                width={64}
+                height={64}
                 alt={`${user.username}'s picture`}
-                className="w-10 h-10 rounded-full mx-auto" />
+                className="rounded-full border border-gray-300 h-10 w-10"
+              />
             </div>
-            <div className="text-center">{user.username}</div>
-            <div className="text-center">{user.score}</div>
-            <div className="text-center">{user.medal}</div>
-            <div className="text-center">{user.lastActivity}</div>
+            <div className="flex justify-center items-center text-sm text-black">{user.username}</div>
+            <div className="flex justify-center items-center text-sm text-black">{user.score}</div>
+            <div className="flex justify-center items-center text-sm text-black">{user.medal}</div>
+            <div className="flex justify-center items-center text-sm text-black">{user.lastActivity}</div>
           </div>
         ))}
       </div>
-      <button
-        className="bg-accent text-white rounded hover:brightness-90"
-        onClick={() => router.push("/leaderboard")}>
-        مشاهده تابلوی برترین‌ها
-      </button>
-    </div>);
+
+      {/* Button */}
+      <div className="flex w-full">
+        <button
+          className=" bg-accent text-white font-semibold text-lg rounded-lg mt-6 px-6 py-3
+        transition duration-300 hover:text-black"
+          onClick={() => router.push("/leaderboard")}
+        >
+          مشاهده تابلوی برترین‌ها
+        </button>
+      </div>
+    </div>
+  );
 };
 
 const ReviewsSection = () => {
