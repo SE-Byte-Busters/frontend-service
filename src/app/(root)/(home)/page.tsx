@@ -83,7 +83,7 @@ const StepsSection = () => {
       </div>
 
       {/* Timeline */}
-      <div className="flex flex-wrap flex-row-reverse justify-center items-start gap-6">
+      <div className="flex flex-wrap flex-row-reverse justify-center items-center">
         {/* Step 1 */}
         <div className="text-center max-w-sm">
           <Image
@@ -91,7 +91,7 @@ const StepsSection = () => {
             alt="Timeline Begin"
             width={550}
             height={180}
-            className="w-auto h-auto max-w-full max-h-full mx-auto mb-4"
+            className="w-auto h-auto mx-auto mb-4"
           />
           <div>
             <Image
@@ -101,7 +101,7 @@ const StepsSection = () => {
               height={256}
               className="w-20 h-20 mx-auto mb-4"
             />
-            <p className="text-lg text-white leading-relaxed">
+            <p className="text-lg text-white leading-relaxed mx-5">
               مشکل شهری را با مشخص‌کردن موقعیت و نوع آن ثبت کنید. گزارش شما روی نقشه نمایش داده می‌شود.
             </p>
           </div>
@@ -114,7 +114,7 @@ const StepsSection = () => {
             alt="Timeline Continue"
             width={550}
             height={180}
-            className="w-auto h-auto max-w-full max-h-full mx-auto mb-4"
+            className="w-auto h-auto mx-auto mb-4"
           />
           <div>
             <Image
@@ -124,7 +124,7 @@ const StepsSection = () => {
               height={256}
               className="w-20 h-20 mx-auto mb-4"
             />
-            <p className="text-lg text-white leading-relaxed">
+            <p className="text-lg text-white leading-relaxed mx-5">
               مشکل شهری را با مشخص‌کردن موقعیت و نوع آن را ثبت کنید. گزارش شما روی نقشه نمایش داده می‌شود.
             </p>
           </div>
@@ -137,7 +137,7 @@ const StepsSection = () => {
             alt="Timeline End"
             width={550}
             height={180}
-            className="w-auto h-auto max-w-full max-h-full mx-auto mb-4"
+            className="w-auto h-auto mx-auto mb-4"
           />
           <div>
             <Image
@@ -147,7 +147,7 @@ const StepsSection = () => {
               height={256}
               className="w-20 h-20 mx-auto mb-4"
             />
-            <p className="text-lg text-white leading-relaxed">
+            <p className="text-lg text-white leading-relaxed mx-5">
               گزارش‌های تأییدشده به نهادهای مسئول ارسال شده و پس از حل مشکل، وضعیت آن به‌روزرسانی می‌شود.
             </p>
           </div>
