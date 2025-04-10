@@ -4,7 +4,8 @@ import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { useState, useEffect } from "react";
-import MaterialSymbol from "../MaterialSymbol";
+
+import { LucideIconName, Icon } from "@/components/Icon";
 
 export default function Header() {
   const pathname = usePathname();
@@ -23,11 +24,15 @@ export default function Header() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  const navItems = [
-    { name: "صفحه اصلی", href: "/", logo: "home" },
-    { name: "گزارشات اخیر", href: "/reports", logo: "description" },
-    { name: "نقشه", href: "/map", logo: "pin_drop" },
-    { name: "تابلوی بهترین‌ها", href: "/leaderboard", logo: "leaderboard" },
+  const navItems: Array<{
+    name: string;
+    href: string;
+    logo: LucideIconName;
+  }> = [
+    { name: "صفحه اصلی", href: "/", logo: "Home" },
+    { name: "گزارشات اخیر", href: "/reports", logo: "ScrollText" },
+    { name: "نقشه", href: "/map", logo: "MapPin" },
+    { name: "تابلوی بهترین‌ها", href: "/leaderboard", logo: "Medal" },
   ];
 
   return (
@@ -59,8 +64,8 @@ export default function Header() {
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
             aria-label="منو"
           >
-            <MaterialSymbol 
-              name={isMobileMenuOpen ? "close" : "menu"} 
+            <Icon 
+              name={isMobileMenuOpen ? "X" : "Menu"} 
               className="text-2xl transition-transform duration-300 ease-in-out"
             />
           </button>
@@ -79,7 +84,7 @@ export default function Header() {
                   : "text-gray-500"
                 }`}
             >
-              <MaterialSymbol name={item.logo} className="mx-1" />
+              <Icon name={item.logo} className="mx-1" />
               <span className="text-xs sm:text-sm">{item.name}</span>
             </Link>
           ))}
@@ -92,7 +97,7 @@ export default function Header() {
             className="flex items-center bg-accent rounded-lg px-3 py-2
             text-white hover:text-black transition-colors duration-300"
           >
-            <MaterialSymbol name="person" />
+            <Icon name="User" />
             <span className="text-sm hidden md:inline px-2">ورود / ثبت نام</span>
           </Link>
         </div>
@@ -121,7 +126,7 @@ export default function Header() {
                 `}
                 style={{ transitionDelay: isMobileMenuOpen ? `${index * 75}ms` : '0ms' }}
               >
-                <MaterialSymbol name={item.logo} className="ml-2" />
+                <Icon name={item.logo} className="ml-2" />
                 {item.name}
               </Link>
             ))}
@@ -137,7 +142,7 @@ export default function Header() {
                 className="flex items-center justify-center bg-accent rounded-lg px-4 py-3
                 text-white transition-colors duration-300 active:text-black"
               >
-                <MaterialSymbol name="person" className="ml-2" />
+                <Icon name="User" className="ml-2" />
                 <span>ورود / ثبت نام</span>
               </Link>
             </div>
