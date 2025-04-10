@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 import MaterialSymbol from "@/components/MaterialSymbol";
 
@@ -254,7 +254,15 @@ const RankingSection = () => {
 };
 
 const ReviewsSection = () => {
-  const reviews = [
+  interface Review {
+    name: string;
+    date: string;
+    rating: number;
+    picture: string;
+    body: string;
+  }
+
+  const reviews: Review[] = [
     {
       name: "محمد امیری",
       date: "۵ دی ۱۴۰۲",
@@ -313,20 +321,42 @@ const ReviewsSection = () => {
     },
   ];
 
-  const [currentIndex, setCurrentIndex] = useState(0);
+  const [currentIndex, setCurrentIndex] = useState<number>(0);
+  const [transitionStage, setTransitionStage] = useState<'fadeIn' | 'fadeOut'>('fadeIn');
+  const [displayedReviews, setDisplayedReviews] = useState<Review[]>([]);
 
   const reviewsPerPage = 3;
   const totalPages = Math.ceil(reviews.length / reviewsPerPage);
 
+  useEffect(() => {
+    if (transitionStage === 'fadeOut') {
+      const timer = setTimeout(() => {
+        setDisplayedReviews(
+          reviews.slice(
+            currentIndex * reviewsPerPage,
+            (currentIndex + 1) * reviewsPerPage
+          )
+        );
+        setTransitionStage('fadeIn');
+      }, 300);
+      
+      return () => clearTimeout(timer);
+    }
+  }, [transitionStage, currentIndex]);
+
+  useEffect(() => {
+    setDisplayedReviews(
+      reviews.slice(0, reviewsPerPage)
+    );
+  }, []);
+
   const handleDotClick = (index: number) => {
-    setCurrentIndex(index);
+    if (index !== currentIndex) {
+      setTransitionStage('fadeOut');
+      setCurrentIndex(index);
+    }
   };
-
-  const currentReviews = reviews.slice(
-    currentIndex * reviewsPerPage,
-    currentIndex * reviewsPerPage + reviewsPerPage
-  );
-
+  
   const getStars = (rating: number) => {
     const stars = [];
     for (let i = 1; i <= 5; i++) {
@@ -394,31 +424,37 @@ const ReviewsSection = () => {
       </div>
 
       {/* Reviews */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
-        {currentReviews.map((review, index) => (
-          <div
-            key={index}
-            className="flex flex-col bg-accent rounded-2xl md:rounded-3xl p-4 md:p-6"
-          >
-            <div className="flex flex-row items-center">
-              <div className="flex flex-col text-right grow">
-                <p className="text-base md:text-lg font-semibold text-black">{review.name}</p>
-                <p className="text-xs md:text-sm text-black">{review.date}</p>
-                <div className="flex flex-row-reverse justify-end">
-                  {getStars(review.rating)}
+      <div className="relative">
+        <div
+          className={`grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8 transition-opacity duration-300 ${
+            transitionStage === 'fadeIn' ? 'opacity-100' : 'opacity-0'
+          }`}
+        >
+          {displayedReviews.map((review, index) => (
+            <div
+              key={`${currentIndex}-${index}`}
+              className="flex flex-col bg-accent rounded-2xl md:rounded-3xl p-4 md:p-6"
+            >
+              <div className="flex flex-row items-center">
+                <div className="flex flex-col text-right grow">
+                  <p className="text-base md:text-lg font-semibold text-black">{review.name}</p>
+                  <p className="text-xs md:text-sm text-black">{review.date}</p>
+                  <div className="flex flex-row-reverse justify-end">
+                    {getStars(review.rating)}
+                  </div>
                 </div>
+                <Image
+                  src={review.picture}
+                  alt={`${review.name}'s photo`}
+                  width={64}
+                  height={64}
+                  className="rounded-full bg-white border border-gray-300 h-16 w-16 md:h-20 md:w-20"
+                />
               </div>
-              <Image
-                src={review.picture}
-                alt={`${review.name}'s photo`}
-                width={64}
-                height={64}
-                className="rounded-full bg-white border border-gray-300 h-16 w-16 md:h-20 md:w-20"
-              />
+              <p className="text-black pt-3 md:pt-4 text-justify text-sm md:text-base leading-5">"{review.body}"</p>
             </div>
-            <p className="text-black pt-3 md:pt-4 text-justify text-sm md:text-base leading-5">"{review.body}"</p>
-          </div>
-        ))}
+          ))}
+        </div>
       </div>
 
       {/* Pagination */}
