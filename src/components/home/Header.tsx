@@ -40,27 +40,11 @@ export default function Header() {
       isScrolled ? 'py-0' : 'py-2'
     }`}>
       <div className="flex flex-col sm:flex-row justify-between items-center container mx-auto px-4 sm:px-6 gap-2 sm:gap-0">
-        {/* Logo and Mobile Menu Button */}
-        <div className="flex items-center justify-between w-full sm:w-auto py-2 sm:py-0">
-          <div className="flex items-center space-x-2 sm:space-x-6">
-            <Link href="/">
-              <Image
-                src="/logo.png"
-                width={256}
-                height={256}
-                alt="CleanCity Logo"
-                className={`h-12 w-12 sm:h-14 sm:w-14 transition-all duration-300 ${
-                  isScrolled ? 'scale-90' : 'scale-100'
-                }`}
-                priority
-              />
-            </Link>
-            <span className="text-lg sm:text-xl font-semibold text-black">CleanCity</span>
-          </div>
-          
-          {/* Mobile menu button */}
+        {/* Mobile Header */}
+        <div className="flex items-center justify-between w-full sm:hidden py-1">
+          {/* Dropdown menu icon */}
           <button 
-            className="sm:hidden p-2 rounded-lg hover:bg-gray-100 transition-colors"
+            className="p-2 rounded-lg text-gray-300 hover:text-black transition-colors"
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
             aria-label="منو"
           >
@@ -69,6 +53,49 @@ export default function Header() {
               className="text-2xl transition-transform duration-300 ease-in-out"
             />
           </button>
+          
+          {/* Logo */}
+          <Link href="/" className="flex items-center">
+            <Image
+              src="/logo.png"
+              width={256}
+              height={256}
+              alt="CleanCity Logo"
+              className={`h-12 w-12 bg-light rounded-lg transition-all duration-300 ${
+                isScrolled ? 'scale-90' : 'scale-125'
+              }`}
+              priority
+            />
+          </Link>
+          
+          {/* Signup/login */}
+          <Link
+            href="/signup"
+            className="p-2 bg-accent rounded-lg hover:text-black transition-colors"
+            aria-label="ورود / ثبت نام"
+          >
+            <Icon name="User" className="text-2xl" />
+          </Link>
+        </div>
+
+        {/* Desktop Header */}
+        <div className="hidden sm:flex items-center justify-between w-full sm:w-auto py-2 sm:py-0">
+          {/* Logo */}
+          <div className="flex items-center space-x-2 sm:space-x-6">
+            <Link href="/">
+              <Image
+                src="/logo.png"
+                width={256}
+                height={256}
+                alt="CleanCity Logo"
+                className={`h-12 w-12 sm:h-14 sm:w-14 bg-light rounded-lg transition-all duration-300 ${
+                  isScrolled ? 'scale-90' : 'scale-100'
+                }`}
+                priority
+              />
+            </Link>
+            <span className="text-lg sm:text-xl font-semibold text-black">CleanCity</span>
+          </div>
         </div>
 
         {/* Desktop Navigation */}
@@ -130,22 +157,6 @@ export default function Header() {
                 {item.name}
               </Link>
             ))}
-            
-            {/* Mobile Authentication */}
-            <div className={`
-              p-2 mx-2
-              transition-transform duration-300 ease-out
-              ${isMobileMenuOpen ? 'translate-x-0' : 'translate-x-full'}
-            `} style={{ transitionDelay: isMobileMenuOpen ? `${navItems.length * 75}ms` : '0ms' }}>
-              <Link
-                href="/signup"
-                className="flex items-center justify-center bg-accent rounded-lg px-4 py-3
-                text-white transition-colors duration-300 active:text-black"
-              >
-                <Icon name="User" className="ml-2" />
-                <span>ورود / ثبت نام</span>
-              </Link>
-            </div>
           </div>
         </div>
       </div>
