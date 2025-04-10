@@ -19,16 +19,16 @@ const HeroSection = () => {
       <div className="flex flex-col mx-auto py-6 md:py-10 px-4 sm:px-6 md:px-20 mt-8 md:mt-15" dir="rtl">
         {/* Title and Description */}
         <div>
-          <div className="flex flex-col sm:flex-row items-center text-right mb-4 md:mb-6">
+          <div className="flex flex-row items-center text-right mb-4 md:mb-6">
             <Image
               src="/hero-icon.png"
               width={256}
               height={256}
               alt="Hero Icon"
-              className="h-16 w-16 sm:h-20 sm:w-20 ml-0 sm:ml-4 mb-4 sm:mb-0"
+              className="h-16 w-16 sm:h-20 sm:w-20 ml-4 mb-4 sm:mb-0"
               priority
             />
-            <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-black">
+            <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-black text-right">
               شهر خود را پاک‌تر کنید
             </h1>
           </div>
@@ -65,15 +65,15 @@ const StepsSection = () => {
   return (
     <div className="bg-accent py-8 md:py-10 px-4 sm:px-6 md:px-20" dir="rtl">
       {/* Title */}
-      <div className="flex flex-col sm:flex-row items-center mb-6">
+      <div className="flex flex-row items-center mb-6">
         <Image
           src="/steps-icon.png"
           width={256}
           height={256}
           alt="Steps Icon"
-          className="h-16 w-16 sm:h-20 sm:w-20 ml-0 sm:ml-4 mb-4 sm:mb-0"
+          className="h-16 w-16 sm:h-20 sm:w-20 ml-4 mb-4 sm:mb-0"
         />
-        <h1 className="font-bold text-3xl sm:text-4xl md:text-5xl text-white text-center sm:text-right">
+        <h1 className="font-bold text-3xl sm:text-4xl md:text-5xl text-white text-right">
           چطور از CleanCity استفاده کنیم؟
         </h1>
       </div>
@@ -186,15 +186,15 @@ const RankingSection = () => {
   return (
     <div className="flex flex-col items-center bg-dark px-4 sm:px-6 md:px-20 py-8 md:py-10" dir="rtl">
       {/* Title */}
-      <div className="flex flex-col sm:flex-row items-center mb-6 w-full">
+      <div className="flex flex-row items-center mb-6 w-full">
         <Image
           src="/ranking-icon.png"
           width={256}
           height={256}
           alt="Ranking Icon"
-          className="h-16 w-16 sm:h-20 sm:w-20 ml-0 sm:ml-4 mb-4 sm:mb-0"
+          className="h-16 w-16 sm:h-20 sm:w-20 ml-4 mb-4 sm:mb-0"
         />
-        <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-white text-center sm:text-right">
+        <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-white text-right">
           با فعالیت در CleanCity، قهرمان محیط‌زیست شوید!
         </h1>
       </div>
@@ -375,16 +375,16 @@ const ReviewsSection = () => {
   return (
     <div className="bg-light py-8 md:py-10 px-4 sm:px-6 md:px-20" dir="rtl">
       {/* Title */}
-      <div className="flex flex-col sm:flex-row items-center text-right mb-6">
+      <div className="flex flex-row items-center mb-6">
         <Image
           src="/review-icon.png"
           width={256}
           height={256}
           alt="Review Icon"
-          className="h-16 w-16 sm:h-20 sm:w-20 ml-0 sm:ml-4 mb-4 sm:mb-0"
+          className="h-16 w-16 sm:h-20 sm:w-20 ml-4 mb-4 sm:mb-0"
         />
-        <div className="flex flex-col items-center sm:items-right text-center sm:text-right">
-          <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-black">
+        <div className="flex flex-col items-right text-right">
+          <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-black mb-2">
             نظرات کاربران
           </h1>
           <h2 className="text-base sm:text-lg md:text-xl text-black">
