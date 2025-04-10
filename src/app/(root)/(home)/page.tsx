@@ -184,7 +184,7 @@ const RankingSection = () => {
   ];
 
   return (
-    <div className="flex flex-col items-center bg-dark px-4 sm:px-6 md:px-20 py-8 md:py-10" dir="rtl">
+    <div className="flex flex-col items-center bg-primary px-4 sm:px-6 md:px-20 py-8 md:py-10" dir="rtl">
       {/* Title */}
       <div className="flex flex-row items-center mb-6 w-full">
         <Image
