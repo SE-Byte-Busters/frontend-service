@@ -14,8 +14,8 @@ export default function Footer() {
   ];
 
   return (
-    <footer className="bg-dark py-4">
-      <div className="container mx-auto">
+    <footer className="bg-dark py-4 px-4 sm:px-0">
+      <div className="container mx-auto sm:px-10">
         <div className="flex flex-col md:flex-row justify-between items-center mb-6">
           {/* Logo */}
           <div className="flex items-center mb-6 md:mb-0">
@@ -24,21 +24,21 @@ export default function Footer() {
               width={256}
               height={256}
               alt="CleanCity Logo"
-              className="bg-light rounded-xl h-20 w-20 p-1 mr-5"
+              className="bg-light rounded-xl h-16 w-16 md:h-20 md:w-20 p-1 mr-3 md:mr-5"
             />
-            <span className="text-black font-bold text-2xl">CleanCity</span>
+            <span className="text-black font-bold text-xl md:text-2xl">CleanCity</span>
           </div>
 
           {/* Links */}
-          <nav className="flex flex-wrap justify-center gap-5" dir="rtl">
+          <nav className="w-full md:w-auto grid grid-cols-2 gap-3 md:flex md:flex-wrap justify-center md:gap-5" dir="rtl">
             {navItems.map((item) => (
-              <Link key={item.name} href={item.href}>
+              <Link key={item.name} href={item.href} className="rounded-lg p-2">
                 <div className="flex items-center text-black font-bold">
                   <MaterialSymbol
                     name={item.logo}
-                    className="mx-2 !text-[48px]"
+                    className="mx-1 md:mx-2 !text-[32px] md:!text-[48px]"
                   />
-                  <span className="text-base">{item.name}</span>
+                  <span className="text-sm md:text-base">{item.name}</span>
                 </div>
               </Link>
             ))}
@@ -46,7 +46,7 @@ export default function Footer() {
         </div>
 
         {/* Copyright notice */}
-        <div className="text-center text-black font-bold text-sm" dir="rtl">
+        <div className="text-center text-black font-bold text-xs md:text-sm" dir="rtl">
           <p>&copy; 2025 CleanCity. تمامی حقوق محفوظ است.</p>
         </div>
       </div>
