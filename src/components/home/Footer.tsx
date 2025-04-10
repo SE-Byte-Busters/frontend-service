@@ -16,9 +16,9 @@ export default function Footer() {
   return (
     <footer className="bg-dark py-4 px-4 sm:px-0">
       <div className="container mx-auto sm:px-10">
-        <div className="flex flex-col md:flex-row justify-between items-center mb-6">
+        <div className="flex flex-row items-start justify-between mb-6">
           {/* Logo */}
-          <div className="flex items-center mb-6 md:mb-0">
+          <div className="flex items-center shrink-0">
             <Image
               src="/logo.png"
               width={256}
@@ -30,15 +30,15 @@ export default function Footer() {
           </div>
 
           {/* Links */}
-          <nav className="w-full md:w-auto grid grid-cols-2 gap-3 md:flex md:flex-wrap justify-center md:gap-5" dir="rtl">
+          <nav className="flex flex-col md:flex-row flex-wrap gap-1 md:gap-1" dir="rtl">
             {navItems.map((item) => (
-              <Link key={item.name} href={item.href} className="rounded-lg p-2">
+              <Link key={item.name} href={item.href} className="rounded-lg p-1 md:p-2">
                 <div className="flex items-center text-black font-bold">
                   <MaterialSymbol
                     name={item.logo}
-                    className="mx-1 md:mx-2 !text-[32px] md:!text-[48px]"
+                    className="mx-1 md:mx-2 !text-[24px] md:!text-[48px]"
                   />
-                  <span className="text-sm md:text-base">{item.name}</span>
+                  <span className="text-xs md:text-base">{item.name}</span>
                 </div>
               </Link>
             ))}
