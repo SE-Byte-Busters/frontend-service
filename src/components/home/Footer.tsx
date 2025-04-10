@@ -3,14 +3,18 @@
 import Link from 'next/link';
 import Image from "next/image";
 
-import MaterialSymbol from '../MaterialSymbol';
+import { LucideIconName, Icon } from "@/components/Icon";
 
 export default function Footer() {
-  const navItems = [
-    { name: "درباره ما", href: "/about-us", logo: "groups" },
-    { name: "تماس با ما", href: "/contact-us", logo: "mail" },
-    { name: "سوالات متداول", href: "/faq", logo: "help" },
-    { name: "سیاست‌های حفظ حریم خصوصی", href: "/privacy-policy", logo: "text_snippet" },
+  const navItems: Array<{
+    name: string;
+    href: string;
+    logo: LucideIconName;
+  }> = [
+    { name: "درباره ما", href: "/about-us", logo: "Users" },
+    { name: "تماس با ما", href: "/contact-us", logo: "Mail" },
+    { name: "سوالات متداول", href: "/faq", logo: "CircleHelp" },
+    { name: "سیاست‌های حفظ حریم خصوصی", href: "/privacy-policy", logo: "FileText" },
   ];
 
   return (
@@ -34,7 +38,7 @@ export default function Footer() {
             {navItems.map((item) => (
               <Link key={item.name} href={item.href} className="rounded-lg p-1 md:p-2">
                 <div className="flex items-center text-black font-bold">
-                  <MaterialSymbol
+                  <Icon
                     name={item.logo}
                     className="mx-1 md:mx-2 !text-[24px] md:!text-[48px]"
                   />

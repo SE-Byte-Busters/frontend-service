@@ -4,7 +4,7 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 
-import MaterialSymbol from "@/components/MaterialSymbol";
+import { Icon } from "@/components/Icon";
 
 const HeroSection = () => {
   const router = useRouter();
@@ -362,39 +362,25 @@ const ReviewsSection = () => {
     for (let i = 1; i <= 5; i++) {
       if ((rating / 2) >= i) {
         stars.push(
-          <MaterialSymbol
+          <Icon
+            name="Star"
             key={i}
-            name="star_rate"
-            type="rounded"
-            className="text-yellow-500"
-            style={{ fontVariationSettings: "'FILL' 1" }}
+            className="w-5 h-5 fill-yellow-500 text-yellow-500"
           />
         );
       } else if ((rating / 2) >= i - 0.5) {
         stars.push(
           <div key={i} className="relative inline-block">
-            <MaterialSymbol
-              name="star_rate"
-              type="rounded"
-              className="text-gray-300"
-              style={{ fontVariationSettings: "'FILL' 1" }}
-            />
-            <MaterialSymbol
-              name="star_rate"
-              type="rounded"
-              className="text-yellow-500 absolute top-0 left-0"
-              style={{ fontVariationSettings: "'FILL' 1", clipPath: "inset(0 50% 0 0)" }}
-            />
+            <Icon name="Star" className="w-5 h-5 fill-gray-300 text-gray-300" />
+            <Icon name="StarHalf" className="w-5 h-5 absolute top-0 left-0 fill-yellow-500 text-yellow-500" />
           </div>
         );
       } else {
         stars.push(
-          <MaterialSymbol
+          <Icon
+            name="Star"
             key={i}
-            name="star_rate"
-            type="rounded"
-            className="text-gray-300"
-            style={{ fontVariationSettings: "'FILL' 1" }}
+            className="w-5 h-5 fill-gray-300 text-gray-300"
           />
         );
       }
