@@ -87,7 +87,7 @@ const StepsSection = () => {
             alt="Timeline Begin"
             width={550}
             height={180}
-            className="w-auto h-12 md:h-auto mx-auto mb-4"
+            className="w-auto h-20 md:h-auto mx-auto mb-4"
           />
           <div>
             <Image
@@ -110,7 +110,7 @@ const StepsSection = () => {
             alt="Timeline Continue"
             width={550}
             height={180}
-            className="w-auto h-12 md:h-auto mx-auto mb-4"
+            className="w-auto h-20 md:h-auto mx-auto mb-4"
           />
           <div>
             <Image
@@ -133,7 +133,7 @@ const StepsSection = () => {
             alt="Timeline End"
             width={550}
             height={180}
-            className="w-auto h-12 md:h-auto mx-auto mb-4"
+            className="w-auto h-20 md:h-auto mx-auto mb-4"
           />
           <div>
             <Image
