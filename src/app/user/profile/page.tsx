@@ -3,6 +3,8 @@
 import { useState, useRef } from 'react';
 import Image from "next/image";
 
+import { StarRating } from "@/components/StarRating";
+
 
 const InfoSection = () => {
   // get user info here
@@ -78,7 +80,6 @@ const InfoSection = () => {
 
   return (
     <div dir="rtl" className="bg-white shadow rounded-lg p-6">
-
       <h1>مشخصات پروفایل کاربری من</h1>
 
       {/* Profile Picture */}
@@ -231,6 +232,7 @@ const PasswordSection = () => {
   return (
     <div dir="rtl" className="bg-white shadow rounded-lg p-6">
       <h1>تغییر رمز عبور من</h1>
+
       <form onSubmit={handleSubmitPassword}>
         {/* Current Password */}
         <div>
@@ -288,12 +290,73 @@ const PasswordSection = () => {
 }
 
 const ReviewSection = () => {
+  const [review, setReview] = useState({
+    rating: 10,
+    comment: '',
+  });
+
+  const handleReviewChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { name, value } = e.target;
+    setReview(prev => ({ ...prev, [name]: value }));
+  };
+
+  const handleRatingChange = (rating: number) => {
+    setReview(prev => ({ ...prev, rating }));
+  };
+
+  const handleSubmitReview = (e: React.FormEvent) => {
+    e.preventDefault();
+
+    console.log('Trying to send review:', review);
+    try {
+      // call backend here
+      console.log('Review submitted');
+      setReview(prev => ({ ...prev, comment: '' }));
+      alert('Thank you for your review!');
+    } catch (error) {
+      alert('Failed to send review!');
+    }
+  };
+
   return (
-    <div>
-      <p>Review</p>
+    <div className="bg-white shadow rounded-lg p-6">
+      <h1>پیشنهاد و نظر من</h1>
+      <div className="flex flex-col">
+        <Image
+          src="/comment.png"
+          height={256}
+          width={256}
+          alt="Review Picture"
+        />
+        <h2>به ما بازخورد بدهید!</h2>
+        <p>
+          بازخورد شما به ما کمک می‌کند تا بهبود پیدا کنیم، از زمانی که برای ارسال بازخورد صرف کرده‌اید، قدر دانیم.
+        </p>
+      </div>
+      <form onSubmit={handleSubmitReview}>
+        <div>
+          <textarea
+            id="review-comment"
+            name="comment"
+            rows={4}
+            placeholder="پیشنهاد و نظرت رو اینجا بنویس ..."
+            value={review.comment}
+            onChange={handleReviewChange}
+            required
+          />
+          <StarRating
+            rating={review.rating}
+            setRating={handleRatingChange}
+            interactive={true}
+          />
+        </div>
+        <button type="submit">
+          ثبت بازخورد
+        </button>
+      </form>
     </div>
   );
-}
+};
 
 export default function Profile() {
   return (
