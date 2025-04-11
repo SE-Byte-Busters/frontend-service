@@ -27,7 +27,7 @@ const InfoSection = () => {
   const handleImageClick = () => {
     fileInputRef.current?.click();
   };
-  
+
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
@@ -44,7 +44,7 @@ const InfoSection = () => {
     e.preventDefault();
 
     // call backend here
-    try {      
+    try {
       console.log("Profile updated:", profile);
       alert("Profile updated successfully!");
     } catch (error) {
@@ -55,7 +55,7 @@ const InfoSection = () => {
 
   const handleSubmitPhoto = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!selectedFile) {
       alert("Please select a file first!");
       return;
@@ -67,7 +67,7 @@ const InfoSection = () => {
         ...prev,
         photo: previewUrl || "/default-profile.png"
       }));
-      
+
       alert("Profile picture updated successfully!");
       setSelectedFile(null);
     } catch (error) {
@@ -77,7 +77,7 @@ const InfoSection = () => {
   };
 
   return (
-    <div className="bg-white shadow rounded-lg p-6">
+    <div dir="rtl" className="bg-white shadow rounded-lg p-6">
 
       <h1>مشخصات پروفایل کاربری من</h1>
 
@@ -93,7 +93,7 @@ const InfoSection = () => {
             accept="image/*"
             className="hidden"
           />
-          <div 
+          <div
             onClick={handleImageClick}
             className="cursor-pointer"
           >
@@ -199,9 +199,90 @@ const InfoSection = () => {
 }
 
 const PasswordSection = () => {
+  const [password, setPassword] = useState({
+    current: '',
+    new: '',
+    confirm: '',
+  });
+
+  const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setPassword(prev => ({ ...prev, [name]: value }));
+  };
+
+  const handleSubmitPassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (password.new !== password.confirm) {
+      alert("New password doesn't match!");
+      return;
+    }
+
+    console.log('Password change requested:', password);
+    try {
+      // call backend here
+      setPassword({ current: '', new: '', confirm: '' });
+      alert('Password changed successfully!');
+    } catch (error) {
+      setPassword({ current: '', new: '', confirm: '' });
+      alert('Failed to change password!');
+    }
+  };
+
   return (
-    <div>
-      <p>Password</p>
+    <div dir="rtl" className="bg-white shadow rounded-lg p-6">
+      <h1>تغییر رمز عبور من</h1>
+      <form onSubmit={handleSubmitPassword}>
+        {/* Current Password */}
+        <div>
+          <label htmlFor="current-password">
+            رمز عبور فعلی
+          </label>
+          <input
+            type="password"
+            id="current-password"
+            name="current"
+            placeholder="رمز عبور فعلی خود را وارد کنید"
+            value={password.current}
+            onChange={handlePasswordChange}
+            required
+          />
+        </div>
+
+        {/* New Password */}
+        <div>
+          <label htmlFor="new-password">
+            رمز عبور جدید
+          </label>
+          <input
+            type="password"
+            id="new-password"
+            name="new"
+            placeholder="رمز عبور جدید خود را وارد کنید"
+            value={password.new}
+            onChange={handlePasswordChange}
+            required
+          />
+        </div>
+
+        {/* Confirm Password */}
+        <div>
+          <label htmlFor="confirm-password">
+            تکرار رمز عبور جدید
+          </label>
+          <input
+            type="password"
+            id="confirm-password"
+            name="confirm"
+            placeholder="رمز عبور جدید خود را مجدداً وارد کنید"
+            value={password.confirm}
+            onChange={handlePasswordChange}
+            required
+          />
+        </div>
+        <button type="submit">
+          تغییر رمز عبور
+        </button>
+      </form>
     </div>
   );
 }
@@ -216,14 +297,12 @@ const ReviewSection = () => {
 
 export default function Profile() {
   return (
-    <div>
-      <div className="min-h-screen bg-light">
+      <div dir="rtl" className="min-h-screen bg-light">
           <div className="flex flex-col md:flex-row pt-24">
             <InfoSection />
             <PasswordSection />
             <ReviewSection />
           </div>
       </div>
-    </div>
   );
 }
