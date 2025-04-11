@@ -16,14 +16,12 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="fa">
-      <body>
-        <Header />
+    <div>
+      <Header />
 
-        <main>{children}</main>
+      <main>{children}</main>
 
-        <Footer />
-      </body>
-    </html>
+      <Footer />
+    </div>
   );
 }
