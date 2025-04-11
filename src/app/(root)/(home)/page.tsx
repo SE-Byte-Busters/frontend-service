@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 
 import { Icon } from "@/components/Icon";
+import { StarRating } from "@/components/StarRating";
 
 const HeroSection = () => {
   const router = useRouter();
@@ -339,7 +340,7 @@ const ReviewsSection = () => {
         );
         setTransitionStage('fadeIn');
       }, 300);
-      
+
       return () => clearTimeout(timer);
     }
   }, [transitionStage, currentIndex]);
@@ -355,37 +356,6 @@ const ReviewsSection = () => {
       setTransitionStage('fadeOut');
       setCurrentIndex(index);
     }
-  };
-  
-  const getStars = (rating: number) => {
-    const stars = [];
-    for (let i = 1; i <= 5; i++) {
-      if ((rating / 2) >= i) {
-        stars.push(
-          <Icon
-            name="Star"
-            key={i}
-            className="w-5 h-5 fill-yellow-500 text-yellow-500"
-          />
-        );
-      } else if ((rating / 2) >= i - 0.5) {
-        stars.push(
-          <div key={i} className="relative inline-block">
-            <Icon name="Star" className="w-5 h-5 fill-gray-300 text-gray-300" />
-            <Icon name="StarHalf" className="w-5 h-5 absolute top-0 left-0 fill-yellow-500 text-yellow-500" />
-          </div>
-        );
-      } else {
-        stars.push(
-          <Icon
-            name="Star"
-            key={i}
-            className="w-5 h-5 fill-gray-300 text-gray-300"
-          />
-        );
-      }
-    }
-    return stars;
   };
 
   return (
@@ -426,7 +396,7 @@ const ReviewsSection = () => {
                   <p className="text-base md:text-lg font-semibold text-black">{review.name}</p>
                   <p className="text-xs md:text-sm text-black">{review.date}</p>
                   <div className="flex flex-row-reverse justify-end">
-                    {getStars(review.rating)}
+                    <StarRating rating={review.rating} />
                   </div>
                 </div>
                 <Image
