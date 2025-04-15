@@ -29,31 +29,30 @@ export default function Header() {
     href: string;
     logo: LucideIconName;
   }> = [
-    { name: "صفحه اصلی", href: "/", logo: "Home" },
-    { name: "گزارشات اخیر", href: "/reports", logo: "ScrollText" },
-    { name: "نقشه", href: "/map", logo: "MapPin" },
-    { name: "تابلوی بهترین‌ها", href: "/leaderboard", logo: "Medal" },
-  ];
+      { name: "صفحه اصلی", href: "/", logo: "Home" },
+      { name: "گزارشات اخیر", href: "/reports", logo: "ScrollText" },
+      { name: "نقشه", href: "/map", logo: "MapPin" },
+      { name: "تابلوی بهترین‌ها", href: "/leaderboard", logo: "Medal" },
+    ];
 
   return (
-    <header className={`bg-white/60 shadow-md fixed top-0 left-0 w-full z-20 backdrop-blur transition-all duration-300 ${
-      isScrolled ? 'py-0' : 'py-2'
-    }`}>
+    <header className={`bg-white/60 shadow-md fixed top-0 left-0 w-full z-20 backdrop-blur transition-all duration-300 ${isScrolled ? 'py-0' : 'py-2'
+      }`}>
       <div className="flex flex-col sm:flex-row justify-between items-center container mx-auto px-4 sm:px-6 gap-2 sm:gap-0">
         {/* Mobile Header */}
         <div className="flex items-center justify-between w-full sm:hidden py-1">
           {/* Dropdown menu icon */}
-          <button 
+          <button
             className="p-2 rounded-lg text-gray-300 hover:text-black transition-colors"
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
             aria-label="منو"
           >
-            <Icon 
-              name={isMobileMenuOpen ? "X" : "Menu"} 
+            <Icon
+              name={isMobileMenuOpen ? "X" : "Menu"}
               className="text-2xl transition-transform duration-300 ease-in-out"
             />
           </button>
-          
+
           {/* Logo */}
           <Link href="/" className="flex items-center">
             <Image
@@ -61,13 +60,12 @@ export default function Header() {
               width={256}
               height={256}
               alt="CleanCity Logo"
-              className={`h-12 w-12 bg-light rounded-lg transition-all duration-300 ${
-                isScrolled ? 'scale-90' : 'scale-125'
-              }`}
+              className={`h-12 w-12 bg-light rounded-lg transition-all duration-300 ${isScrolled ? 'scale-90' : 'scale-125'
+                }`}
               priority
             />
           </Link>
-          
+
           {/* Signup/login */}
           <Link
             href="/signup"
@@ -88,9 +86,8 @@ export default function Header() {
                 width={256}
                 height={256}
                 alt="CleanCity Logo"
-                className={`h-12 w-12 sm:h-14 sm:w-14 bg-light rounded-lg transition-all duration-300 ${
-                  isScrolled ? 'scale-90' : 'scale-100'
-                }`}
+                className={`h-12 w-12 sm:h-14 sm:w-14 bg-light rounded-lg transition-all duration-300 ${isScrolled ? 'scale-90' : 'scale-100'
+                  }`}
                 priority
               />
             </Link>
@@ -120,7 +117,7 @@ export default function Header() {
         {/* Desktop Authentication */}
         <div dir="rtl" className="hidden sm:block">
           <Link
-            href="/signup"
+            href="/auth/sign-up"
             className="flex items-center bg-accent rounded-lg px-3 py-2
             text-white hover:text-black transition-colors duration-300"
           >

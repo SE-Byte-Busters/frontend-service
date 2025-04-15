@@ -5,13 +5,10 @@
 :root {
   --background: #ffffff;
   --foreground: #171717;
-}
-
-@theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-sans: var(--font-geist-sans, sans-serif);
+  --font-mono: var(--font-geist-mono, monospace);
 }
 
 @media (prefers-color-scheme: dark) {
@@ -25,4 +22,20 @@ body {
   background: var(--background);
   color: var(--foreground);
   font-family: Vazirmatn, Arial, Helvetica, sans-serif;
+}
+
+.toast {
+  @apply fixed top-5 left-1/2 transform -translate-x-1/2 px-4 py-2 rounded shadow z-50 text-right flex items-center gap-2 text-sm font-medium hidden;
+}
+
+.toast-success {
+  @apply bg-green-200 text-green-800;
+}
+
+.toast-error {
+  @apply bg-red-200 text-red-800;
+}
+
+.toast-loading {
+  @apply bg-blue-200 text-blue-800;
 }
