@@ -8,7 +8,6 @@ export default function IranMap() {
   const mapRef = useRef<L.Map | null>(null);
   const markerRef = useRef<L.Marker | null>(null);
 
-  // تابع جدید برای دریافت موقعیت از IP
   const getLocationByIP = async () => {
     try {
       const response = await fetch('https://ipapi.co/json/', {

@@ -12,7 +12,7 @@ export default function page({ params }: { params: { username?: string } }) {
           priority
           className="absolute top-[-45px] left-1/2 -translate-x-1/2 z-10"
         />
-        <div className="flex flex-col  items-center text-center sm:w-[568px] sm:h-[672px] w-[315px] h-[681px] bg-[#FDF7F4] opacity-[95%] rounded-[80px] z-0">
+        <div className="flex flex-col  items-center text-center sm:w-[568px] sm:h-[672px] w-[315px] h-[700px] bg-[#FDF7F4] opacity-[95%] rounded-[80px] z-0">
           <SignUp />
         </div>
       </div>
