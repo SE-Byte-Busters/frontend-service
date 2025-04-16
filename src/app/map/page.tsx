@@ -12,8 +12,7 @@ const LazyMap = dynamic(
 
 export default function Home() {
     return (
-        <div
-        >
+        <div>
             <LazyMap />
         </div>
     );

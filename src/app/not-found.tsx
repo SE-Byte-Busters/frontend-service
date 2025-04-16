@@ -5,6 +5,8 @@ import Header from '@/components/home/Header';
 import Footer from '@/components/home/Footer';
 import Image from 'next/image';
 
+
+// If this page passes through the layout, you must remove the HTML and body tags.
 export default function NotFound() {
   const router = useRouter();
   return (
@@ -15,11 +17,11 @@ export default function NotFound() {
         <div dir="rtl" className="flex flex-col md:flex-row items-center justify-center bg-light pt-24">
           {/* Image */}
           <div className="w-full md:w-1/2 p-6 md:p-10 flex justify-center">
-            <Image 
+            <Image
               src="/404.jpg"
               alt="404"
               width={512}
-              height={512} 
+              height={512}
               className="object-contain"
             />
           </div>
