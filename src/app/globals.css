@@ -24,18 +24,32 @@ body {
   font-family: Vazirmatn, Arial, Helvetica, sans-serif;
 }
 
-.toast {
-  @apply fixed top-5 left-1/2 transform -translate-x-1/2 px-4 py-2 rounded shadow z-50 text-right flex items-center gap-2 text-sm font-medium hidden;
+/* پیام موفقیت */
+.alert-success {
+  @apply flex items-center justify-between p-4 mb-4 text-green-800 bg-green-100 rounded-lg;
 }
 
-.toast-success {
-  @apply bg-green-200 text-green-800;
+/* پیام خطا */
+.alert-error {
+  @apply flex items-center justify-between p-4 mb-4 text-red-800 bg-red-100 rounded-lg;
 }
 
-.toast-error {
-  @apply bg-red-200 text-red-800;
+/* پیام در حال انتقال */
+.alert-loading {
+  @apply flex items-center justify-between p-4 mb-4 text-blue-800 bg-blue-100 rounded-lg animate-pulse;
 }
 
-.toast-loading {
-  @apply bg-blue-200 text-blue-800;
+/* آیکون موفقیت */
+.icon-success {
+  @apply w-5 h-5 text-green-800;
+}
+
+/* آیکون خطا */
+.icon-error {
+  @apply w-5 h-5 text-red-800;
+}
+
+/* آیکون لودینگ */
+.icon-loading {
+  @apply w-5 h-5 animate-spin text-blue-800;
 }
