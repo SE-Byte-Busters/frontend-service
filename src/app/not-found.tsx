@@ -1,14 +1,10 @@
-'use client';
-
-import { useRouter } from 'next/navigation';
-import Header from '@/components/home/Header';
-import Footer from '@/components/home/Footer';
+import Link from 'next/link';
 import Image from 'next/image';
 
+import Header from '@/components/home/Header';
+import Footer from '@/components/home/Footer';
 
-// If this page passes through the layout, you must remove the HTML and body tags.
 export default function NotFound() {
-  const router = useRouter();
   return (
     <html lang="fa">
       <body>
@@ -18,6 +14,7 @@ export default function NotFound() {
           {/* Image */}
           <div className="w-full md:w-1/2 p-6 md:p-10 flex justify-center">
             <Image
+              rel="preload"
               src="/404.jpg"
               alt="404"
               width={512}
@@ -40,18 +37,18 @@ export default function NotFound() {
             </p>
 
             <div className="flex flex-col md:flex-row justify-center items-center gap-4 md:gap-20 w-full">
-              <button
-                className="bg-accent text-white text-base md:text-2xl rounded-lg px-6 py-3 transition duration-300 hover:bg-green-700 w-full md:w-64"
-                onClick={() => router.push('/new-report')}
+              <Link
+                href="/new-report"
+                className="bg-accent text-white text-base md:text-2xl rounded-lg px-6 py-3 transition duration-300 hover:text-black w-full md:w-64 text-center"
               >
                 ثبت گزارش جدید
-              </button>
-              <button
-                className="bg-transparent text-accent text-base md:text-2xl rounded-lg px-6 py-3 transition duration-300 hover:bg-green-700 hover:text-white w-full md:w-64 border-2 border-accent hover:border-green-700"
-                onClick={() => router.push('/')}
+              </Link>
+              <Link
+                href="/"
+                className="bg-transparent text-accent text-base md:text-2xl rounded-lg px-6 py-3 transition duration-300 hover:bg-accent hover:text-white w-full md:w-64 border-2 border-accent text-center"
               >
                 برو به صفحه اصلی
-              </button>
+              </Link>
             </div>
           </div>
         </div>
