@@ -1,5 +1,3 @@
-"use client";
-
 import Link from 'next/link';
 import Image from "next/image";
 
@@ -24,6 +22,7 @@ export default function Footer() {
           {/* Logo */}
           <div className="flex items-center shrink-0">
             <Image
+              rel="preload"
               src="/logo.png"
               width={256}
               height={256}
