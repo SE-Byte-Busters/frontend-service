@@ -22,12 +22,12 @@ export default function Footer() {
           {/* Logo */}
           <div className="flex items-center shrink-0">
             <Image
-              rel="preload"
               src="/logo.png"
               width={256}
               height={256}
               alt="CleanCity Logo"
               className="bg-light rounded-xl h-16 w-16 md:h-20 md:w-20 p-1 mr-3 md:mr-5"
+              priority
             />
             <span className="text-black font-bold text-xl md:text-2xl">CleanCity</span>
           </div>
