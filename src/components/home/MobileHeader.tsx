@@ -40,7 +40,6 @@ export default function MobileHeader({
 
         <Link href="/" className="flex items-center">
           <Image
-            rel="preload"
             src="/logo.png"
             width={48}
             height={48}

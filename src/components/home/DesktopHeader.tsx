@@ -19,7 +19,6 @@ export default function DesktopHeader({
       <div className="flex items-center space-x-2 sm:space-x-6">
         <Link href="/">
           <Image
-            rel="preload"
             src="/logo.png"
             width={256}
             height={256}
