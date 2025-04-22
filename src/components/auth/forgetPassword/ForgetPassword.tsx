@@ -3,7 +3,6 @@
 // by importing in app/ alwayes is considered like use server
 
 // static data without hooks and react components
-import Link from "next/link";
 export default function forgetPassword() {
   return (
     <>
