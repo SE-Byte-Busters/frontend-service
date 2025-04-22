@@ -244,7 +244,7 @@ export default function SignUp() {
 
         <button
           type="submit"
-          className="sm:w-[418px] sm:h-[52px] w-[231.81px] h-[42.15px] mt-[32px] sm:mt-[28px] text-[18px] font-semibold font-vazirmatn bg-[url('/colorkitGreen.png')] bg-cover bg-center text-white py-2 px-6 rounded-[12px] hover:opacity-90 transition disabled:opacity-70"
+          className="sm:w-[418px] sm:h-[52px] w-[231.81px] h-[42.15px] mt-[32px] sm:mt-[28px] text-[18px] font-semibold font-vazirmatn bg-accent bg-cover bg-center text-white py-2 px-6 rounded-[12px] hover:opacity-90 transition disabled:opacity-70"
         >
           ثبت نام
         </button>
@@ -256,7 +256,7 @@ export default function SignUp() {
       </form>
       {alert.message && (
         <section
-          className={`fixed top-4 right-4 z-50 
+          className={`fixed top-4 right-4 z-50
       ${alert.type === 'success' ? 'alert-success' : ''}
       ${alert.type === 'error' ? 'alert-error' : ''}
     `}

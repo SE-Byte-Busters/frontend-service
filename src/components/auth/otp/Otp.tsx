@@ -102,7 +102,7 @@ export default function Otp() {
             <section className="sm:w-[416px] sm:h-[62px] w-[230px] h-[50px] mt-[2px]">
                 <button
                     onClick={handleResendOtp}
-                    className={`sm:w-[418px] sm:h-[52px] w-[231.81px] h-[42.15px] mt-[24px] sm:mt-[32px] text-[18px] font-semibold font-vazirmatn bg-[url('/colorkitGreen.png')] bg-cover bg-center text-white py-2 px-6 rounded-[12px] hover:opacity-90 transition ${isDisabled ? 'opacity-50 cursor-not-allowed' : ''}`}
+                    className={`sm:w-[418px] sm:h-[52px] w-[231.81px] h-[42.15px] mt-[24px] sm:mt-[32px] text-[18px] font-semibold font-vazirmatn bg-accent bg-cover bg-center text-white py-2 px-6 rounded-[12px] hover:opacity-90 transition ${isDisabled ? 'opacity-50 cursor-not-allowed' : ''}`}
                 // disabled={isDisabled}
                 >
                     ارسال مجدد پیامک ({seconds}s)
@@ -110,7 +110,7 @@ export default function Otp() {
             </section>
             {alert.message && (
                 <section
-                    className={`fixed top-4 right-4 z-50 
+                    className={`fixed top-4 right-4 z-50
       ${alert.type === 'success' ? 'alert-success' : ''}
       ${alert.type === 'error' ? 'alert-error' : ''}
     `}
