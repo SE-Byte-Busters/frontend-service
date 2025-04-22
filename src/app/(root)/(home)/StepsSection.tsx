@@ -7,8 +7,8 @@ export default function StepsSection() {
       <div className="flex flex-row items-center mb-6">
         <Image
           src="/steps-icon.png"
-          width={256}
-          height={256}
+          width={64}
+          height={64}
           alt="Steps Icon"
           className="h-16 w-16 sm:h-20 sm:w-20 ml-4 mb-4 sm:mb-0"
         />
@@ -32,8 +32,8 @@ export default function StepsSection() {
             <Image
               src="/problem.png"
               alt="Problem Icon"
-              width={256}
-              height={256}
+              width={64}
+              height={64}
               className="w-16 h-16 sm:w-20 sm:h-20 mx-auto mb-4"
             />
             <p className="text-base sm:text-lg text-white leading-relaxed mx-2 sm:mx-5">
@@ -55,8 +55,8 @@ export default function StepsSection() {
             <Image
               src="/teamwork.png"
               alt="Teamwork Icon"
-              width={256}
-              height={256}
+              width={64}
+              height={64}
               className="w-16 h-16 sm:w-20 sm:h-20 mx-auto mb-4"
             />
             <p className="text-base sm:text-lg text-white leading-relaxed mx-2 sm:mx-5">
@@ -78,8 +78,8 @@ export default function StepsSection() {
             <Image
               src="/action.png"
               alt="Action Icon"
-              width={256}
-              height={256}
+              width={64}
+              height={64}
               className="w-16 h-16 sm:w-20 sm:h-20 mx-auto mb-4"
             />
             <p className="text-base sm:text-lg text-white leading-relaxed mx-2 sm:mx-5">

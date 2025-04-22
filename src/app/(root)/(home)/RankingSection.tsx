@@ -1,46 +1,44 @@
 "use client";
 
 import Image from "next/image";
-import { useRouter } from "next/navigation";
+import Link from "next/link";
+
+const users = [
+  {
+    rank: 1,
+    picture: "/default-profile.png",
+    username: "علی رضایی",
+    score: 110,
+    medal: "قهرمان محیط‌زیست و فعال‌ترین گزارش‌دهنده",
+    lastActivity: "۲۳ اسفند ۱۴۰۳",
+  },
+  {
+    rank: 2,
+    picture: "/default-profile.png",
+    username: "سارا محمدی",
+    score: 88,
+    medal: "فعال‌ترین گزارش‌دهنده",
+    lastActivity: "۲۵ اسفند ۱۴۰۳",
+  },
+  {
+    rank: 3,
+    picture: "/default-profile.png",
+    username: "محمد امیری",
+    score: 58,
+    medal: "فعال برتر",
+    lastActivity: "۲۰ اسفند ۱۴۰۳",
+  },
+];
 
 export default function RankingSection() {
-  const router = useRouter();
-
-  const users = [
-    {
-      rank: 1,
-      picture: "/default-profile.png",
-      username: "علی رضایی",
-      score: 110,
-      medal: "قهرمان محیط‌زیست و فعال‌ترین گزارش‌دهنده",
-      lastActivity: "۲۳ اسفند ۱۴۰۳",
-    },
-    {
-      rank: 2,
-      picture: "/default-profile.png",
-      username: "سارا محمدی",
-      score: 88,
-      medal: "فعال‌ترین گزارش‌دهنده",
-      lastActivity: "۲۵ اسفند ۱۴۰۳",
-    },
-    {
-      rank: 3,
-      picture: "/default-profile.png",
-      username: "محمد امیری",
-      score: 58,
-      medal: "فعال برتر",
-      lastActivity: "۲۰ اسفند ۱۴۰۳",
-    },
-  ];
-
   return (
     <div className="flex flex-col items-center bg-primary px-4 sm:px-6 md:px-20 py-8 md:py-10" dir="rtl">
       {/* Title */}
       <div className="flex flex-row items-center mb-6 w-full">
         <Image
           src="/ranking-icon.png"
-          width={256}
-          height={256}
+          width={64}
+          height={64}
           alt="Ranking Icon"
           className="h-16 w-16 sm:h-20 sm:w-20 ml-4 mb-4 sm:mb-0"
         />
@@ -91,13 +89,13 @@ export default function RankingSection() {
 
       {/* Button */}
       <div className="flex w-full justify-center sm:justify-start">
-        <button
+        <Link
+          href="/leaderboard"
           className="bg-accent text-white font-bold text-base sm:text-lg rounded-lg mt-4 sm:mt-6 px-4 py-2 sm:px-6 sm:py-3
           transition duration-300 hover:text-black w-auto"
-          onClick={() => router.push("/leaderboard")}
         >
           مشاهده تابلوی برترین‌ها
-        </button>
+        </Link>
       </div>
     </div>
   );

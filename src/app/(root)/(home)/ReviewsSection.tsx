@@ -146,8 +146,8 @@ export default function ReviewsSection() {
       <div className="flex flex-row items-center mb-6">
         <Image
           src="/review-icon.png"
-          width={256}
-          height={256}
+          width={64}
+          height={64}
           alt="Review Icon"
           className="h-16 w-16 sm:h-20 sm:w-20 ml-4 mb-4 sm:mb-0"
         />
