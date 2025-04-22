@@ -67,7 +67,7 @@ const CustomZoomControls = ({ setUserPosition }: { setUserPosition: (pos: [numbe
   const map = useMap();
 
   return (
-    <div className="absolute bottom-10 right-3 z-[1000] flex flex-col gap-2">
+    <div className="absolute sm:bottom-10 bottom-5 right-3 z-[1000] flex flex-col gap-2 ">
       <LocateButton setUserPosition={setUserPosition} />
 
       <button
@@ -143,7 +143,7 @@ const IranMap = () => {
       </section>
 
       {/* دکمه‌های پایین صفحه */}
-      <section className="absolute bottom-10 w-full flex justify-center gap-8 z-[1000]">
+      <section className="absolute bottom-5 sm:bottom-10 w-full flex justify-center items-center sm:gap-8 gap-3 z-10 flex-col sm:flex-row text-center">
         <button className="w-[200px]  bg-[#00E083] text-sm px-4 py-2 rounded-3xl shadow hover:bg-gray-100 transition  text-black">
           مشکلات حل شده
         </button>
