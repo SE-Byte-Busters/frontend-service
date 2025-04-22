@@ -37,7 +37,7 @@ export default function StepsSection() {
               className="w-16 h-16 sm:w-20 sm:h-20 mx-auto mb-4"
             />
             <h3 className="sr-only">گام اول: ثبت مشکل</h3>
-            <p className="text-base sm:text-lg text-white leading-relaxed mx-2 sm:mx-5">
+            <p className="text-base sm:text-lg text-white text-justify leading-relaxed mx-2 sm:mx-5">
               مشکل شهری را با مشخص‌کردن موقعیت و نوع آن ثبت کنید. گزارش شما روی نقشه نمایش داده می‌شود.
             </p>
           </div>
@@ -61,7 +61,7 @@ export default function StepsSection() {
               className="w-16 h-16 sm:w-20 sm:h-20 mx-auto mb-4"
             />
             <h3 className="sr-only">گام دوم: بررسی گزارش</h3>
-            <p className="text-base sm:text-lg text-white leading-relaxed mx-2 sm:mx-5">
+            <p className="text-base sm:text-lg text-white text-justify leading-relaxed mx-2 sm:mx-5">
               مشکل شهری را با مشخص‌کردن موقعیت و نوع آن را ثبت کنید. گزارش شما روی نقشه نمایش داده می‌شود.
             </p>
           </div>
@@ -85,7 +85,7 @@ export default function StepsSection() {
               className="w-16 h-16 sm:w-20 sm:h-20 mx-auto mb-4"
             />
             <h3 className="sr-only">گام سوم: حل مشکل</h3>
-            <p className="text-base sm:text-lg text-white leading-relaxed mx-2 sm:mx-5">
+            <p className="text-base sm:text-lg text-white text-justify leading-relaxed mx-2 sm:mx-5">
               گزارش‌های تأییدشده به نهادهای مسئول ارسال شده و پس از حل مشکل، وضعیت آن به‌روزرسانی می‌شود.
             </p>
           </div>

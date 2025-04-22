@@ -34,7 +34,7 @@ export default function HeroSection() {
         </header>
 
         {/* New Report Link */}
-        <nav>
+        <nav className="flex justify-center">
           <Link
             href="/new-report"
             className="bg-accent text-white text-lg sm:text-xl md:text-2xl rounded-lg px-4 py-2 sm:px-6 sm:py-3
