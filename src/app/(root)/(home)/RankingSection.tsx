@@ -3,10 +3,12 @@
 import Image from "next/image";
 import Link from "next/link";
 
+import UserAvatar from "@/components/UserAvatar";
+
 const users = [
   {
     rank: 1,
-    picture: "/images/avatars/default-profile.png",
+    picture: "",
     username: "علی رضایی",
     score: 110,
     medal: "قهرمان محیط‌زیست و فعال‌ترین گزارش‌دهنده",
@@ -14,7 +16,7 @@ const users = [
   },
   {
     rank: 2,
-    picture: "/images/avatars/default-profile.png",
+    picture: "",
     username: "سارا محمدی",
     score: 88,
     medal: "فعال‌ترین گزارش‌دهنده",
@@ -22,7 +24,7 @@ const users = [
   },
   {
     rank: 3,
-    picture: "/images/avatars/default-profile.png",
+    picture: "",
     username: "محمد امیری",
     score: 58,
     medal: "فعال برتر",
@@ -73,12 +75,12 @@ export default function RankingSection() {
               >
                 <td className="flex justify-center items-center text-black text-sm">{user.rank}</td>
                 <td className="flex justify-center">
-                  <Image
-                    src={user.picture}
+                  <UserAvatar
+                    picture={user.picture}
+                    username={user.username}
+                    className="h-8 w-8 sm:h-10 sm:w-10"
                     width={64}
                     height={64}
-                    alt={`${user.username}'s picture`}
-                    className="bg-white rounded-full border border-gray-300 h-8 w-8 sm:h-10 sm:w-10"
                   />
                 </td>
                 <td className="flex justify-center items-center text-xs sm:text-sm text-black">{user.username}</td>
