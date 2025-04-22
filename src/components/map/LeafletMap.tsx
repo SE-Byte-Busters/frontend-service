@@ -5,6 +5,7 @@ import { useState } from 'react';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import Image from 'next/image';
+import { Icon } from '@/components/Icon';
 
 const getLocationByIP = async () => {
   try {
@@ -95,6 +96,7 @@ const CustomZoomControls = ({ setUserPosition }: { setUserPosition: (pos: [numbe
           className="rounded-full"
         />
 
+        <Icon name="MapPin" className="w-6 h-6 object-contain text-black" />
       </button>
     </div>
   );
