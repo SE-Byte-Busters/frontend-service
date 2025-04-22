@@ -1,6 +1,6 @@
 import ForgetPassword from "@/components/auth/forgetPassword/ForgetPassword";
 import Image from "next/image";
-export default function page({ params }: { params: { username?: string } }) {
+export default function page() {
   return (
     <>
       <div className="relative flex  justify-center mt-[323px] min-h-screen">

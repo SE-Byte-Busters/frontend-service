@@ -1,0 +1,19 @@
+import SignIn from "@/components/auth/signIn/SignIn";
+import Image from "next/image";
+export default function page() {
+  return (
+    <div className="relative flex  justify-center mt-[322px] min-h-screen">
+      <Image
+        src="/images-removebg.png"
+        alt="Background Image"
+        width={75.74}
+        height={75.74}
+        priority
+        className="absolute top-[-45px] left-1/2 -translate-x-1/2 z-10"
+      />
+      <div className="flex flex-col  items-center text-center sm:w-[568px] sm:h-[427px] w-[315px] h-[393px] bg-[#FDF7F4] opacity-[95%] rounded-[80px] z-0">
+        <SignIn />
+      </div>
+    </div>
+  );
+}

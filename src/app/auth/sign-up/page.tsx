@@ -1,6 +1,6 @@
 import SignUp from "@/components/auth/signUp/SignUp";
 import Image from "next/image";
-export default function page({ params }: { params: { username?: string } }) {
+export default function page() {
   return (
     <>
       <div className="relative flex  justify-center mt-[228px] min-h-screen">

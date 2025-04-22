@@ -4,6 +4,7 @@ import { MapContainer, TileLayer, Marker, useMap, ZoomControl, Popup } from 'rea
 import { useState } from 'react';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
+import Image from 'next/image';
 
 const getLocationByIP = async () => {
   try {
@@ -48,17 +49,56 @@ const LocateButton = ({ setUserPosition }: { setUserPosition: (pos: [number, num
   };
 
   return (
-    <div className="absolute bottom-28 right-3 z-[1000]">
+    <button
+      onClick={handleClick}
+      className="w-12 h-12 rounded-full bg-[#fefaf8] shadow-md flex items-center justify-center hover:bg-[#f2ece8] transition"
+    >
+      <Image
+        src="/ipMap.png"
+        alt="ip"
+        width={20}
+        height={20}
+        className="rounded-full"
+      />
+    </button>
+  );
+};
+const CustomZoomControls = ({ setUserPosition }: { setUserPosition: (pos: [number, number], msg: string) => void }) => {
+  const map = useMap();
+
+  return (
+    <div className="absolute bottom-10 right-3 z-[1000] flex flex-col gap-2">
+      <LocateButton setUserPosition={setUserPosition} />
+
       <button
-        onClick={handleClick}
+        onClick={() => map.zoomIn()}
         className="w-12 h-12 rounded-full bg-[#fefaf8] shadow-md flex items-center justify-center hover:bg-[#f2ece8] transition"
       >
-        <img src="/location.png" alt="locate" className="w-6 h-6 object-contain" />
+        <Image
+          src="/plusMap.png"
+          alt="plus"
+          width={20}
+          height={20}
+          className="rounded-full"
+        />
+
+      </button>
+      <button
+        onClick={() => map.zoomOut()}
+        className="w-12 h-12 rounded-full bg-[#fefaf8] shadow-md flex items-center justify-center hover:bg-[#f2ece8] transition"
+      >
+        <Image
+          src="/minusMap.png"
+          alt="minus"
+          width={20}
+          height={20}
+          className="rounded-full"
+        />
+
       </button>
     </div>
   );
 };
-
 const IranMap = () => {
   const [position, setPosition] = useState<[number, number] | null>(null);
   const [popupText, setPopupText] = useState<string>('');
@@ -84,7 +124,6 @@ const IranMap = () => {
       >
         <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
 
-        <LocateButton setUserPosition={setUserPosition} />
 
         {position && (
           <Marker position={position}>
@@ -92,21 +131,29 @@ const IranMap = () => {
           </Marker>
         )}
 
-        <ZoomControl position="bottomright" />
+        <CustomZoomControls setUserPosition={setUserPosition} />
       </MapContainer>
+      <section className="absolute top-7 right-10 w-[60px] h-[60px] bg-[#8EB486] flex justify-center rounded-xl">
+        <Image
+          src="/User.png"
+          alt="User"
+          width={25}
+          height={25}
+        />
+      </section>
 
       {/* دکمه‌های پایین صفحه */}
-      <div className="absolute bottom-4 w-full flex justify-center gap-8 z-[1000]">
-        <button className="bg-[#00E083] text-sm px-4 py-2 rounded-lg shadow hover:bg-gray-100 transition  text-black">
+      <section className="absolute bottom-10 w-full flex justify-center gap-8 z-[1000]">
+        <button className="w-[200px]  bg-[#00E083] text-sm px-4 py-2 rounded-3xl shadow hover:bg-gray-100 transition  text-black">
           مشکلات حل شده
         </button>
-        <button className="bg-[#F45151] text-sm px-4 py-2 rounded-lg shadow hover:bg-gray-100 transition  text-black">
+        <button className="w-[200px]  bg-[#F45151] text-sm px-4 py-2 rounded-3xl shadow hover:bg-gray-100 transition  text-black">
           مشکلات حل نشده
         </button>
-        <button className="bg-[#F48B11] text-sm px-4 py-2 rounded-lg shadow hover:bg-gray-100 transition  text-black">
+        <button className="w-[200px]  bg-[#F48B11] text-sm px-4 py-2 rounded-3xl shadow hover:bg-gray-100 transition  text-black">
           ثبت گزارش جدید
         </button>
-      </div>
+      </section>
     </div>
   );
 };
