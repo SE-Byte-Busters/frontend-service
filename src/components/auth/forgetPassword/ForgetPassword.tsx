@@ -20,7 +20,7 @@ export default function forgetPassword() {
       </div>
 
       <div className="sm:w-[416px] sm:h-[62px] w-[230px] h-[50px] mt-[2px] ">
-        <button className="sm:w-[418px] sm:h-[52px] w-[231.81px] h-[42.15px]  mt-[24px] sm:mt-[32px] text-[18px] font-semibold font-vazirmatn bg-[url('/colorkitGreen.png')] bg-cover bg-center text-white py-2 px-6 rounded-[12px] hover:opacity-90 transition">
+        <button className="sm:w-[418px] sm:h-[52px] w-[231.81px] h-[42.15px]  mt-[24px] sm:mt-[32px] text-[18px] font-semibold font-vazirmatn bg-accent bg-cover bg-center text-white py-2 px-6 rounded-[12px] hover:opacity-90 transition">
           بازیابی
         </button>
       </div>
