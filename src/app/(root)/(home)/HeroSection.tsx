@@ -5,7 +5,7 @@ export default function HeroSection() {
   return (
     <section className="relative flex min-h-[80vh] md:min-h-screen pt-16 md:pt-20">
       {/* Background */}
-      <div className="absolute inset-0 -z-10 pointer-events-none bg-[url('/homepage.jpg')] bg-cover bg-center">
+      <div className="absolute inset-0 -z-10 pointer-events-none bg-[url('/images/backgrounds/homepage.jpg')] bg-cover bg-center">
         <div className="absolute inset-0 bg-gradient-to-b from-white via-white/65 to-transparent" />
       </div>
 
@@ -14,7 +14,7 @@ export default function HeroSection() {
         <header>
           <div className="flex flex-row items-center text-right mb-4 md:mb-6">
             <Image
-              src="/hero-icon.png"
+              src="/images/icons/hero.png"
               width={64}
               height={64}
               alt="Hero Icon"

@@ -18,56 +18,56 @@ const reviews: Review[] = [
     name: "محمد امیری",
     date: "۵ دی ۱۴۰۲",
     rating: 6,
-    picture: "/default-profile.png",
+    picture: "/images/avatars/default-profile.png",
     body: "پلتفرم جالبیه، ولی بعضی از گزارش‌ها مدت زیادی بدون بررسی باقی می‌مونن. اگه تیم پشتیبانی سریع‌تر پیگیری کنه، این سیستم می‌تونه تأثیر خیلی بهتری داشته باشه. در کل، ایده خیلی خوبیه ولی نیاز به بهینه‌سازی داره."
   },
   {
     name: "سارا محمدی",
     date: "۱۸ بهمن ۱۴۰۲",
     rating: 9,
-    picture: "/default-profile.png",
+    picture: "/images/avatars/default-profile.png",
     body: "ایده این پلتفرم خیلی کاربردیه و شهروندها رو تشویق می‌کنه که خودشون برای بهبود محیط اقدام کنن. تنها پیشنهادی که دارم اینه که قابلیت پیگیری وضعیت گزارش‌ها رو هم اضافه کنن تا بدونیم مشکل دقیقاً چه زمانی حل می‌شه."
   },
   {
     name: "علی رضایی",
     date: "۲۵ اسفند ۱۴۰۲",
     rating: 7,
-    picture: "/default-profile.png",
+    picture: "/images/avatars/default-profile.png",
     body: "پلتفرم CleanCity واقعاً عالیه! گزارش مشکلم رو درباره ریختن زباله‌های غیرمجاز توی محله‌مون ثبت کردم و در کمتر از یک هفته، شهرداری اقدام کرد. از این که می‌تونم برای شهر تمیزتر کمک کنم، خیلی خوشحالم!"
   },
   {
     name: "آرش کمانگیر",
     date: "۱۵ اسفند ۱۴۰۳",
     rating: 7,
-    picture: "/default-profile.png",
+    picture: "/images/avatars/default-profile.png",
     body: "CleanCity واقعاً زندگی ما رو راحت‌تر کرده! من چند مشکل مثل خرابی چراغ‌های خیابان و سطل‌های زباله پر رو گزارش کردم و واقعاً به‌سرعت رسیدگی شد. ممنون از این پلتفرم عالی!"
   },
   {
     name: "لیلا محسنی",
     date: "۵ بهمن ۱۴۰۳",
     rating: 6,
-    picture: "/default-profile.png",
+    picture: "/images/avatars/default-profile.png",
     body: "وقتی دیدم میشه با چند کلیک ساده مشکلات شهری رو گزارش داد، خیلی خوشحال شدم. گزارش کردن چاله‌های خیابون و زباله‌های اطراف خیلی راحت شد. دستتون درد نکنه CleanCity!"
   },
   {
     name: "نیلوفر شریفی",
     date: "۲۷ دی ۱۴۰۳",
     rating: 8,
-    picture: "/default-profile.png",
+    picture: "/images/avatars/default-profile.png",
     body: "این برنامه کمک کرده تا شهرمون تمیزتر و مرتب‌تر باشه. پیگیری‌ها خیلی دقیق هستن و این واقعاً حس خوبی به شهروندها میده. پیشنهادش می‌کنم!"
   },
   {
     name: "کیان مرادی",
     date: "۲۲ بهمن ۱۴۰۳",
     rating: 9,
-    picture: "/default-profile.png",
+    picture: "/images/avatars/default-profile.png",
     body: "من اولین بار گزارشی درباره‌ی پارکی که همیشه شلوغ و کثیف بود دادم و فکر نمی‌کردم که واقعاً تأثیری داشته باشه، اما فقط چند روز بعد دیدم که شرایط بهبودیافته. CleanCity بی‌نظیره!"
   },
   {
     name: "احسان مشهدی",
     date: "۱۸ اسفند ۱۴۰۳",
     rating: 10,
-    picture: "/default-profile.png",
+    picture: "/images/avatars/default-profile.png",
     body: "یکی از بهترین اپلیکیشن‌هایی که تا حالا دیدم. حس می‌کنم با استفاده از این اپ، می‌تونیم خودمون هم توی بهتر شدن شهرمون نقش داشته باشیم. خیلی کاربردیه!"
   },
 ];
@@ -145,7 +145,7 @@ export default function ReviewsSection() {
       {/* Title */}
       <header className="flex flex-row items-center mb-6">
         <Image
-          src="/review-icon.png"
+          src="/images/icons/review.png"
           width={64}
           height={64}
           alt="Review Icon"

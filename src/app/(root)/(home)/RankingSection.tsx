@@ -6,7 +6,7 @@ import Link from "next/link";
 const users = [
   {
     rank: 1,
-    picture: "/default-profile.png",
+    picture: "/images/avatars/default-profile.png",
     username: "علی رضایی",
     score: 110,
     medal: "قهرمان محیط‌زیست و فعال‌ترین گزارش‌دهنده",
@@ -14,7 +14,7 @@ const users = [
   },
   {
     rank: 2,
-    picture: "/default-profile.png",
+    picture: "/images/avatars/default-profile.png",
     username: "سارا محمدی",
     score: 88,
     medal: "فعال‌ترین گزارش‌دهنده",
@@ -22,7 +22,7 @@ const users = [
   },
   {
     rank: 3,
-    picture: "/default-profile.png",
+    picture: "/images/avatars/default-profile.png",
     username: "محمد امیری",
     score: 58,
     medal: "فعال برتر",
@@ -36,7 +36,7 @@ export default function RankingSection() {
       {/* Title */}
       <header className="flex flex-row items-center mb-6 w-full">
         <Image
-          src="/ranking-icon.png"
+          src="/images/icons/ranking.png"
           width={64}
           height={64}
           alt="Ranking Icon"

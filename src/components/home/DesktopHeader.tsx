@@ -19,9 +19,9 @@ export default function DesktopHeader({
       <div className="flex items-center space-x-2 sm:space-x-6">
         <Link href="/">
           <Image
-            src="/logo.png"
-            width={256}
-            height={256}
+            src="/images/logo.png"
+            width={64}
+            height={64}
             alt="CleanCity Logo"
             className="h-12 w-12 sm:h-14 sm:w-14 bg-light rounded-lg"
             priority
