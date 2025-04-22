@@ -1,5 +1,5 @@
 import * as LucideIcons from 'lucide-react';
-import { ComponentProps, forwardRef } from 'react';
+import { ComponentProps } from 'react';
 
 // i have absolutely no f***ing clue what any of this type gymnastics does.
 // the name property only accepts LucideIconName so import it if you need it.
@@ -22,7 +22,7 @@ export const Icon = ({ name, ...props }: IconProps) => {
   const LucideIcon = LucideIcons[name] as React.ForwardRefExoticComponent<
     React.ComponentProps<'svg'> & React.RefAttributes<SVGSVGElement>
   >;
-  
+
   if (!LucideIcon) {
     console.warn(`Icon "${name}" not found`);
     return null;

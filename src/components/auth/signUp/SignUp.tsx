@@ -3,13 +3,11 @@
 import { useActionState, useEffect, useState } from "react";
 import { Eye, EyeOff } from "lucide-react";
 import Link from "next/link";
-import { useFormState, useFormStatus } from "react-dom";
 import { sendEmail } from "../../../lib/actions/act";
 import { useRouter } from "next/navigation";
 
 // must imported for tailwind global
 import '../../../app/globals.css';
-
 
 
 interface FormData {
