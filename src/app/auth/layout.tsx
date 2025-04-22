@@ -23,12 +23,9 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-
     <div className="relative min-h-screen">
-      <div className="absolute inset-0 bg-[url(/back-auth.jpg)] bg-no-repeat bg-cover bg-center bg-fixed"></div>
+      <div className="absolute inset-0 bg-[url(/images/backgrounds/auth.jpg)] bg-no-repeat bg-cover bg-center bg-fixed"></div>
       <div className="relative z-10 flex flex-col min-h-screen">{children}</div>
     </div>
-
-
   );
 }

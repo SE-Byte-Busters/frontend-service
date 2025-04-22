@@ -6,7 +6,7 @@ export default function StepsSection() {
       {/* Title */}
       <header className="flex flex-row items-center mb-6">
         <Image
-          src="/steps-icon.png"
+          src="/images/icons/steps.png"
           width={64}
           height={64}
           alt="Steps Icon"
@@ -22,15 +22,15 @@ export default function StepsSection() {
         {/* Step 1 */}
         <article className="text-center max-w-xs sm:max-w-sm mb-8 md:mb-0">
           <Image
-            src="/timeline_begin.svg"
+            src="/images/graphics/timeline_begin.svg"
             alt="Timeline Begin"
-            width={550}
-            height={180}
+            width={440}
+            height={144}
             className="w-auto h-20 md:h-auto mx-auto mb-4"
           />
           <div>
             <Image
-              src="/problem.png"
+              src="/images/icons/problem.png"
               alt="Problem Icon"
               width={64}
               height={64}
@@ -46,15 +46,15 @@ export default function StepsSection() {
         {/* Step 2 */}
         <article className="text-center max-w-xs sm:max-w-sm mb-8 md:mb-0">
           <Image
-            src="/timeline_continue.svg"
+            src="/images/graphics/timeline_continue.svg"
             alt="Timeline Continue"
-            width={550}
-            height={180}
+            width={440}
+            height={144}
             className="w-auto h-20 md:h-auto mx-auto mb-4"
           />
           <div>
             <Image
-              src="/teamwork.png"
+              src="/images/icons/teamwork.png"
               alt="Teamwork Icon"
               width={64}
               height={64}
@@ -70,15 +70,15 @@ export default function StepsSection() {
         {/* Step 3 */}
         <article className="text-center max-w-xs sm:max-w-sm">
           <Image
-            src="/timeline_end.svg"
+            src="/images/graphics/timeline_end.svg"
             alt="Timeline End"
-            width={550}
-            height={180}
+            width={440}
+            height={144}
             className="w-auto h-20 md:h-auto mx-auto mb-4"
           />
           <div>
             <Image
-              src="/action.png"
+              src="/images/icons/action.png"
               alt="Action Icon"
               width={64}
               height={64}

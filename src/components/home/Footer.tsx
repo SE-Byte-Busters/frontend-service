@@ -22,9 +22,9 @@ export default function Footer() {
           {/* Logo */}
           <div className="flex items-center shrink-0">
             <Image
-              src="/logo.png"
-              width={256}
-              height={256}
+              src="/images/logo.png"
+              width={64}
+              height={64}
               alt="CleanCity Logo"
               className="bg-light rounded-xl h-16 w-16 md:h-20 md:w-20 p-1 mr-3 md:mr-5"
               priority

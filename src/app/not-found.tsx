@@ -27,7 +27,7 @@ export default function NotFound() {
         {/* Image */}
         <section className="w-full md:w-1/2 p-6 md:p-10 flex justify-center">
           <Image
-            src="/404.jpg"
+            src="/images/special/404.jpg"
             alt="تصویر خطای ۴۰۴ - صفحه یافت نشد"
             width={512}
             height={512}

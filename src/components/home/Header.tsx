@@ -45,9 +45,9 @@ function MobileHeaderFallback() {
       </button>
       <Link href="/" className="flex items-center">
         <Image
-          src="/logo.png"
-          width={48}
-          height={48}
+          src="/images/logo.png"
+          width={64}
+          height={64}
           alt="CleanCity Logo"
           className="h-12 w-12 bg-light rounded-lg"
           priority
