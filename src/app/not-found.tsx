@@ -1,8 +1,8 @@
 import Link from 'next/link';
 import Image from 'next/image';
 
-import Header from '@/components/home/Header';
-import Footer from '@/components/home/Footer';
+import Header from '@/components/layout/Header';
+import Footer from '@/components/layout/Footer';
 
 export const metadata = {
   title: 'صفحه مورد نظر یافت نشد | 404 خطا',
