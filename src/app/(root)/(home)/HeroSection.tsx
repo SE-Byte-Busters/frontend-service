@@ -1,11 +1,7 @@
-"use client";
-
 import Image from "next/image";
-import { useRouter } from "next/navigation";
+import Link from "next/link";
 
 export default function HeroSection() {
-  const router = useRouter();
-
   return (
     <div className="relative flex min-h-[80vh] md:min-h-screen pt-16 md:pt-20">
       {/* Background */}
@@ -19,8 +15,8 @@ export default function HeroSection() {
           <div className="flex flex-row items-center text-right mb-4 md:mb-6">
             <Image
               src="/hero-icon.png"
-              width={256}
-              height={256}
+              width={64}
+              height={64}
               alt="Hero Icon"
               className="h-16 w-16 sm:h-20 sm:w-20 ml-4 mb-4 sm:mb-0"
               priority
@@ -37,15 +33,15 @@ export default function HeroSection() {
           </p>
         </div>
 
-        {/* Button */}
+        {/* New Report Link */}
         <div className="flex justify-center">
-          <button
+          <Link
+            href="/new-report"
             className="bg-accent text-white text-lg sm:text-xl md:text-2xl rounded-lg px-4 py-2 sm:px-6 sm:py-3
             transition duration-300 hover:text-black w-auto"
-            onClick={() => router.push('/new-report')}
           >
             ثبت گزارش جدید
-          </button>
+          </Link>
         </div>
       </div>
     </div>
