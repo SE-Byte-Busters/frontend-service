@@ -40,9 +40,12 @@ export default function Header() {
 function MobileHeaderFallback() {
   return (
     <div className="flex items-center justify-between w-full py-1">
-      <button className="p-2 rounded-lg text-gray-300">
-        <Icon name="Menu" className="text-2xl" />
-      </button>
+      <Link
+        href="/auth/sign-up"
+        className="p-2 bg-accent rounded-lg"
+      >
+        <Icon name="User" className="text-2xl" />
+      </Link>
       <Link href="/" className="flex items-center">
         <Image
           src="/images/logo.png"
@@ -53,12 +56,9 @@ function MobileHeaderFallback() {
           priority
         />
       </Link>
-      <Link
-        href="/auth/sign-up"
-        className="p-2 bg-accent rounded-lg"
-      >
-        <Icon name="User" className="text-2xl" />
-      </Link>
+      <button className="p-2 rounded-lg text-gray-300">
+        <Icon name="Menu" className="text-2xl" />
+      </button>
     </div>
   );
 }

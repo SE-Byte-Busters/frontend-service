@@ -27,17 +27,16 @@ export default function MobileHeader({
     <>
       {/* Mobile header */}
       <div className="flex items-center justify-between w-full py-1">
-        <button
-          className="p-2 rounded-lg text-gray-300 hover:text-black transition-colors"
-          onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-          aria-label="منو"
+        {/* Auth */}
+        <Link
+          href="/auth/sign-up"
+          className="p-2 bg-accent rounded-lg hover:text-black transition-colors"
+          aria-label="ورود / ثبت نام"
         >
-          <Icon
-            name={isMobileMenuOpen ? "X" : "Menu"}
-            className="text-2xl transition-transform duration-300 ease-in-out"
-          />
-        </button>
+          <Icon name="User" className="text-2xl" />
+        </Link>
 
+        {/* Logo */}
         <Link href="/" className="flex items-center">
           <Image
             src="/images/logo.png"
@@ -49,13 +48,17 @@ export default function MobileHeader({
           />
         </Link>
 
-        <Link
-          href="/auth/sign-up"
-          className="p-2 bg-accent rounded-lg hover:text-black transition-colors"
-          aria-label="ورود / ثبت نام"
+        {/* Menu button */}
+        <button
+          className="p-2 rounded-lg text-gray-300 hover:text-black transition-colors"
+          onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+          aria-label="منو"
         >
-          <Icon name="User" className="text-2xl" />
-        </Link>
+          <Icon
+            name={isMobileMenuOpen ? "X" : "Menu"}
+            className="text-2xl transition-transform duration-300 ease-in-out"
+          />
+        </button>
       </div>
 
       {/* Mobile Navigation */}
