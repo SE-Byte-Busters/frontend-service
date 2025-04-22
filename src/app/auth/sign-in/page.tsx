@@ -4,7 +4,7 @@ export default function page() {
   return (
     <div className="relative flex  justify-center mt-[322px] min-h-screen">
       <Image
-        src="/images/backgrounds/auth.jpg"
+        src="/images/logo.png"
         alt="Background Image"
         width={64}
         height={64}
