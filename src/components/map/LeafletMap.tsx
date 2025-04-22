@@ -54,13 +54,7 @@ const LocateButton = ({ setUserPosition }: { setUserPosition: (pos: [number, num
       onClick={handleClick}
       className="w-12 h-12 rounded-full bg-[#fefaf8] shadow-md flex items-center justify-center hover:bg-[#f2ece8] transition"
     >
-      <Image
-        src="/ipMap.png"
-        alt="ip"
-        width={20}
-        height={20}
-        className="rounded-full"
-      />
+      <Icon name="Locate" className="rounded-full text-black" />
     </button>
   );
 };
@@ -75,28 +69,13 @@ const CustomZoomControls = ({ setUserPosition }: { setUserPosition: (pos: [numbe
         onClick={() => map.zoomIn()}
         className="w-12 h-12 rounded-full bg-[#fefaf8] shadow-md flex items-center justify-center hover:bg-[#f2ece8] transition"
       >
-        <Image
-          src="/plusMap.png"
-          alt="plus"
-          width={20}
-          height={20}
-          className="rounded-full"
-        />
-
+        <Icon name="Plus" className="rounded-full text-black" />
       </button>
       <button
         onClick={() => map.zoomOut()}
         className="w-12 h-12 rounded-full bg-[#fefaf8] shadow-md flex items-center justify-center hover:bg-[#f2ece8] transition"
       >
-        <Image
-          src="/minusMap.png"
-          alt="minus"
-          width={20}
-          height={20}
-          className="rounded-full"
-        />
-
-        <Icon name="MapPin" className="w-6 h-6 object-contain text-black" />
+        <Icon name="Minus" className="rounded-full text-black" />
       </button>
     </div>
   );
@@ -136,12 +115,7 @@ const IranMap = () => {
         <CustomZoomControls setUserPosition={setUserPosition} />
       </MapContainer>
       <section className="absolute top-7 right-10 w-[60px] h-[60px] bg-[#8EB486] flex justify-center rounded-xl">
-        <Image
-          src="/User.png"
-          alt="User"
-          width={25}
-          height={25}
-        />
+        <Icon name="User" />
       </section>
 
       {/* دکمه‌های پایین صفحه */}

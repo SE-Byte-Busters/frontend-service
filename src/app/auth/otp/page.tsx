@@ -6,7 +6,7 @@ export default function page() {
     <>
       <div className="relative flex  justify-center mt-[323px] min-h-screen">
         <Image
-          src="/logo.png"
+          src="/images/logo.png"
           alt="Background Image"
           width={64}
           height={64}
