@@ -4,10 +4,10 @@ export default function page() {
   return (
     <div className="relative flex  justify-center mt-[322px] min-h-screen">
       <Image
-        src="/images-removebg.png"
+        src="/images/backgrounds/auth.jpg"
         alt="Background Image"
-        width={75.74}
-        height={75.74}
+        width={64}
+        height={64}
         priority
         className="absolute top-[-45px] left-1/2 -translate-x-1/2 z-10"
       />
