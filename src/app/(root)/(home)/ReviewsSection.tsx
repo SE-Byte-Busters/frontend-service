@@ -141,9 +141,9 @@ export default function ReviewsSection() {
   };
 
   return (
-    <div className="bg-light py-8 md:py-10 px-4 sm:px-6 md:px-20" dir="rtl">
+    <section className="bg-light py-8 md:py-10 px-4 sm:px-6 md:px-20" dir="rtl">
       {/* Title */}
-      <div className="flex flex-row items-center mb-6">
+      <header className="flex flex-row items-center mb-6">
         <Image
           src="/review-icon.png"
           width={64}
@@ -152,14 +152,14 @@ export default function ReviewsSection() {
           className="h-16 w-16 sm:h-20 sm:w-20 ml-4 mb-4 sm:mb-0"
         />
         <div className="flex flex-col items-right text-right">
-          <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-black mb-2">
+          <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-black mb-2">
             نظرات کاربران
-          </h1>
-          <h2 className="text-base sm:text-lg md:text-xl text-black">
-            نمایش چند نقل قول از کاربران درباره‌ی تجربه استفاده از CleanCity
           </h2>
+          <p className="text-base sm:text-lg md:text-xl text-black">
+            نمایش چند نقل قول از کاربران درباره‌ی تجربه استفاده از CleanCity
+          </p>
         </div>
-      </div>
+      </header>
 
       {/* Reviews */}
       <div className="relative">
@@ -169,14 +169,14 @@ export default function ReviewsSection() {
           }`}
         >
           {displayedReviews.map((review, index) => (
-            <div
+            <article
               key={`${currentIndex}-${index}`}
               className="flex flex-col bg-accent rounded-2xl md:rounded-3xl p-4 md:p-6"
             >
               <div className="flex flex-row items-center">
                 <div className="flex flex-col text-right grow">
                   <p className="text-base md:text-lg font-semibold text-black">{review.name}</p>
-                  <p className="text-xs md:text-sm text-black">{review.date}</p>
+                  <time className="text-xs md:text-sm text-black">{review.date}</time>
                   <div className="flex flex-row-reverse justify-end">
                     {getStars(review.rating)}
                   </div>
@@ -190,13 +190,13 @@ export default function ReviewsSection() {
                 />
               </div>
               <p className="text-black pt-3 md:pt-4 text-justify text-sm md:text-base leading-5">"{review.body}"</p>
-            </div>
+            </article>
           ))}
         </div>
       </div>
 
       {/* Pagination */}
-      <div className="flex justify-center mt-6 md:mt-10">
+      <nav className="flex justify-center mt-6 md:mt-10" aria-label="پیمایش نظرات">
         {Array(totalPages)
           .fill(0)
           .map((_, index) => (
@@ -207,9 +207,11 @@ export default function ReviewsSection() {
                 w-3 h-3 sm:w-4 sm:h-4 rounded-full transition-colors hover:bg-gray-400 mr-2
                 ${currentIndex === index ? "bg-accent" : "bg-gray-300"}
               `}
+              aria-label={`صفحه ${index + 1}`}
+              aria-current={currentIndex === index ? "page" : undefined}
             ></button>
           ))}
-      </div>
-    </div>
+      </nav>
+    </section>
   );
 };

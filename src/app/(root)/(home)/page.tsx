@@ -6,12 +6,12 @@ import ReviewsSection from "./ReviewsSection";
 
 export default function Home() {
   return (
-    <div>
+    <>
       <HeroSection />
       <MapSection />
       <StepsSection />
       <RankingSection />
       <ReviewsSection />
-    </div>
+    </>
   );
 }

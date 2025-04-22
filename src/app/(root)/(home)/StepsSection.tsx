@@ -2,9 +2,9 @@ import Image from "next/image";
 
 export default function StepsSection() {
   return (
-    <div className="bg-accent py-8 md:py-10 px-4 sm:px-6 md:px-20" dir="rtl">
+    <section className="bg-accent py-8 md:py-10 px-4 sm:px-6 md:px-20" dir="rtl">
       {/* Title */}
-      <div className="flex flex-row items-center mb-6">
+      <header className="flex flex-row items-center mb-6">
         <Image
           src="/steps-icon.png"
           width={64}
@@ -12,15 +12,15 @@ export default function StepsSection() {
           alt="Steps Icon"
           className="h-16 w-16 sm:h-20 sm:w-20 ml-4 mb-4 sm:mb-0"
         />
-        <h1 className="font-bold text-3xl sm:text-4xl md:text-5xl text-white text-right">
+        <h2 className="font-bold text-3xl sm:text-4xl md:text-5xl text-white text-right">
           چطور از CleanCity استفاده کنیم؟
-        </h1>
-      </div>
+        </h2>
+      </header>
 
       {/* Timeline */}
       <div className="flex flex-col md:flex-row-reverse justify-center items-center">
         {/* Step 1 */}
-        <div className="text-center max-w-xs sm:max-w-sm mb-8 md:mb-0">
+        <article className="text-center max-w-xs sm:max-w-sm mb-8 md:mb-0">
           <Image
             src="/timeline_begin.svg"
             alt="Timeline Begin"
@@ -36,14 +36,15 @@ export default function StepsSection() {
               height={64}
               className="w-16 h-16 sm:w-20 sm:h-20 mx-auto mb-4"
             />
+            <h3 className="sr-only">گام اول: ثبت مشکل</h3>
             <p className="text-base sm:text-lg text-white leading-relaxed mx-2 sm:mx-5">
               مشکل شهری را با مشخص‌کردن موقعیت و نوع آن ثبت کنید. گزارش شما روی نقشه نمایش داده می‌شود.
             </p>
           </div>
-        </div>
+        </article>
 
         {/* Step 2 */}
-        <div className="text-center max-w-xs sm:max-w-sm mb-8 md:mb-0">
+        <article className="text-center max-w-xs sm:max-w-sm mb-8 md:mb-0">
           <Image
             src="/timeline_continue.svg"
             alt="Timeline Continue"
@@ -59,14 +60,15 @@ export default function StepsSection() {
               height={64}
               className="w-16 h-16 sm:w-20 sm:h-20 mx-auto mb-4"
             />
+            <h3 className="sr-only">گام دوم: بررسی گزارش</h3>
             <p className="text-base sm:text-lg text-white leading-relaxed mx-2 sm:mx-5">
               مشکل شهری را با مشخص‌کردن موقعیت و نوع آن را ثبت کنید. گزارش شما روی نقشه نمایش داده می‌شود.
             </p>
           </div>
-        </div>
+        </article>
 
         {/* Step 3 */}
-        <div className="text-center max-w-xs sm:max-w-sm">
+        <article className="text-center max-w-xs sm:max-w-sm">
           <Image
             src="/timeline_end.svg"
             alt="Timeline End"
@@ -82,12 +84,13 @@ export default function StepsSection() {
               height={64}
               className="w-16 h-16 sm:w-20 sm:h-20 mx-auto mb-4"
             />
+            <h3 className="sr-only">گام سوم: حل مشکل</h3>
             <p className="text-base sm:text-lg text-white leading-relaxed mx-2 sm:mx-5">
               گزارش‌های تأییدشده به نهادهای مسئول ارسال شده و پس از حل مشکل، وضعیت آن به‌روزرسانی می‌شود.
             </p>
           </div>
-        </div>
+        </article>
       </div>
-    </div>
+    </section>
   );
 };
