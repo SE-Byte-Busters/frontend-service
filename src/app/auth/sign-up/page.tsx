@@ -5,7 +5,7 @@ export default function page() {
     <>
       <div className=" flex  justify-center mt-[228px] min-h-screen">
         <Image
-          src="/images/logo.png"
+          src="/images/cleanCity.png"
           alt="Background Image"
           width={64}
           height={64}
