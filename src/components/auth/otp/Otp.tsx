@@ -18,7 +18,7 @@ export default function Otp() {
       code: code,
       method: "phone",
       _id: id,
-      phoneNumber
+      phoneNumber: "+" + phoneNumber
 
 
     }))
@@ -38,7 +38,8 @@ export default function Otp() {
         }),
       });
       const data = await response.json();
-      if (response.status >= 200 || response.status < 300) {
+      console.log(data)
+      if (response.status >= 200 && response.status < 300) {
         setAlert({ type: 'success', message: 'تغییرات شما با موفقیت ذخیره شد.' });
       } else if (response.status == 400) {
         setAlert({ type: 'error', message: 'مقدار ورودی را درست وارد نمایید' });
@@ -54,9 +55,59 @@ export default function Otp() {
       setTimeout(() => {
         setAlert({ type: '', message: '' });
       }, 2000);
-      if (response.status >= 200 || response.status < 300) {
+      if (response.status >= 200 && response.status < 300) {
         router.push("/map"); // Navigate to map page after successful OTP verification
       }
+    }
+    catch (error) {
+      setAlert({ type: 'error', message: 'خطای سرور. لطفاً بعداً تلاش کنید.' });
+      setTimeout(() => {
+        setAlert({ type: '', message: '' });
+      }, 2000);
+    }
+  }
+  const handleResendOtp = async () => {
+    // console.log(JSON.stringify({
+    //   code: code,
+    //   method: "phone",
+    //   _id: id,
+    //   phoneNumber: "+" + phoneNumber
+
+
+    // }))
+    try {
+      const response = await fetch('https://shahriar.thetechverse.ir:3000/api/v1/auth/resend-signup-otp', {
+        method: "PUT",
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          method: "phone",
+          _id: id,
+
+        }),
+      });
+      const data = await response.json();
+      console.log(data)
+      if (response.status >= 200 && response.status < 300) {
+        setAlert({ type: 'success', message: 'ارسال مجدد انجام شد' });
+      } else if (response.status == 400) {
+        setAlert({ type: 'error', message: 'مقدار ورودی را درست وارد نمایید' });
+      } else if (response.status == 403) {
+        setAlert({ type: 'error', message: 'بیش از حد تلاش کرده اید' });
+      } else if (response.status == 404) {
+        setAlert({ type: 'error', message: 'مدت زمان استفاده از توکن گذشته است' });
+      } else if (response.status >= 500 || response.status < 600) {
+        setAlert({ type: 'error', message: 'خطای سرور. لطفاً بعداً تلاش کنید.' });
+      }
+
+      // مخفی شدن پیام بعد از ۲ ثانیه
+      setTimeout(() => {
+        setAlert({ type: '', message: '' });
+      }, 2000);
+      // if (response.status >= 200 && response.status < 300) {
+      //   setAlert({ type: 'success', message: '' });
+      // }
     }
     catch (error) {
       setAlert({ type: 'error', message: 'خطای سرور. لطفاً بعداً تلاش کنید.' });
@@ -77,8 +128,8 @@ export default function Otp() {
     }
   }, [seconds]);
 
-  const handleResendOtp = () => {
-    setSeconds(60); // Reset the timer
+  const handleSendOtp = () => {
+    setSeconds(10); // Reset the timer
     setIsDisabled(true);
     // Add the resend OTP logic here (e.g., make an API request)
     handleSubmit(); // Trigger the submit handler to send the request again
@@ -101,12 +152,27 @@ export default function Otp() {
 
       <section className="sm:w-[416px] sm:h-[62px] w-[230px] h-[50px] mt-[2px]">
         <button
-          onClick={handleResendOtp}
+          onClick={handleSendOtp}
           className={`sm:w-[418px] sm:h-[52px] w-[231.81px] h-[42.15px] mt-[24px] sm:mt-[32px] text-[18px] font-semibold font-vazirmatn bg-accent bg-cover bg-center text-white py-2 px-6 rounded-[12px] hover:opacity-90 transition ${isDisabled ? 'opacity-50 cursor-not-allowed' : ''}`}
         // disabled={isDisabled}
         >
-          ارسال مجدد پیامک ({seconds}s)
+          تایید
         </button>
+        <div className="flex  flex-col  items-start mt-1.5 px-2 text-[14px] text-[#685752] font-vazirmatn">
+          <button
+            onClick={handleResendOtp}
+            disabled={isDisabled}
+            className={` ${isDisabled ? "opacity-50 cursor-not-allowed" : "hover:opacity-80"}`}
+          >
+            ارسال مجدد ({seconds}s)
+          </button>
+          <button
+            onClick={() => router.push('/auth/sign-up')}
+            className=" hover:opacity-80 "
+          >
+            تغییر شماره
+          </button>
+        </div>
       </section>
       {alert.message && (
         <section
