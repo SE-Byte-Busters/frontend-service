@@ -6,6 +6,38 @@ import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import Image from 'next/image';
 import { Icon } from '@/components/Icon';
+import { customSchema } from '@hookform/resolvers/standard-schema/src/__tests__/__fixtures__/data.js';
+import ReportForm from './ReportForm';
+
+
+const customIconNeedle = new L.Icon({
+  iconUrl: '/images/icons/needle.png', // مسیر عکس از public
+  iconSize: [35, 35],          // اندازه دلخواه
+  iconAnchor: [17, 35],        // نقطه نوک آیکن
+  popupAnchor: [0, -35],       // موقعیت پاپ‌آپ
+});
+
+const customIconRedNeedle = new L.Icon({
+  iconUrl: '/images/icons/redNeedle.png', // مسیر عکس از public
+  iconSize: [35, 35],          // اندازه دلخواه
+  iconAnchor: [17, 35],        // نقطه نوک آیکن
+  popupAnchor: [0, -35],       // موقعیت پاپ‌آپ
+});
+const customIconGreenNeedle = new L.Icon({
+  iconUrl: '/images/icons/greenNeedle.png', // مسیر عکس از public
+  iconSize: [35, 35],          // اندازه دلخواه
+  iconAnchor: [17, 35],        // نقطه نوک آیکن
+  popupAnchor: [0, -35],       // موقعیت پاپ‌آپ
+});
+// داده‌های ماک که نشان‌دهنده مکان‌های ثبت‌شده در تهران هستند
+const savedLocations = [
+  { latitude: 35.6892, longitude: 51.3890, label: "مکان 1", condition: "yes" },
+  { latitude: 35.7023, longitude: 51.3510, label: "مکان 2", condition: "yes" },
+  { latitude: 35.7310, longitude: 51.3890, label: "مکان 3", condition: "yes" },
+  { latitude: 35.7110, longitude: 51.3890, label: "مکان 4", condition: "no" },
+  { latitude: 35.7110, longitude: 51.3790, label: "مکان 5", condition: "no" },
+  // اضافه کردن مکان‌های بیشتر به همین شکل
+];
 
 const getLocationByIP = async () => {
   try {
@@ -58,6 +90,7 @@ const LocateButton = ({ setUserPosition }: { setUserPosition: (pos: [number, num
     </button>
   );
 };
+
 const CustomZoomControls = ({ setUserPosition }: { setUserPosition: (pos: [number, number], msg: string) => void }) => {
   const map = useMap();
 
@@ -80,6 +113,7 @@ const CustomZoomControls = ({ setUserPosition }: { setUserPosition: (pos: [numbe
     </div>
   );
 };
+
 const IranMap = () => {
   const [position, setPosition] = useState<[number, number] | null>(null);
   const [popupText, setPopupText] = useState<string>('');
@@ -91,8 +125,16 @@ const IranMap = () => {
     setPopupText(text);
   };
 
+  const handleMapClick = (e: L.LeafletMouseEvent) => {
+    const coords: [number, number] = [e.latlng.lat, e.latlng.lng];
+    setUserPosition(coords, "موقعیت انتخاب شده توسط شما");
+  };
+
+  const [isReporting, setIsReporting] = useState(false);
+
   return (
     <div className="relative w-full h-screen">
+      <ReportForm className='w-[50%] absolute top-0 left-0  h-[100%] z-10' />
       <MapContainer
         center={iranCenter}
         zoom={5.5}
@@ -105,33 +147,85 @@ const IranMap = () => {
       >
         <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
 
+        {/* نشان دادن موقعیت‌های ذخیره‌شده روی نقشه */}
+        {savedLocations.map((location, index) => (
+          <Marker key={index} position={[location.latitude, location.longitude]} icon={(location.condition == "yes" ? customIconGreenNeedle : customIconRedNeedle)}>
+            <Popup>{location.label}</Popup>
+          </Marker>
+        ))}
 
         {position && (
-          <Marker position={position}>
+          <Marker position={position} icon={customIconNeedle}>
             <Popup>{popupText}</Popup>
           </Marker>
         )}
 
         <CustomZoomControls setUserPosition={setUserPosition} />
+        {isReporting && (
+          <MapClickHandler onClick={(e) => {
+            const coords: [number, number] = [e.latlng.lat, e.latlng.lng];
+            setUserPosition(coords, "موقعیت انتخاب شده توسط شما");
+          }} />
+        )}
       </MapContainer>
       <section className="absolute top-7 right-10 w-[60px] h-[60px] bg-[#8EB486] flex justify-center rounded-xl">
         <Icon name="User" />
       </section>
 
-      {/* دکمه‌های پایین صفحه */}
-      <section className="absolute bottom-5 sm:bottom-10 w-full flex justify-center items-center sm:gap-8 gap-3 z-10 flex-col sm:flex-row text-center">
-        <button className="w-[200px]  bg-[#00E083] text-sm px-4 py-2 rounded-3xl shadow hover:bg-gray-100 transition  text-black">
-          مشکلات حل شده
-        </button>
-        <button className="w-[200px]  bg-[#F45151] text-sm px-4 py-2 rounded-3xl shadow hover:bg-gray-100 transition  text-black">
-          مشکلات حل نشده
-        </button>
-        <button className="w-[200px]  bg-[#F48B11] text-sm px-4 py-2 rounded-3xl shadow hover:bg-gray-100 transition  text-black">
-          ثبت گزارش جدید
-        </button>
-      </section>
+      {!isReporting &&
+        <section className="absolute bottom-5 sm:bottom-10 w-full flex justify-center items-center sm:gap-8 gap-3 z-10 flex-col sm:flex-row text-center">
+          <button className="w-[200px]  bg-[#00E083] text-sm px-4 py-2 rounded-3xl shadow hover:bg-gray-100 transition  text-black">
+            مشکلات حل شده
+          </button>
+          <button className="w-[200px]  bg-[#F45151] text-sm px-4 py-2 rounded-3xl shadow hover:bg-gray-100 transition  text-black">
+            مشکلات حل نشده
+          </button>
+          <button
+            onClick={() => setIsReporting(true)}
+            className="w-[200px]  bg-[#F48B11] text-sm px-4 py-2 rounded-3xl shadow hover:bg-gray-100 transition  text-black"
+          >
+            ثبت گزارش جدید
+          </button>
+        </section>
+      }
+
+      {isReporting && position && (
+        <div className="absolute bottom-10 w-full flex justify-center z-10 gap-4">
+          <button
+            onClick={() => {
+              alert(`مکان ثبت شد: ${position[0]}, ${position[1]}`);
+              setIsReporting(false);
+            }}
+            className="bg-green-600 text-white px-6 py-2 rounded-xl shadow"
+          >
+            ثبت مکان گزارش
+          </button>
+          <button
+            onClick={() => {
+              setIsReporting(false);
+              setPosition(null);
+              setPopupText('');
+            }}
+            className="bg-transparent border-0 p-0"
+          >
+            <Image
+              src="/images/icons/X.png"  // مسیر تصویر لغو
+              alt="Background Image"
+              width={64}
+              height={64}
+              className="w-10 h-10"  // سایز دلخواه برای عکس
+            />
+          </button>
+        </div>
+      )}
+
     </div>
   );
+};
+
+const MapClickHandler = ({ onClick }: { onClick: (e: L.LeafletMouseEvent) => void }) => {
+  useMap().on('click', onClick);
+  return null;
 };
 
 export default IranMap;
