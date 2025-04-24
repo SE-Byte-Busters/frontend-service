@@ -113,6 +113,38 @@ const CustomZoomControls = ({ setUserPosition }: { setUserPosition: (pos: [numbe
     </div>
   );
 };
+const ReportFormWithButton = () => {
+  const [isVisible, setIsVisible] = useState(false);
+
+  const toggleForm = () => {
+    setIsVisible(!isVisible);
+  };
+
+  return (
+    <div>
+      <div
+        onClick={toggleForm}
+        className={`absolute top-1/2 ${isVisible ? "left-[50%]" : "left-0"} transform -translate-y-1/2 z-20 cursor-pointer transition-all duration-500`}
+      >
+        <Image
+          src='/images/icons/cross.png'
+          alt={isVisible ? 'بستن فرم' : 'نمایش فرم'}
+          width={48}
+          height={61}
+        />
+      </div>
+
+      {/* ReportForm */}
+      <div
+        className={`w-[50%] fixed top-0 left-0 z-10 bg-white shadow-lg rounded-lg transition-all duration-500 ${isVisible ? 'translate-x-0' : '-translate-x-full'
+          }`}
+      >
+        {/* محتویات فرم شما در اینجا */}
+        <ReportForm />
+      </div>
+    </div >
+  );
+};
 
 const IranMap = () => {
   const [position, setPosition] = useState<[number, number] | null>(null);
@@ -134,7 +166,7 @@ const IranMap = () => {
 
   return (
     <div className="relative w-full h-screen">
-      <ReportForm className='w-[50%] absolute top-0 left-0  h-[100%] z-10' />
+      <ReportFormWithButton />
       <MapContainer
         center={iranCenter}
         zoom={5.5}
@@ -168,7 +200,7 @@ const IranMap = () => {
           }} />
         )}
       </MapContainer>
-      <section className="absolute top-7 right-10 w-[60px] h-[60px] bg-[#8EB486] flex justify-center rounded-xl">
+      <section className="absolute top-7 right-10 w-[60px] h-[60px] bg-[#8EB486] flex justify-center items-center rounded-xl">
         <Icon name="User" />
       </section>
 
