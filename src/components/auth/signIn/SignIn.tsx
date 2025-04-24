@@ -68,7 +68,11 @@ export default function SignIn() {
         setAlert({ type: '', message: '' });
       }, 2000);
       if (response.status >= 200 && response.status < 300) {
-        router.push("/map"); // Navigate to map page after successful OTP verification
+        localStorage.setItem("token", data.data.token)
+        localStorage.setItem("role", data.data.role)
+        setTimeout(() => {
+          router.push("/map"); // Navigate to map page after successful OTP verification
+        }, 1000);
       }
 
     } catch (error) {
