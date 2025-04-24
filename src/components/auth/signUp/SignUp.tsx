@@ -73,7 +73,7 @@ export default function SignUp() {
       });
       const data = await response.json();
 
-      if (response.status >= 200 || response.status < 300) {
+      if (response.status >= 200 && response.status < 300) {
         setAlert({ type: 'success', message: 'تغییرات شما با موفقیت ذخیره شد.' });
       } else if (response.status >= 400 || response.status < 500) {
         setAlert({ type: 'error', message: 'در ثبت تغییرات مشکلی پیش آمد. لطفاً دوباره تلاش کنید.' });
@@ -85,7 +85,7 @@ export default function SignUp() {
       setTimeout(() => {
         setAlert({ type: '', message: '' });
       }, 2000);
-      if (response.status >= 200 || response.status < 300) {
+      if (response.status >= 200 && response.status < 300) {
         router.push(`/auth/otp?id=${data.data._id}&phonenumber=${data.data.otpSentTo}`);
       }
 
