@@ -51,7 +51,7 @@ export default function NotFound() {
 
           <nav className="flex flex-col md:flex-row justify-center items-center gap-4 md:gap-20 w-full">
             <Link
-              href="/new-report"
+              href="/report/new-report"
               className="bg-accent text-white text-base md:text-2xl rounded-lg px-6 py-3 transition duration-300 hover:text-black w-full md:w-64 text-center"
               aria-label="ثبت گزارش جدید"
             >
