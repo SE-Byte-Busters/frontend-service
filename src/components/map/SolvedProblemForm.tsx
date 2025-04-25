@@ -54,7 +54,6 @@ const SolvedProblemForm: React.FC<ReportFormProps> = ({ onSubmit, className }) =
                             onChange={(e) => setDescription(e.target.value)}
                         />
 
-<<<<<<< HEAD
                         <h2 className="flex border-b border-[#685752] pb-6 pt-4 m-2">
                             <span className="font-bold text-[20px] text-[#685752] font-vazirmatn ml-8">
                                 JAVADI334                            </span>
@@ -73,31 +72,6 @@ const SolvedProblemForm: React.FC<ReportFormProps> = ({ onSubmit, className }) =
                                 hamed_Gangi24                            </span>
                             <span className="font-bold text-[20px] text-[#685752] font-vazirmatn">
                                 امروز بارون اومد، چاله پر آب شده بود!                            </span>
-=======
-                        <h2 className="inline-block border-b border-[#685752] pb-6 pt-4 m-2">
-                            <span className="font-bold text-[20px] text-[#685752] font-vazirmatn ml-8">
-                                saraH
-                            </span>
-                            <span className="font-bold text-[20px] text-[#685752] font-vazirmatn">
-                                من دارم میایم شما کجتاینن
-                            </span>
-                        </h2>
-                        <h2 className="inline-block border-b border-[#685752] pb-6 pt-4 m-2">
-                            <span className="font-bold text-[20px] text-[#685752] font-vazirmatn ml-8">
-                                saraH
-                            </span>
-                            <span className="font-bold text-[20px] text-[#685752] font-vazirmatn">
-                                من دارم میایم شما کجتاینن
-                            </span>
-                        </h2>
-                        <h2 className="inline-block border-b border-[#685752] pb-6 pt-4 m-2">
-                            <span className="font-bold text-[20px] text-[#685752] font-vazirmatn ml-8">
-                                saraH
-                            </span>
-                            <span className="font-bold text-[20px] text-[#685752] font-vazirmatn">
-                                من دارم میایم شما کجتاینن
-                            </span>
->>>>>>> 87a8d77 (add : add options to map)
                         </h2>
                     </div>
 
