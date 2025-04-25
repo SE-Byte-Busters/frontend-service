@@ -45,7 +45,7 @@ export default function FormField({
           onChange={onChange}
           required={required}
           disabled={disabled}
-          className={`w-full p-3 border border-gray-300 text-gray-700 rounded-full focus:ring-2 focus:ring-accent focus:border-accent outline-none transition ${
+          className={`w-full p-3 px-6 border border-gray-300 text-gray-700 rounded-full focus:ring-2 focus:ring-accent focus:border-accent outline-none transition ${
             disabled ? "bg-gray-100 cursor-not-allowed" : ""
           } ${type === "password" ? "pr-10" : ""}`}
         />

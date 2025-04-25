@@ -3,7 +3,7 @@
 import { useState, useRef } from 'react';
 
 import UserAvatar from '@/components/UserAvatar';
-import FormField from './FormFeild';
+import FormField from './FormField';
 
 interface Profile {
   username: string;
