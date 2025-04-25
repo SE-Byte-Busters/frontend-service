@@ -1,160 +1,131 @@
-import React, { useState } from 'react';
+'use client';
+
+import React from 'react';
 import Image from 'next/image';
-import { useReport } from '@/context/ ReportContext';
+import { Avatar } from '@mui/material';
+import PersonIcon from '@mui/icons-material/Person';
 
 interface ReportFormProps {
     onSubmit?: (data: any) => void;
     className?: string;
 }
 
-
 const UnSolvedProblemForm: React.FC<ReportFormProps> = ({ onSubmit, className }) => {
-    const [title, setTitle] = useState('');
-    const [description, setDescription] = useState('');
-    const [address, setAddress] = useState('');
-    const [category, setCategory] = useState('');
-    const [images, setImages] = useState<File[]>([]);
-    const { isLocatedNeedle, setIsLocatedNeedle } = useReport();
-    const { isVisible, setIsVisible } = useReport();
-
-
-    const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        if (e.target.files) {
-            setImages(Array.from(e.target.files));
-        }
-    };
-
-    const handleSubmit = () => {
-        setIsLocatedNeedle(false)
-        setIsVisible(true)
-
-        const formData = {
-            title,
-            description,
-            address,
-            category,
-            images,
-        };
-        if (onSubmit) onSubmit(formData);
-        alert("گزارش ثبت شد!");
-    };
-
-    const categories = [
-        { id: 'cleaning', label: 'زباله و پاکسازی', icon: '/images/icons/bin.png' },
-        { id: 'maintenance', label: 'خرابی یا تعمیرات', icon: '/images/icons/wrench.png' },
-        { id: 'danger', label: 'خطرات احتمالی', icon: '/images/icons/danger.png' },
-        { id: 'other', label: 'سایر موارد', icon: '/images/icons/question.png' },
-    ];
+    // مقادیر داینامیک
+    const totalVotes = 13;
+    const positivePercent = 64;
+    const negativePercent = 100 - positivePercent;
 
     return (
-        <div className={className}>
-            <div className=" grid grid-cols-12 md:flex-row gap-6 w-full p-6 bg-[#fff9f5] rounded-lg shadow-md min-h-screen" >
-                {/* فرم */}
-                <div className="col-span-5 space-y-4">
-                    <div>
-                        <label className="block mb-1 text-right text-[#685752] text-[24px] font-vazirmatn">عنوان گزارش</label>
-                        <label className="block mb-1 text-right text-[#685752]">یک جمله کوتاه و واضح برای عنوان مشکلت بنویس.</label>
-                        <input
-                            type="text"
-                            className="w-full border border-[#685752] p-2 rounded-[30px] text-[#685752]"
-                            placeholder="مثلا: دیواره کنار پل ترک برداشته"
-                            value={title}
-                            onChange={(e) => setTitle(e.target.value)}
-                        />
-                    </div>
-                    <div>
-                        <label className="block mb-1 text-right text-[#685752] text-[24px] font-vazirmatn">توضیح مشکل</label>
-                        <label className="block mb-1 text-right text-[#685752]">یک جمله کوتاه و واضح برای عنوان مشکلت بنویس.</label>
-
-                        <textarea
-                            className="w-full border border-[#685752] p-2 rounded-[30px] text-[#685752]"
-                            placeholder="مثلا: ترک عمیق به‌وجود آمده و ترس ریزش پل وجود دارد."
-                            rows={4}
-                            value={description}
-                            onChange={(e) => setDescription(e.target.value)}
-                        />
-                    </div>
-                    <div>
-                        <label className="block mb-1 text-right text-[#685752] text-[24px] font-vazirmatn">آدرس حدودی</label>
-                        <label className="block mb-1 text-right text-[#685752]">یک جمله کوتاه و واضح برای عنوان مشکلت بنویس.</label>
-
-                        <input
-                            type="text"
-                            className="w-full border border-[#685752] p-2 rounded-[30px] text-[#685752]"
-                            placeholder="مثلا: تهران، خیابان ولیعصر، روبروی پارک دانشجو"
-                            value={address}
-                            onChange={(e) => setAddress(e.target.value)}
-                        />
+        <div dir="rtl" className="grid grid-cols-12 gap-6 p-6 bg-[#fff5f3] rounded-xl shadow-sm min-h-screen">
+            {/* بخش اطلاعات و کامنت‌ها */}
+            <div dir="rtl" className="bg-[#fff5f3] rounded-xl p-5 w-full max-w-md mx-auto shadow-sm space-y-5">
+                {/* بخش بالا: آیکون، وضعیت و تاریخ */}
+                <div className="flex items-start justify-between">
+                    <div className="flex items-center space-x-2 space-x-reverse">
+                        <Image src="/images/special/pickaxe.png" alt="آیکون" width={40} height={40} />
+                        <div className="flex flex-col items-start">
+                            <span className="text-green-600 font-semibold text-lg">حل شده</span>
+                        </div>
                     </div>
 
-
-                </div>
-                {/* تصاویر */}
-                <div className="col-span-7">
-                    <h3 className="text-right mb-2 text-[#685752] ">ارسال عکس ها</h3>
-                    <div className="border border-dashed border-[#c1a291] p-6 rounded-md text-center flex flex-col justify-center items-center ">
-
-                        <Image src="/images/icons/cloudUpload.png" alt="cloud-upload" width={72} height={73} />
-                        <p className="text-md text-[#685752]">عکس‌های مربوط به گزارش را اینجا بکشید و رها کنید یا برای انتخاب از دستگاه خود کلیک کنید.</p>
-                        <p className="text-sm text-[#87878B]">حداکثر ۵ تصویر | فرمت‌های مجاز: JPG, PNG | حجم هر تصویر تا ۵ مگابایت</p>
-                        <div className="mb-4">
-                            <input
-                                type="file"
-                                multiple
-                                accept="image/*"
-                                onChange={handleImageChange}
-                                id="image-upload"
-                                className="hidden"
-                            />
-                            <label
-                                htmlFor="image-upload"
-                                className="cursor-pointer bg-[#6B5147] text-white py-2 px-6 rounded-xl inline-block text-sm text-center"
-                            >
-                                جستجو
-                            </label>
+                    <div className="text-sm text-right">
+                        <p className="text-gray-700">تاریخ حل مشکل: ۱۰ بهمن ۱۴۰۳</p>
+                        <div className="flex items-center justify-end mt-1 space-x-2 space-x-reverse">
+                            <Avatar sx={{ width: 24, height: 24 }}>
+                                <PersonIcon sx={{ fontSize: 16 }} />
+                            </Avatar>
+                            <span className="text-gray-800 text-sm font-medium">hamed_Gangi24</span>
                         </div>
                     </div>
                 </div>
-                <div className='col-span-12'>
-                    <p className="text-md text-[#685752]">عکس‌های مربوط به گزارش را اینجا بکشید و رها کنید یا برای انتخاب از دستگاه خود کلیک کنید.</p>
-                    <p className="text-sm text-[#87878B]">حداکثر ۵ تصویر | فرمت‌های مجاز: JPG, PNG | حجم هر تصویر تا ۵ مگابایت</p>
+
+                {/* اولویت */}
+                <div className="flex items-center justify-end space-x-2 space-x-reverse">
+                    <span className="text-sm text-gray-700">اولویت متوسط</span>
+                    <span className="w-4 h-4 rounded-full bg-blue-600 inline-block" />
                 </div>
 
-                <div className='col-span-6 space-y-0'>
+                {/* نظرات */}
+                <div className="space-y-4">
+                    <h3 className="font-semibold text-gray-800">نظرات و پیشنهادات</h3>
 
-                    {/* انتخاب دسته‌بندی */}
-                    <Image src="/images/icons/tools.png" alt="tools" width={280} height={54} />
+                    <textarea
+                        placeholder="پیشنهاد و نظرت رو اینجا بنویس ..."
+                        className="w-full h-20 border border-gray-300 rounded-lg p-2 text-sm resize-none outline-none focus:ring-1 focus:ring-orange-300 bg-white"
+                    />
 
-                    <Image src="/images/icons/lightbulb.png" alt="lightbulb" width={280} height={54} />
-
-                    <Image src="/images/icons/trash.png" alt="trash" width={280} height={54} />
-
-
-
-
+                    {/* نظرات کاربران */}
+                    <div className="space-y-4 text-sm text-gray-800">
+                        <div>
+                            <p className="mb-1">ظاهر مغازه رو خیلی بد کرده، لطفاً سریع‌تر رسیدگی شه.</p>
+                            <p className="text-xs text-gray-500 text-left">saraAH</p>
+                            <hr className="my-2" />
+                        </div>
+                        <div>
+                            <p className="mb-1">بچه‌م از اینجا رد میشه، ترک دیوار خطرناکه.</p>
+                            <p className="text-xs text-gray-500 text-left">Hamid_453</p>
+                            <hr className="my-2" />
+                        </div>
+                        <div>
+                            <p className="mb-1">اگه لازم باشه خودم کمک می‌کنم رنگش کنیم!</p>
+                            <p className="text-xs text-gray-500 text-left">hamed_Gangi24</p>
+                        </div>
+                    </div>
                 </div>
-                <div className='col-span-6 space-y-2'>
-                    <Image src="/images/icons/barrier.png" alt="barrier" width={320} height={74} />
-
-                    <Image src="/images/icons/smog.png" alt="smog" width={320} height={74} />
-                    <Image src="/images/icons/leaf.png" alt="leaf" width={320} height={74} />
-                </div>
-                <div className='col-span-12 text-center'>
-                    <button
-                        onClick={handleSubmit}
-                        className="bg-[#f89b2f] w-[234px] h-[44px] mt-4 py-2 rounded-full text-white shadow-md hover:bg-[#e38821] transition"
-                    >
-                        ثبت گزارش
-                    </button>
-                </div>
-
-
-
-
             </div>
 
+            {/* بخش تصویر و رأی‌دهی */}
+            <div className="col-span-12 md:col-span-5 space-y-3">
+                <Image src="/images/special/kharabi.png" alt="تصویر دیوار" width={350} height={310} />
 
-        </div >
+                {/* نوار رأی‌دهی داینامیک */}
+                <div className="w-full space-y-1">
+                    <div className="flex w-full h-8 overflow-hidden rounded-full border border-gray-200 shadow-sm text-sm font-bold">
+                        {/* درصد مخالف */}
+                        <span className="text-green-600 font-semibold rounded-full">
+                            <Image src="/images/icons/dislike.png" alt="like" width={56} height={64} />
+
+                        </span>
+
+                        <div
+                            className="bg-red-200 text-red-600 flex items-center justify-center"
+                            style={{
+                                width: `${negativePercent}%`,
+                                borderTopLeftRadius: '9999px',
+                                borderBottomLeftRadius: '9999px',
+                                borderTopRightRadius: 0,
+                                borderBottomRightRadius: 0,
+                            }}
+                        >
+                            {Math.round(negativePercent)}٪
+                        </div>
+
+
+                        {/* درصد موافق */}
+                        <div
+                            className="bg-green-200 text-green-600 flex items-center justify-center"
+                            style={{
+                                width: `${positivePercent}%`,
+                                borderTopRightRadius: '9999px',
+                                borderBottomRightRadius: '9999px',
+                                borderTopLeftRadius: 0,
+                                borderBottomLeftRadius: 0,
+                            }}
+                        >
+                            {Math.round(positivePercent)}٪
+                        </div>
+                        <span className="text-red-500 font-semibold rounded-full">
+                            <Image src="/images/icons/like.png" alt="like" width={56} height={64} />
+
+                        </span>
+
+                    </div>
+
+                    <p className="text-center text-xs text-gray-700">{totalVotes} نفر رای داده‌اند</p>
+                </div>
+            </div>
+        </div>
     );
 };
 
