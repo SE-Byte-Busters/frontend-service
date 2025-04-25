@@ -8,7 +8,7 @@ interface ReportFormProps {
 }
 
 
-const ReportForm: React.FC<ReportFormProps> = ({ onSubmit, className }) => {
+const UnSolvedProblemForm: React.FC<ReportFormProps> = ({ onSubmit, className }) => {
     const [title, setTitle] = useState('');
     const [description, setDescription] = useState('');
     const [address, setAddress] = useState('');
@@ -158,4 +158,4 @@ const ReportForm: React.FC<ReportFormProps> = ({ onSubmit, className }) => {
     );
 };
 
-export default ReportForm;
+export default UnSolvedProblemForm;

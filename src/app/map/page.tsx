@@ -1,5 +1,6 @@
 'use client';
 
+import { ReportProvider } from '@/context/ ReportContext';
 import dynamic from 'next/dynamic';
 
 const LazyMap = dynamic(
@@ -12,8 +13,7 @@ const LazyMap = dynamic(
 
 export default function Home() {
   return (
-    <div>
+    <ReportProvider>
       <LazyMap />
-    </div>
-  );
+    </ReportProvider>);
 }
