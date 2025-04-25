@@ -2,8 +2,6 @@
 
 import React from 'react';
 import Image from 'next/image';
-import { Avatar } from '@mui/material';
-import PersonIcon from '@mui/icons-material/Person';
 
 interface ReportFormProps {
     onSubmit?: (data: any) => void;
@@ -19,58 +17,38 @@ const UnSolvedProblemForm: React.FC<ReportFormProps> = ({ onSubmit, className })
     return (
         <div dir="rtl" className="grid grid-cols-12 gap-6 p-6 bg-[#fff5f3] rounded-xl shadow-sm min-h-screen">
             {/* بخش اطلاعات و کامنت‌ها */}
-            <div dir="rtl" className="bg-[#fff5f3] rounded-xl p-5 w-full max-w-md mx-auto shadow-sm space-y-5">
-                {/* بخش بالا: آیکون، وضعیت و تاریخ */}
-                <div className="flex items-start justify-between">
-                    <div className="flex items-center space-x-2 space-x-reverse">
-                        <Image src="/images/special/pickaxe.png" alt="آیکون" width={40} height={40} />
-                        <div className="flex flex-col items-start">
-                            <span className="text-green-600 font-semibold text-lg">حل شده</span>
-                        </div>
+            <div className="col-span-12 md:col-span-7 flex flex-col space-y-4">
+                <div className="flex justify-between items-start">
+                    <div className="space-y-1">
+                        <h2 className="font-bold text-lg text-gray-800">دیوار شکسته و خراب مغازه</h2>
+                        <p className="text-sm text-gray-500">تاریخ ثبت: ۱۰ بهمن ۱۴۰۳</p>
+                        <p className="text-sm text-gray-500">تهران، نرسیده به میدان توحید</p>
                     </div>
-
-                    <div className="text-sm text-right">
-                        <p className="text-gray-700">تاریخ حل مشکل: ۱۰ بهمن ۱۴۰۳</p>
-                        <div className="flex items-center justify-end mt-1 space-x-2 space-x-reverse">
-                            <Avatar sx={{ width: 24, height: 24 }}>
-                                <PersonIcon sx={{ fontSize: 16 }} />
-                            </Avatar>
-                            <span className="text-gray-800 text-sm font-medium">hamed_Gangi24</span>
-                        </div>
+                    <div className="text-center text-sm text-gray-700">
+                        <p className="text-xs">تاریخ حل مشکل:</p>
+                        <p className="font-bold text-base">۱۰ بهمن ۱۴۰۳</p>
+                        <p className="text-xs text-gray-500 mt-1">hamed_Gangi24</p>
                     </div>
                 </div>
 
-                {/* اولویت */}
-                <div className="flex items-center justify-end space-x-2 space-x-reverse">
-                    <span className="text-sm text-gray-700">اولویت متوسط</span>
-                    <span className="w-4 h-4 rounded-full bg-blue-600 inline-block" />
+                <span className="bg-green-100 text-green-700 px-3 py-1 rounded-full w-fit text-sm font-semibold">
+                    حل شده ✅
+                </span>
+
+                <div className="flex items-center gap-2">
+                    <span className="text-sm font-medium">اولویت:</span>
+                    <span className="bg-blue-100 text-blue-700 px-2 py-1 rounded-full text-sm">متوسط</span>
                 </div>
 
-                {/* نظرات */}
-                <div className="space-y-4">
-                    <h3 className="font-semibold text-gray-800">نظرات و پیشنهادات</h3>
-
+                <div className="bg-white border rounded-xl p-4 space-y-3">
                     <textarea
-                        placeholder="پیشنهاد و نظرت رو اینجا بنویس ..."
-                        className="w-full h-20 border border-gray-300 rounded-lg p-2 text-sm resize-none outline-none focus:ring-1 focus:ring-orange-300 bg-white"
+                        placeholder="پیشنهاد و نظرت رو اینجا بنویس..."
+                        className="w-full border border-gray-200 rounded-md p-2 resize-none outline-none focus:ring-1 focus:ring-orange-300 text-sm"
                     />
-
-                    {/* نظرات کاربران */}
-                    <div className="space-y-4 text-sm text-gray-800">
-                        <div>
-                            <p className="mb-1">ظاهر مغازه رو خیلی بد کرده، لطفاً سریع‌تر رسیدگی شه.</p>
-                            <p className="text-xs text-gray-500 text-left">saraAH</p>
-                            <hr className="my-2" />
-                        </div>
-                        <div>
-                            <p className="mb-1">بچه‌م از اینجا رد میشه، ترک دیوار خطرناکه.</p>
-                            <p className="text-xs text-gray-500 text-left">Hamid_453</p>
-                            <hr className="my-2" />
-                        </div>
-                        <div>
-                            <p className="mb-1">اگه لازم باشه خودم کمک می‌کنم رنگش کنیم!</p>
-                            <p className="text-xs text-gray-500 text-left">hamed_Gangi24</p>
-                        </div>
+                    <div className="space-y-2 text-sm leading-relaxed text-gray-700">
+                        <p><strong>saraAH:</strong> ظاهر مغازه رو خیلی بد کرده، لطفاً سریع‌تر رسیدگی شه.</p>
+                        <p><strong>Hamid_453:</strong> بچه‌م از اینجا رد میشه، ترک دیوار خطرناکه.</p>
+                        <p><strong>hamed_Gangi24:</strong> اگه لازم باشه خودم کمک می‌کنم رنگش کنیم!</p>
                     </div>
                 </div>
             </div>
