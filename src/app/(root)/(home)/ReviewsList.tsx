@@ -1,7 +1,8 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Icon } from "@/components/Icon";
+
+import StarRating from "@/components/StarRating";
 import UserAvatar from "@/components/UserAvatar";
 
 export interface ReviewType {
@@ -56,37 +57,6 @@ export function ReviewsList({
     }
   };
 
-  const getStars = (rating: number) => {
-    const stars = [];
-    for (let i = 1; i <= 5; i++) {
-      if ((rating / 2) >= i) {
-        stars.push(
-          <Icon
-            name="Star"
-            key={i}
-            className="w-5 h-5 fill-yellow-500 text-yellow-500"
-          />
-        );
-      } else if ((rating / 2) >= i - 0.5) {
-        stars.push(
-          <div key={i} className="relative inline-block">
-            <Icon name="Star" className="w-5 h-5 fill-gray-300 text-gray-300" />
-            <Icon name="StarHalf" className="w-5 h-5 absolute top-0 left-0 fill-yellow-500 text-yellow-500" />
-          </div>
-        );
-      } else {
-        stars.push(
-          <Icon
-            name="Star"
-            key={i}
-            className="w-5 h-5 fill-gray-300 text-gray-300"
-          />
-        );
-      }
-    }
-    return stars;
-  };
-
   return (
     <>
       <div className="relative">
@@ -104,9 +74,7 @@ export function ReviewsList({
               <div className="flex flex-col text-right grow">
                 <p className="text-base md:text-lg font-semibold text-black">{review.name}</p>
                 <time className="text-xs md:text-sm text-black">{review.date}</time>
-                <div className="flex flex-row-reverse justify-end">
-                  {getStars(review.rating)}
-                </div>
+                <StarRating rating={review.rating} className="justify-end"/>
               </div>
               <UserAvatar
                 picture={review.picture}
