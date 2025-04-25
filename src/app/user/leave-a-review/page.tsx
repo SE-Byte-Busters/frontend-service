@@ -3,6 +3,8 @@
 import { useState } from "react";
 import Image from "next/image";
 
+import StarRating from "@/components/StarRating";
+
 export default function LeaveReview() {
   const [review, setReview] = useState({
     rating: 10,
@@ -61,11 +63,11 @@ export default function LeaveReview() {
             className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent focus:border-accent outline-none transition"
           />
           <div className="flex justify-center">
-            {/* <StarRating
+            <StarRating
               rating={review.rating}
               setRating={handleRatingChange}
               interactive={true}
-            /> */}
+            />
           </div>
         </div>
         <button
