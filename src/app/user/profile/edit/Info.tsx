@@ -12,7 +12,7 @@ export default function InfoSection() {
   };
 
   return (
-    <section className="bg-light rounded-2xl shadow-md p-6 mb-6">
+    <section className="bg-light rounded-2xl shadow-md p-6">
       <h1 className="text-xl font-bold text-dark">
         مشخصات پروفایل کاربری من
       </h1>

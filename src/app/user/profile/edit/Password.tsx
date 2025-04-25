@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 
-import FormField from './FormFeild';
+import FormField from './FormField';
 
 export default function PasswordSection() {
   const [password, setPassword] = useState({
@@ -35,7 +35,7 @@ export default function PasswordSection() {
   };
 
   return (
-    <section className="bg-light rounded-2xl shadow-md p-6 mb-6">
+    <section className="bg-light rounded-2xl shadow-md p-6">
       <h1 className="text-xl font-bold text-dark">
         تغییر رمز عبور من
       </h1>

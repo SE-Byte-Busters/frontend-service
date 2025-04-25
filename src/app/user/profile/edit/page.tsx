@@ -3,9 +3,11 @@ import PasswordSection from "./Password";
 
 export default function EditProfile() {
   return (
-    <div className="flex flex-col md:flex-row bg-white sm:bg-light pt-16 sm:pt-20">
-      <InfoSection />
-      <PasswordSection />
+    <div className="min-h-screen bg-gray-100 pt-20 py-8 px-4 sm:px-8 lg:px-20">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-20 items-start">
+        <InfoSection />
+        <PasswordSection />
+      </div>
     </div>
   )
 }
