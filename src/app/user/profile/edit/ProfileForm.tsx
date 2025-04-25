@@ -1,7 +1,9 @@
 "use client";
 
 import { useState, useRef } from 'react';
+
 import UserAvatar from '@/components/UserAvatar';
+import FormField from './FormFeild';
 
 interface Profile {
   username: string;
@@ -181,51 +183,6 @@ export default function ProfileForm({ initialProfile }: ProfileFormProps) {
           </button>
         </div>
       </form>
-    </div>
-  );
-}
-
-interface FormFieldProps {
-  label: string;
-  id: string;
-  name: string;
-  value: string;
-  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
-  dir?: string;
-  type?: string;
-  required?: boolean;
-  disabled?: boolean;
-}
-
-function FormField({
-  label,
-  id,
-  name,
-  value,
-  onChange,
-  dir = "rtl",
-  type = "text",
-  required = false,
-  disabled = false,
-}: FormFieldProps) {
-  return (
-    <div className="space-y-2">
-      <label htmlFor={id} className="block text-lg font-medium text-dark">
-        {label}
-      </label>
-      <input
-        type={type}
-        id={id}
-        name={name}
-        value={value}
-        dir={dir}
-        onChange={onChange}
-        required={required}
-        disabled={disabled}
-        className={`w-full p-3 border border-gray-300 text-gray-700 rounded-full focus:ring-2 focus:ring-accent focus:border-accent outline-none transition ${
-          disabled ? 'bg-gray-100 cursor-not-allowed' : ''
-        }`}
-      />
     </div>
   );
 }
