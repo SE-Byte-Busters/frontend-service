@@ -12,7 +12,7 @@ const navItems: Array<{
   logo: LucideIconName;
 }> = [
   { name: "صفحه اصلی", href: "/", logo: "Home" },
-  { name: "گزارشات اخیر", href: "/reports", logo: "ScrollText" },
+  { name: "گزارشات اخیر", href: "/report/reports", logo: "ScrollText" },
   { name: "نقشه", href: "/map", logo: "MapPin" },
   { name: "تابلوی بهترین‌ها", href: "/leaderboard", logo: "Medal" },
 ];
