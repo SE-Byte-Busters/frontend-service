@@ -5,6 +5,8 @@ type ReportContextType = {
     setIsVisible: (value: boolean) => void;
     isLocatedNeedle: boolean;
     setIsLocatedNeedle: (value: boolean) => void;
+    showNeedleOrange: boolean;
+    setShowNeedleOrange: (value: boolean) => void;
 };
 
 const ReportContext = createContext<ReportContextType | undefined>(undefined);
@@ -13,11 +15,13 @@ const ReportContext = createContext<ReportContextType | undefined>(undefined);
 export const ReportProvider = ({ children }: { children: React.ReactNode }) => {
     const [isVisible, setIsVisible] = useState(true);
     const [isLocatedNeedle, setIsLocatedNeedle] = useState(false);
+    const [showNeedleOrange, setShowNeedleOrange] = useState(false);
+
 
 
 
     return (
-        <ReportContext.Provider value={{ isVisible, setIsVisible, isLocatedNeedle, setIsLocatedNeedle }}>
+        <ReportContext.Provider value={{ isVisible, setIsVisible, isLocatedNeedle, setIsLocatedNeedle, showNeedleOrange, setShowNeedleOrange }}>
             {children}
         </ReportContext.Provider>
     );
