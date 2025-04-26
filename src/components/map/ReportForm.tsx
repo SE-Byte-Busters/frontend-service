@@ -16,6 +16,7 @@ const ReportForm: React.FC<ReportFormProps> = ({ onSubmit, className }) => {
     const [images, setImages] = useState<File[]>([]);
     const { isLocatedNeedle, setIsLocatedNeedle } = useReport();
     const { isVisible, setIsVisible } = useReport();
+    const { showNeedleOrange, setShowNeedleOrange } = useReport();
 
 
     const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -27,7 +28,7 @@ const ReportForm: React.FC<ReportFormProps> = ({ onSubmit, className }) => {
     const handleSubmit = () => {
         setIsLocatedNeedle(false)
         setIsVisible(true)
-
+        setShowNeedleOrange(false)
         const formData = {
             title,
             description,
