@@ -22,6 +22,8 @@ export default function ProfileForm({ initialProfile }: ProfileFormProps) {
   const [profile, setProfile] = useState<Profile>(initialProfile);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [isProfileLoading, setIsProfileLoading] = useState(false);
+  const [isPhotoLoading, setIsPhotoLoading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleProfileChange = (
@@ -49,34 +51,79 @@ export default function ProfileForm({ initialProfile }: ProfileFormProps) {
 
   const handleSubmitProfile = async (e: React.FormEvent) => {
     e.preventDefault();
+    setIsProfileLoading(true);
+
     try {
-      // TODO: replace with API call
-      console.log("Profile updated:", profile);
-      alert("Profile updated successfully!");
-    } catch (error) {
+      const response = await fetch('https://shahriar.thetechverse.ir:3000/api/v1/user-profile/update-profile', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('token')}`,
+        },
+        body: JSON.stringify({
+          firstName: profile.first_name,
+          lastName: profile.last_name,
+          username: profile.username,
+          email: profile.email
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || 'خطا در بروزرسانی پروفایل');
+      }
+
+      alert("پروفایل با موفقیت بروزرسانی شد!");
+    } catch (error: any) {
       console.error("Error updating profile:", error);
-      alert("Failed to update profile!");
+      alert(error.message || "خطا در بروزرسانی پروفایل!");
+    } finally {
+      setIsProfileLoading(false);
     }
   };
 
   const handleSubmitPhoto = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!selectedFile) {
-      alert("Please select a file first!");
+      alert("لطفا یک عکس انتخاب کنید!");
       return;
     }
 
+    setIsPhotoLoading(true);
+
     try {
-      // TODO: replace with API call
+      const formData = new FormData();
+      formData.append('profileImage', selectedFile);
+
+      const response = await fetch('https://shahriar.thetechverse.ir:3000/api/v1/user-profile/update-profile-image', {
+        method: 'PUT',
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token')}`,
+        },
+        body: formData,
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || 'خطا در بروزرسانی عکس پروفایل');
+      }
+
+      // update local state with the new photo URL if the API returns it
+      // otherwise keep the preview URL
+      const newPhotoUrl = data.photoUrl || previewUrl;
       setProfile((prev) => ({
         ...prev,
-        photo: previewUrl || null,
+        photo: newPhotoUrl,
       }));
-      alert("Profile picture updated successfully!");
+      alert("عکس پروفایل با موفقیت بروزرسانی شد!");
       setSelectedFile(null);
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error uploading image:", error);
-      alert("Failed to update profile picture");
+      alert(error.message || "خطا در بروزرسانی عکس پروفایل");
+    } finally {
+      setIsPhotoLoading(false);
     }
   };
 
@@ -111,9 +158,9 @@ export default function ProfileForm({ initialProfile }: ProfileFormProps) {
           <button
             type="submit"
             className="bg-accent text-white py-2 px-4 rounded-lg hover:text-black transition-colors duration-300 mt-auto"
-            disabled={!selectedFile}
+            disabled={!selectedFile || isPhotoLoading}
           >
-            بارگذاری عکس
+            {isPhotoLoading ? 'در حال بارگذاری...' : 'بارگذاری عکس'}
           </button>
         </form>
 
@@ -177,9 +224,12 @@ export default function ProfileForm({ initialProfile }: ProfileFormProps) {
         <div className="pt-4">
           <button
             type="submit"
-            className="w-full bg-accent text-white font-medium py-3 px-4 rounded-lg hover:text-black transition-colors duration-300"
+            className={`w-full bg-accent text-white font-medium py-3 px-4 rounded-lg hover:text-black transition-colors duration-300 ${
+              isProfileLoading ? 'opacity-70 cursor-not-allowed' : ''
+            }`}
+            disabled={isProfileLoading}
           >
-            ایجاد تغییرات
+            {isProfileLoading ? 'در حال بروزرسانی...' : 'ایجاد تغییرات'}
           </button>
         </div>
       </form>

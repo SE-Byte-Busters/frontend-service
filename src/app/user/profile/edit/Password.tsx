@@ -10,6 +10,7 @@ export default function PasswordSection() {
     new: '',
     confirm: '',
   });
+  const [isLoading, setIsLoading] = useState(false);
 
   const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -18,19 +19,39 @@ export default function PasswordSection() {
 
   const handleSubmitPassword = async (e: React.FormEvent) => {
     e.preventDefault();
+
     if (password.new !== password.confirm) {
-      alert("New password doesn't match!");
+      alert("رمز عبور جدید با تکرار آن مطابقت ندارد!");
       return;
     }
 
-    console.log('Password change requested:', password);
+    setIsLoading(true);
     try {
-      // TODO: replace with API call
+      const response = await fetch('https://shahriar.thetechverse.ir:3000/api/v1/user-profile/update-password', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('token')}`,
+        },
+        body: JSON.stringify({
+          oldPassword: password.current,
+          newPassword: password.new
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || 'خطا در تغییر رمز عبور');
+      }
+
       setPassword({ current: '', new: '', confirm: '' });
-      alert('Password changed successfully!');
-    } catch (error) {
-      setPassword({ current: '', new: '', confirm: '' });
-      alert('Failed to change password!');
+      alert('رمز عبور با موفقیت تغییر یافت!');
+    } catch (error: any) {
+      console.error('Error changing password:', error);
+      alert(error.message || 'خطا در تغییر رمز عبور! لطفا مجددا تلاش نمایید.');
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -79,9 +100,12 @@ export default function PasswordSection() {
         <div className="pt-4">
           <button
             type="submit"
-            className="w-full bg-accent text-white font-medium py-3 px-4 rounded-lg hover:text-black transition-colors duration-300"
+            disabled={isLoading}
+            className={`w-full bg-accent text-white font-medium py-3 px-4 rounded-lg hover:text-black transition-colors duration-300 ${
+              isLoading ? 'opacity-70 cursor-not-allowed' : ''
+            }`}
           >
-            تغییر رمز عبور
+            {isLoading ? 'در حال تغییر...' : 'تغییر رمز عبور'}
           </button>
         </div>
       </form>
