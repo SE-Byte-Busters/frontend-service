@@ -129,6 +129,7 @@ const ReportFormWithButton = ({ }) => {
       <div
         onClick={toggleForm}
         className={`absolute top-1/2 ${!isVisible ? "left-[50%]" : "left-0"} transform -translate-y-1/2 z-20 cursor-pointer transition-all duration-500`}
+        style={{ transform: `${!isVisible ? "translateY(-50%)" : "translateY(-50%) rotateY(180deg)"}` }}
       >
         <Image
           src='/images/icons/cross.png'
@@ -137,6 +138,7 @@ const ReportFormWithButton = ({ }) => {
           height={61}
         />
       </div>
+
 
       {/* ReportForm */}
       <div
@@ -162,6 +164,7 @@ const UnSolvedProblemFormWithLocation = ({ }) => {
       <div
         onClick={toggleForm}
         className={`absolute top-1/2 ${!isVisible ? "left-[50%]" : "left-0"} transform -translate-y-1/2 z-20 cursor-pointer transition-all duration-500`}
+        style={{ transform: `${!isVisible ? "translateY(-50%)" : "translateY(-50%) rotateY(180deg)"}` }}
       >
         <Image
           src='/images/icons/crossRed.png'
@@ -170,7 +173,6 @@ const UnSolvedProblemFormWithLocation = ({ }) => {
           height={61}
         />
       </div>
-
       {/* ReportForm */}
       <div
         className={`w-[50%] fixed top-0 left-0 z-10 bg-white shadow-lg rounded-lg transition-all duration-500 ${!isVisible ? 'translate-x-0' : '-translate-x-full'

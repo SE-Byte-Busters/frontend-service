@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import Image from 'next/image';
 
 interface ReportFormProps {
@@ -13,44 +13,70 @@ const UnSolvedProblemForm: React.FC<ReportFormProps> = ({ onSubmit, className })
     const totalVotes = 13;
     const positivePercent = 64;
     const negativePercent = 100 - positivePercent;
+    const [description, setDescription] = useState("")
 
     return (
         <div dir="rtl" className="grid grid-cols-12 gap-6 p-6 bg-[#fff5f3] rounded-xl shadow-sm min-h-screen">
             {/* بخش اطلاعات و کامنت‌ها */}
-            <div className="col-span-12 md:col-span-7 flex flex-col space-y-4">
-                <div className="flex justify-between items-start">
-                    <div className="space-y-1">
-                        <h2 className="font-bold text-lg text-gray-800">دیوار شکسته و خراب مغازه</h2>
-                        <p className="text-sm text-gray-500">تاریخ ثبت: ۱۰ بهمن ۱۴۰۳</p>
-                        <p className="text-sm text-gray-500">تهران، نرسیده به میدان توحید</p>
+            <div className="col-span-12 md:col-span-7 flex flex-row space-y-4">
+                <div className="flex justify-between items-start flex-row">
+                    <div >
+                        <section className="flex justify-between items-center">
+                            <Image src="/images/icons/profile.png" alt="profile" width={80} height={40}></Image>
+                            <section>
+                                <h2 className="font-bold text-lg text-gray-800">تاریخ حل مشکل : ۱۰ بهمن ۱۴۰۳</h2>
+                                <h4 className="font-bold text-sm text-gray-800">hamed_Gangi24</h4>
+
+                            </section>
+
+                        </section>
+                        <Image src="/images/icons/priorityMiddle.png" alt="profile" className="m-[10px]" width={150} height={150}></Image>
+                        <label className="font-bold text-[24px] text-[#685752] font-vazirmatn m-[10px]">نظرات و پیشنهادات</label>
+
+                        <textarea
+                            className="w-[90%] border border-[#685752] p-3  m-2 rounded-[30px] text-[#685752]"
+                            placeholder="مثلا: ترک عمیق به‌وجود آمده و ترس ریزش پل وجود دارد."
+                            rows={4}
+                            value={description}
+                            onChange={(e) => setDescription(e.target.value)}
+                        />
+
+                        <h2 className="inline-block border-b border-[#685752] pb-6 pt-4 m-2">
+                            <span className="font-bold text-[20px] text-[#685752] font-vazirmatn ml-8">
+                                saraH
+                            </span>
+                            <span className="font-bold text-[20px] text-[#685752] font-vazirmatn">
+                                من دارم میایم شما کجتاینن
+                            </span>
+                        </h2>
+                        <h2 className="inline-block border-b border-[#685752] pb-6 pt-4 m-2">
+                            <span className="font-bold text-[20px] text-[#685752] font-vazirmatn ml-8">
+                                saraH
+                            </span>
+                            <span className="font-bold text-[20px] text-[#685752] font-vazirmatn">
+                                من دارم میایم شما کجتاینن
+                            </span>
+                        </h2>
+                        <h2 className="inline-block border-b border-[#685752] pb-6 pt-4 m-2">
+                            <span className="font-bold text-[20px] text-[#685752] font-vazirmatn ml-8">
+                                saraH
+                            </span>
+                            <span className="font-bold text-[20px] text-[#685752] font-vazirmatn">
+                                من دارم میایم شما کجتاینن
+                            </span>
+                        </h2>
+
                     </div>
-                    <div className="text-center text-sm text-gray-700">
-                        <p className="text-xs">تاریخ حل مشکل:</p>
-                        <p className="font-bold text-base">۱۰ بهمن ۱۴۰۳</p>
-                        <p className="text-xs text-gray-500 mt-1">hamed_Gangi24</p>
-                    </div>
+
+
+                    <Image src="/images/icons/solved.png" alt="profile" width={80} height={40}></Image>
+
+
                 </div>
 
-                <span className="bg-green-100 text-green-700 px-3 py-1 rounded-full w-fit text-sm font-semibold">
-                    حل شده ✅
-                </span>
 
-                <div className="flex items-center gap-2">
-                    <span className="text-sm font-medium">اولویت:</span>
-                    <span className="bg-blue-100 text-blue-700 px-2 py-1 rounded-full text-sm">متوسط</span>
-                </div>
 
-                <div className="bg-white border rounded-xl p-4 space-y-3">
-                    <textarea
-                        placeholder="پیشنهاد و نظرت رو اینجا بنویس..."
-                        className="w-full border border-gray-200 rounded-md p-2 resize-none outline-none focus:ring-1 focus:ring-orange-300 text-sm"
-                    />
-                    <div className="space-y-2 text-sm leading-relaxed text-gray-700">
-                        <p><strong>saraAH:</strong> ظاهر مغازه رو خیلی بد کرده، لطفاً سریع‌تر رسیدگی شه.</p>
-                        <p><strong>Hamid_453:</strong> بچه‌م از اینجا رد میشه، ترک دیوار خطرناکه.</p>
-                        <p><strong>hamed_Gangi24:</strong> اگه لازم باشه خودم کمک می‌کنم رنگش کنیم!</p>
-                    </div>
-                </div>
+
             </div>
 
             {/* بخش تصویر و رأی‌دهی */}
@@ -103,7 +129,7 @@ const UnSolvedProblemForm: React.FC<ReportFormProps> = ({ onSubmit, className })
                     <p className="text-center text-xs text-gray-700">{totalVotes} نفر رای داده‌اند</p>
                 </div>
             </div>
-        </div>
+        </div >
     );
 };
 
