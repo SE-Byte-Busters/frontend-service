@@ -9,14 +9,15 @@ interface ReportFormProps {
 }
 
 const ReportForm: React.FC<ReportFormProps> = ({ onSubmit, className }) => {
-  const [title, setTitle] = useState('');
-  const [description, setDescription] = useState('');
-  const [address, setAddress] = useState('');
-  const [category, setCategory] = useState('');
-  const [images, setImages] = useState<File[]>([]);
-  const { isLocatedNeedle, setIsLocatedNeedle } = useReport();
-  const { isVisible, setIsVisible } = useReport();
-  const [alert, setAlert] = useState<AlertProps | null>(null);
+    const [title, setTitle] = useState('');
+    const [description, setDescription] = useState('');
+    const [address, setAddress] = useState('');
+    const [category, setCategory] = useState('');
+    const [images, setImages] = useState<File[]>([]);
+    const { isLocatedNeedle, setIsLocatedNeedle } = useReport();
+    const { isVisible, setIsVisible } = useReport();
+    const { showNeedleOrange, setShowNeedleOrange } = useReport();
+    const [alert, setAlert] = useState<AlertProps | null>(null);
 
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -55,7 +56,6 @@ const ReportForm: React.FC<ReportFormProps> = ({ onSubmit, className }) => {
   return (
     <div className={className}>
       {alert && <Alert {...alert} />}
-
       <div className=" grid grid-cols-12 md:flex-row gap-6 w-full p-6 bg-[#fff9f5] rounded-lg shadow-md min-h-screen" >
         {/* فرم */}
         <div className="col-span-5 space-y-4">
