@@ -12,6 +12,7 @@ import { customSchema } from '@hookform/resolvers/standard-schema/src/__tests__/
 import ReportForm from './ReportForm';
 import HeaderMap from './HeaderMap';
 import UnSolvedProblemForm from './UnSolvedProblemForm';
+import SolvedProblemForm from './SolvedProblemForm';
 
 const customIconNeedle = new L.Icon({
   iconUrl: '/images/icons/needle.png', // مسیر عکس از public
@@ -184,6 +185,39 @@ const UnSolvedProblemFormWithLocation = ({ }) => {
     </div >
   );
 };
+const SolvedProblemFormWithLocation = ({ }) => {
+  const { isVisible, setIsVisible } = useReport();
+
+
+  const toggleForm = () => {
+    setIsVisible(!isVisible);
+  };
+
+  return (
+    <div>
+      <div
+        onClick={toggleForm}
+        className={`absolute top-1/2 ${!isVisible ? "left-[50%]" : "left-0"} transform -translate-y-1/2 z-20 cursor-pointer transition-all duration-500`}
+        style={{ transform: `${!isVisible ? "translateY(-50%)" : "translateY(-50%) rotateY(180deg)"}` }}
+      >
+        <Image
+          src='/images/icons/crossGreen.png'
+          alt={isVisible ? 'بستن فرم' : 'نمایش فرم'}
+          width={48}
+          height={61}
+        />
+      </div>
+      {/* ReportForm */}
+      <div
+        className={`w-[50%] fixed top-0 left-0 z-10 bg-white shadow-lg rounded-lg transition-all duration-500 ${!isVisible ? 'translate-x-0' : '-translate-x-full'
+          }`}
+      >
+        {/* محتویات فرم شما در اینجا */}
+        <SolvedProblemForm />
+      </div>
+    </div >
+  );
+};
 const FlyToPosition = ({ position }: { position: [number, number] }) => {
   const map = useMap();
   map.flyTo([position[0] - 0.005, position[1] - 0.005], 16, { duration: 1.5 });
@@ -198,10 +232,11 @@ const IranMap = () => {
   const [problemUnSolved, setProblemUnSolved] = useState(false);
   const [problemSolved, setProblemSolved] = useState(false);
   const [showUnSolvedProblemForm, setShowUnSolvedProblemForm] = useState(false);
+  const [showSolvedProblemForm, setShowSolvedProblemForm] = useState(false);
 
 
 
-  const iranCenter: [number, number] = [32.4279, 53.6880];
+  const iranCenter: [number, number] = [35.6892, 51.3890];
 
   const setUserPosition = (pos: [number, number], text: string) => {
     setPosition(pos);
@@ -223,10 +258,12 @@ const IranMap = () => {
       </div>
       {isLocatedNeedle ? <ReportFormWithButton /> : <></>}
       {showUnSolvedProblemForm ? <UnSolvedProblemFormWithLocation /> : <></>}
+      {showSolvedProblemForm ? <SolvedProblemFormWithLocation /> : <></>}
+
 
       <MapContainer
         center={iranCenter}
-        zoom={5.5}
+        zoom={11}
         minZoom={5}
         maxZoom={18}
         zoomControl={false}
@@ -238,7 +275,7 @@ const IranMap = () => {
 
         {/* نشان دادن موقعیت‌های ذخیره‌شده روی نقشه */}
         {savedLocations.map((location, index) => (
-          <section>
+          <section key={index}>
             {(problemUnSolved === true && location.solved === "no") ? <Marker key={index} position={[location.latitude, location.longitude]} icon={customIconRedNeedle} eventHandlers={{
               click: () => {
                 setIsReporting(true);
@@ -250,7 +287,9 @@ const IranMap = () => {
             </Marker> : <></>}{
               (problemSolved === true && location.solved === "yes") ? <Marker key={index} position={[location.latitude, location.longitude]} icon={customIconGreenNeedle} eventHandlers={{
                 click: () => {
-                  alert(location)
+                  setIsReporting(true);
+
+                  setShowSolvedProblemForm(true)
                 },
               }}>
                 <Popup>{location.label}</Popup>
@@ -309,12 +348,12 @@ const IranMap = () => {
         <div className="absolute bottom-10 w-full flex justify-center z-10 gap-4">
           <button
             onClick={() => {
-              alert(`مکان ثبت شد: ${position[0]}, ${position[1]}`);
+              // alert(`مکان ثبت شد: ${position[0]}, ${position[1]}`);
               setIsLocatedNeedle(true);
 
               setIsReporting(false);
             }}
-            className="bg-green-600 text-white px-6 py-2 rounded-xl shadow"
+            className="bg-[#F48B11] text-white px-6 py-2 rounded-xl shadow"
           >
             ثبت مکان گزارش
           </button>
@@ -323,6 +362,72 @@ const IranMap = () => {
               setIsReporting(false);
               setPosition(null);
               setPopupText('');
+            }}
+            className="bg-transparent border-0 p-0"
+          >
+            <Image
+              src="/images/icons/X.png"  // مسیر تصویر لغو
+              alt="Background Image"
+              width={64}
+              height={64}
+              className="w-10 h-10"  // سایز دلخواه برای عکس
+            />
+          </button>
+        </div>
+      )}
+      {showSolvedProblemForm && (
+        <div className="absolute bottom-10 w-full flex justify-center z-10 gap-4">
+          <button
+            onClick={() => {
+              // alert(`مکان ثبت شد: ${position[0]}, ${position[1]}`);
+              setProblemSolved(!problemSolved)
+
+            }}
+            className="bg-green-600 text-white px-6 py-2 rounded-xl shadow"
+          >
+            مشکلات حل شده
+          </button>
+          <button
+            onClick={() => {
+              setIsReporting(false);
+              setPosition(null);
+              setPopupText('');
+              setProblemSolved(!problemSolved)
+
+              setShowSolvedProblemForm(false);
+            }}
+            className="bg-transparent border-0 p-0"
+          >
+            <Image
+              src="/images/icons/X.png"  // مسیر تصویر لغو
+              alt="Background Image"
+              width={64}
+              height={64}
+              className="w-10 h-10"  // سایز دلخواه برای عکس
+            />
+          </button>
+        </div>
+      )}
+      {showUnSolvedProblemForm && (
+        <div className="absolute bottom-10 w-full flex justify-center z-10 gap-4">
+          <button
+            onClick={() => {
+              // alert(`مکان ثبت شد: ${position[0]}, ${position[1]}`);
+              setProblemUnSolved(!problemUnSolved)
+
+            }}
+            className="bg-[#F45151] text-white px-6 py-2 rounded-xl shadow"
+          >
+            مشکلات حل نشده
+          </button>
+          <button
+            onClick={() => {
+              setIsReporting(false);
+              setPosition(null);
+              setPopupText('');
+              setProblemUnSolved(!problemUnSolved)
+
+              setShowUnSolvedProblemForm(false);
             }}
             className="bg-transparent border-0 p-0"
           >
