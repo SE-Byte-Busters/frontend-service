@@ -27,11 +27,18 @@ export default function PasswordSection() {
 
     setIsLoading(true);
     try {
-      const response = await fetch('https://shahriar.thetechverse.ir:3000/api/v1/user-profile/update-password', {
+      const token = localStorage.getItem('token');
+      const userRole = localStorage.getItem('role');
+
+      const endpoint = userRole === 'admin'
+        ? 'https://shahriar.thetechverse.ir:3000/api/v1/admin/update-password'
+        : 'https://shahriar.thetechverse.ir:3000/api/v1/user-profile/update-password';
+
+      const response = await fetch(endpoint, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('token')}`,
+          'Authorization': `Bearer ${token}`,
         },
         body: JSON.stringify({
           oldPassword: password.current,
