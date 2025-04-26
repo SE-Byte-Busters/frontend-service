@@ -140,7 +140,6 @@ const ReportFormWithButton = ({ }) => {
         />
       </div>
 
-
       {/* ReportForm */}
       <div
         className={`w-[50%] fixed top-0 left-0 z-10 bg-white shadow-lg rounded-lg transition-all duration-500 ${!isVisible ? 'translate-x-0' : '-translate-x-full'
@@ -174,6 +173,8 @@ const UnSolvedProblemFormWithLocation = ({ }) => {
           height={61}
         />
       </div>
+
+
       {/* ReportForm */}
       <div
         className={`w-[50%] fixed top-0 left-0 z-10 bg-white shadow-lg rounded-lg transition-all duration-500 ${!isVisible ? 'translate-x-0' : '-translate-x-full'
@@ -236,6 +237,8 @@ const IranMap = () => {
 
 
 
+
+
   const iranCenter: [number, number] = [35.6892, 51.3890];
 
   const setUserPosition = (pos: [number, number], text: string) => {
@@ -290,6 +293,7 @@ const IranMap = () => {
                   setIsReporting(true);
 
                   setShowSolvedProblemForm(true)
+
                 },
               }}>
                 <Popup>{location.label}</Popup>
@@ -353,8 +357,8 @@ const IranMap = () => {
 
               setIsReporting(false);
             }}
-            className="bg-[#F48B11] text-white px-6 py-2 rounded-xl shadow"
-          >
+            className="bg-[#F48B11] text-white px-6 py-2 rounded-xl shadow">
+
             ثبت مکان گزارش
           </button>
           <button
@@ -374,75 +378,80 @@ const IranMap = () => {
             />
           </button>
         </div>
-      )}
-      {showSolvedProblemForm && (
-        <div className="absolute bottom-10 w-full flex justify-center z-10 gap-4">
-          <button
-            onClick={() => {
-              // alert(`مکان ثبت شد: ${position[0]}, ${position[1]}`);
-              setProblemSolved(!problemSolved)
+      )
+      }
+      {
+        showSolvedProblemForm && (
+          <div className="absolute bottom-10 w-full flex justify-center z-10 gap-4">
+            <button
+              onClick={() => {
+                // alert(`مکان ثبت شد: ${position[0]}, ${position[1]}`);
+                setProblemSolved(!problemSolved)
 
-            }}
-            className="bg-green-600 text-white px-6 py-2 rounded-xl shadow"
-          >
-            مشکلات حل شده
-          </button>
-          <button
-            onClick={() => {
-              setIsReporting(false);
-              setPosition(null);
-              setPopupText('');
-              setProblemSolved(!problemSolved)
+              }}
+              className="bg-green-600 text-white px-6 py-2 rounded-xl shadow"
+            >
+              مشکلات حل شده
+            </button>
+            <button
+              onClick={() => {
+                setIsReporting(false);
+                setPosition(null);
+                setPopupText('');
+                setProblemSolved(!problemSolved)
 
-              setShowSolvedProblemForm(false);
-            }}
-            className="bg-transparent border-0 p-0"
-          >
-            <Image
-              src="/images/icons/X.png"  // مسیر تصویر لغو
-              alt="Background Image"
-              width={64}
-              height={64}
-              className="w-10 h-10"  // سایز دلخواه برای عکس
-            />
-          </button>
-        </div>
-      )}
-      {showUnSolvedProblemForm && (
-        <div className="absolute bottom-10 w-full flex justify-center z-10 gap-4">
-          <button
-            onClick={() => {
-              // alert(`مکان ثبت شد: ${position[0]}, ${position[1]}`);
-              setProblemUnSolved(!problemUnSolved)
+                setShowSolvedProblemForm(false);
+              }}
+              className="bg-transparent border-0 p-0"
+            >
+              <Image
+                src="/images/icons/X.png"  // مسیر تصویر لغو
+                alt="Background Image"
+                width={64}
+                height={64}
+                className="w-10 h-10"  // سایز دلخواه برای عکس
+              />
+            </button>
+          </div>
+        )
+      }
+      {
+        showUnSolvedProblemForm && (
+          <div className="absolute bottom-10 w-full flex justify-center z-10 gap-4">
+            <button
+              onClick={() => {
+                // alert(`مکان ثبت شد: ${position[0]}, ${position[1]}`);
+                setProblemUnSolved(!problemUnSolved)
 
-            }}
-            className="bg-[#F45151] text-white px-6 py-2 rounded-xl shadow"
-          >
-            مشکلات حل نشده
-          </button>
-          <button
-            onClick={() => {
-              setIsReporting(false);
-              setPosition(null);
-              setPopupText('');
-              setProblemUnSolved(!problemUnSolved)
+              }}
+              className="bg-[#F45151] text-white px-6 py-2 rounded-xl shadow"
+            >
+              مشکلات حل نشده
+            </button>
+            <button
+              onClick={() => {
+                setIsReporting(false);
+                setPosition(null);
+                setPopupText('');
+                setProblemUnSolved(!problemUnSolved)
 
-              setShowUnSolvedProblemForm(false);
-            }}
-            className="bg-transparent border-0 p-0"
-          >
-            <Image
-              src="/images/icons/X.png"  // مسیر تصویر لغو
-              alt="Background Image"
-              width={64}
-              height={64}
-              className="w-10 h-10"  // سایز دلخواه برای عکس
-            />
-          </button>
-        </div>
-      )}
+                setShowUnSolvedProblemForm(false);
+              }}
+              className="bg-transparent border-0 p-0"
+            >
+              <Image
+                src="/images/icons/X.png"  // مسیر تصویر لغو
+                alt="Background Image"
+                width={64}
+                height={64}
+                className="w-10 h-10"  // سایز دلخواه برای عکس
+              />
+            </button>
+          </div>
+        )
+      }
 
-    </div>
+    </div >
   );
 };
 
