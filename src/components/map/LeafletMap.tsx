@@ -296,6 +296,8 @@ const IranMap = () => {
               (problemSolved === true && location.solved === "yes") ? <Marker key={index} position={[location.latitude, location.longitude]} icon={customIconGreenNeedle} eventHandlers={{
                 click: () => {
                   setIsReporting(true);
+                  setPosition([location.latitude, location.longitude]);
+
 
                   setShowSolvedProblemForm(true)
                 },
