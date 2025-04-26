@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 
 import UserAvatar from '@/components/UserAvatar';
 import FormField from './FormField';
@@ -25,6 +25,12 @@ export default function ProfileForm({ initialProfile }: ProfileFormProps) {
   const [isProfileLoading, setIsProfileLoading] = useState(false);
   const [isPhotoLoading, setIsPhotoLoading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const [role, setRole] = useState<string | null>(null);
+
+  useEffect(() => {
+    setRole(localStorage.getItem('role'));
+  }, []);
 
   const handleProfileChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -54,11 +60,17 @@ export default function ProfileForm({ initialProfile }: ProfileFormProps) {
     setIsProfileLoading(true);
 
     try {
-      const response = await fetch('https://shahriar.thetechverse.ir:3000/api/v1/user-profile/update-profile', {
+      const token = localStorage.getItem('token');
+
+      const endpoint = role === 'admin'
+        ? 'https://shahriar.thetechverse.ir:3000/api/v1/admin/update-profile'
+        : 'https://shahriar.thetechverse.ir:3000/api/v1/user-profile/update-profile';
+
+      const response = await fetch(endpoint, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('token')}`,
+          'Authorization': `Bearer ${token}`,
         },
         body: JSON.stringify({
           firstName: profile.first_name,
@@ -96,10 +108,16 @@ export default function ProfileForm({ initialProfile }: ProfileFormProps) {
       const formData = new FormData();
       formData.append('profileImage', selectedFile);
 
-      const response = await fetch('https://shahriar.thetechverse.ir:3000/api/v1/user-profile/update-profile-image', {
+      const token = localStorage.getItem('token');
+
+      const endpoint = role === 'admin'
+        ? 'https://shahriar.thetechverse.ir:3000/api/v1/admin/update-profile-image'
+        : 'https://shahriar.thetechverse.ir:3000/api/v1/user-profile/update-profile-image';
+
+      const response = await fetch(endpoint, {
         method: 'PUT',
         headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`,
+          'Authorization': `Bearer ${token}`,
         },
         body: formData,
       });
@@ -168,7 +186,7 @@ export default function ProfileForm({ initialProfile }: ProfileFormProps) {
         <div className="flex-1 flex-col space-y-4">
           <FormField
             dir="ltr"
-            label="نام کاربری"
+            label={role === "admin" ? "نام ادمین" : "نام کاربری" }
             id="username"
             name="username"
             value={profile.username}
