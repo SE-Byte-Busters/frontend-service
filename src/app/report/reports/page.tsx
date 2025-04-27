@@ -51,7 +51,6 @@ export default function NewReport() {
   const [userData, setUserData] = useState<UserData | null>(null);
   const [reports, setReports] = useState<Report[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
-  const [error, setError] = useState<string | null>(null);
   const [currentImageIndices, setCurrentImageIndices] = useState<Record<number, number>>({});
 
   useEffect(() => {
@@ -92,7 +91,8 @@ export default function NewReport() {
         });
         setCurrentImageIndices(indices);
       } catch (err) {
-        setError(err instanceof Error ? err.message : 'An unknown error occurred');
+        // silently handle errors
+        console.error(err);
       } finally {
         setLoading(false);
       }
@@ -130,8 +130,31 @@ export default function NewReport() {
     return new Date(dateString).toLocaleDateString('fa-IR', options);
   };
 
-  if (loading) return <div className="flex justify-center items-center min-h-screen">Loading...</div>;
-  if (error) return <div className="flex justify-center items-center min-h-screen text-red-500">Error: {error}</div>;
+  // placeholder data for loading state
+  const placeholderReports: Report[] = Array(3).fill(null).map((_, index) => ({
+    _id: `placeholder-${index}`,
+    user: '',
+    title: 'در حال بارگذاری...',
+    description: 'توضیحات گزارش در حال بارگذاری می‌باشد',
+    approximatePosition: 'موقعیت نامشخص',
+    location: {type: '', coordinates: [0, 0]},
+    city: 'شهر نامشخص',
+    category: [],
+    images: [],
+    status: 0,
+    approvalStatus: 0,
+    voteScore: 0,
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+  }));
+
+  const displayReports = loading ? placeholderReports : reports;
+  const displayUserData = loading ? {
+    _id: 'placeholder',
+    score: 0,
+    rank: 0,
+    username: 'کاربر'
+  } : userData;
 
   return (
     <div className="bg-light min-h-screen flex flex-col items-center px-4 pt-20 pb-12 lg:pt-10 lg:pb-10">
@@ -146,11 +169,11 @@ export default function NewReport() {
               <span className="text-left w-1/3">امتیاز کل</span>
             </div>
             <div className="bg-accent rounded-full px-6 py-3 flex justify-between items-center w-full text-sm md:text-base text-gray-900">
-              <span className="text-right w-1/3">{userData?.rank ?? '--'}</span>
+              <span className="text-right w-1/3">{displayUserData?.rank ?? '--'}</span>
               <span className="text-center w-1/3">
-                {userData?.rank === 1 ? 'قهرمان محیط زیست و فعال ترین گزارش دهنده' : '--'}
+                {displayUserData?.rank === 1 ? 'قهرمان محیط زیست و فعال ترین گزارش دهنده' : '--'}
               </span>
-              <span className="text-left w-1/3">{userData?.score ?? '--'}</span>
+              <span className="text-left w-1/3">{displayUserData?.score ?? '--'}</span>
             </div>
           </div>
 
@@ -163,18 +186,20 @@ export default function NewReport() {
               height={120}
               className="rounded-full"
             />
-            <p className="font-bold text-md text-gray-900 mt-2">{userData?.username ?? 'کاربر'}</p>
+            <p className="font-bold text-md text-gray-900 mt-2">{displayUserData?.username ?? 'کاربر'}</p>
           </div>
         </div>
 
         {/* Reports Section */}
         <div className="w-full flex flex-row-reverse flex-wrap justify-end gap-6">
-          {reports.length > 0 ? (
-            reports.map((report, reportIndex) => (
+          {displayReports.length > 0 ? (
+            displayReports.map((report, reportIndex) => (
               <div key={report._id} className="w-full sm:w-[300px] bg-white border border-gray-300 rounded-xl shadow-md overflow-hidden flex flex-col">
                 {/* Image Carousel */}
                 <div className="relative w-full h-48 bg-gray-100">
-                  {report.images && report.images.length > 0 ? (
+                  {loading ? (
+                    <div className="w-full h-full bg-gray-200 animate-pulse"></div>
+                  ) : report.images && report.images.length > 0 ? (
                     <>
                       <img
                         src={report.images[currentImageIndices[reportIndex]]?.url || "/images/special/No_Image_Available.jpg"}
@@ -184,7 +209,7 @@ export default function NewReport() {
 
                       {/* Pagination dots */}
                       <div className="absolute bottom-2 left-1/2 transform -translate-x-1/2 flex gap-1">
-                        {report.images.map((_, index) => (
+                        {report.images.map((_: ReportImage, index: number) => (
                           <span
                             key={index}
                             className={`w-2 h-2 rounded-full ${
@@ -221,45 +246,78 @@ export default function NewReport() {
 
                 {/* Card Content */}
                 <div className="p-4 text-right flex flex-col gap-2">
-                  <h3 className="text-gray-900 text-lg font-bold">{report.title}</h3>
-                  <p className="text-sm text-gray-900">{formatDate(report.createdAt)}</p>
+                  <h3 className="text-gray-900 text-lg font-bold">
+                    {loading ? (
+                      <span className="inline-block w-3/4 h-6 bg-gray-200 rounded animate-pulse"></span>
+                    ) : report.title}
+                  </h3>
+                  <p className="text-sm text-gray-900">
+                    {loading ? (
+                      <span className="inline-block w-1/2 h-4 bg-gray-200 rounded animate-pulse"></span>
+                    ) : formatDate(report.createdAt)}
+                  </p>
                   <p className="text-sm text-gray-900 leading-relaxed">
-                    {report.description}
+                    {loading ? (
+                      <>
+                        <span className="inline-block w-full h-3 bg-gray-200 rounded animate-pulse mb-2"></span>
+                        <span className="inline-block w-4/5 h-3 bg-gray-200 rounded animate-pulse"></span>
+                      </>
+                    ) : report.description}
                   </p>
                   <p className="text-sm font-semibold text-gray-800 mt-1">
-                    {report.city}, {report.approximatePosition}
+                    {loading ? (
+                      <span className="inline-block w-2/3 h-4 bg-gray-200 rounded animate-pulse"></span>
+                    ) : `${report.city}, ${report.approximatePosition}`}
                   </p>
 
                   {/* Status and Clock */}
                   <div className="flex justify-between items-center mt-2">
                     {/* Right side: اولویت بندی */}
                     <span className="text-xs border border-yellow-400 text-yellow-700 px-3 py-1 rounded-full">
-                      {getStatusText(report.status)}
+                      {loading ? (
+                        <span className="inline-block w-20 h-4 bg-gray-200 rounded animate-pulse"></span>
+                      ) : getStatusText(report.status)}
                     </span>
 
                     {/* Left side: بررسی + ساعت */}
                     <div className="flex flex-col items-center text-sm text-gray-600">
-                      <img src="/images/icons/clock.png" alt="Clock" className="w-5 h-5 mb-1" />
-                      <span>امتیاز: {report.voteScore}</span>
+                      {loading ? (
+                        <span className="inline-block w-6 h-6 bg-gray-200 rounded-full animate-pulse mb-1"></span>
+                      ) : (
+                        <img src="/images/icons/clock.png" alt="Clock" className="w-5 h-5 mb-1" />
+                      )}
+                      <span>
+                        {loading ? (
+                          <span className="inline-block w-12 h-4 bg-gray-200 rounded animate-pulse"></span>
+                        ) : `امتیاز: ${report.voteScore}`}
+                      </span>
                     </div>
                   </div>
 
                   {/* Actions (always on right) */}
                   <div className="flex flex-row-reverse justify-end mt-4 gap-3">
-                    {report.category?.includes('road') && (
-                      <img src="/images/icons/road-barrier-solid.svg" alt="Road Barrier" className="w-6 h-6" />
-                    )}
-                    {report.category?.includes('pollution') && (
-                      <img src="/images/icons/smog-solid.svg" alt="Smog" className="w-6 h-6" />
+                    {loading ? (
+                      <span className="inline-block w-6 h-6 bg-gray-200 rounded animate-pulse"></span>
+                    ) : (
+                      <>
+                        {report.category?.includes('road') && (
+                          <img src="/images/icons/road-barrier-solid.svg" alt="Road Barrier" className="w-6 h-6" />
+                        )}
+                        {report.category?.includes('pollution') && (
+                          <img src="/images/icons/smog-solid.svg" alt="Smog" className="w-6 h-6" />
+                        )}
+                      </>
                     )}
                   </div>
                 </div>
               </div>
             ))
           ) : (
-            <div className="w-full text-center py-10 text-gray-500">
-              هیچ گزارشی یافت نشد
-            </div>
+            !loading && (
+              <div className="w-full text-center py-10 text-gray-500">
+                هیچ گزارشی یافت نشد
+              </div>
+            )
           )}
         </div>
       </div>
