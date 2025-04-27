@@ -215,7 +215,7 @@ const IranMap = () => {
   return (
     <div className="relative w-full h-screen">
       <div
-        className={`w-[50%] absolute top-2 z-10 bg-white shadow-lg rounded-lg transition-all duration-500 
+        className={`w-[50%] absolute top-2 z-10 bg-white shadow-lg rounded-lg transition-all duration-500
     ${isVisible ? 'left-0 translate-x-1/2 ' : 'left-1/2 -translate-x-0'}
   `}
       >

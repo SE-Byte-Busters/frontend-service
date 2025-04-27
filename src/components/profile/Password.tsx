@@ -3,6 +3,7 @@
 import { useState } from 'react';
 
 import FormField from './FormField';
+import { Alert, AlertProps } from '@/components/Alert';
 
 export default function PasswordSection() {
   const [password, setPassword] = useState({
@@ -11,6 +12,7 @@ export default function PasswordSection() {
     confirm: '',
   });
   const [isLoading, setIsLoading] = useState(false);
+  const [alert, setAlert] = useState<AlertProps | null>(null);
 
   const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -21,7 +23,12 @@ export default function PasswordSection() {
     e.preventDefault();
 
     if (password.new !== password.confirm) {
-      alert("رمز عبور جدید با تکرار آن مطابقت ندارد!");
+      setAlert({
+        message: "رمز عبور جدید با تکرار آن مطابقت ندارد!",
+        type: "error",
+        duration: 3000,
+        onClose: () => setAlert(null)
+      });
       return;
     }
 
@@ -52,18 +59,30 @@ export default function PasswordSection() {
         throw new Error(data.message || 'خطا در تغییر رمز عبور');
       }
 
-      setPassword({ current: '', new: '', confirm: '' });
-      alert('رمز عبور با موفقیت تغییر یافت!');
+      setAlert({
+        message: 'رمز عبور با موفقیت تغییر یافت!',
+        type: "success",
+        duration: 3000,
+        onClose: () => setAlert(null)
+      });
     } catch (error: any) {
       console.error('Error changing password:', error);
-      alert(error.message || 'خطا در تغییر رمز عبور! لطفا مجددا تلاش نمایید.');
+      setAlert({
+        message: error.message || 'خطا در تغییر رمز عبور! لطفا مجددا تلاش نمایید.',
+        type: "error",
+        duration: 3000,
+        onClose: () => setAlert(null)
+      });
     } finally {
+      setPassword({ current: '', new: '', confirm: '' });
       setIsLoading(false);
     }
   };
 
   return (
     <section className="bg-light rounded-2xl shadow-md p-6">
+      {alert && <Alert {...alert} />}
+
       <h1 className="text-xl font-bold text-dark">
         تغییر رمز عبور من
       </h1>
