@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
+import { Alert, AlertProps } from '@/components/Alert';
 
 type UserData = {
   _id: string;
@@ -52,6 +53,7 @@ export default function NewReport() {
   const [reports, setReports] = useState<Report[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [currentImageIndices, setCurrentImageIndices] = useState<Record<number, number>>({});
+  const [alert, setAlert] = useState<AlertProps | null>(null);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -91,7 +93,12 @@ export default function NewReport() {
         });
         setCurrentImageIndices(indices);
       } catch (err) {
-        // silently handle errors
+        setAlert({
+          type: 'error',
+          message: 'خطا در دریافت اطلاعات. لطفاً دوباره تلاش کنید.',
+          duration: 3000,
+          onClose: () => setAlert(null)
+        });
         console.error(err);
       } finally {
         setLoading(false);
@@ -158,6 +165,7 @@ export default function NewReport() {
 
   return (
     <div className="bg-light min-h-screen flex flex-col items-center px-4 pt-20 pb-12 lg:pt-10 lg:pb-10">
+      {alert && <Alert {...alert} />}
       <div className="flex flex-col items-center w-full max-w-6xl gap-12 mt-10">
         {/* Profile Info & Stats */}
         <div className="w-full flex flex-col-reverse lg:flex-row-reverse items-center lg:items-center lg:justify-center gap-6">
