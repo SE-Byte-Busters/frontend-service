@@ -4,6 +4,7 @@ import { useState, useRef, useEffect } from 'react';
 
 import UserAvatar from '@/components/UserAvatar';
 import FormField from './FormField';
+import { Alert, AlertProps } from '@/components/Alert';
 
 interface Profile {
   username: string;
@@ -25,6 +26,7 @@ export default function ProfileForm({ initialProfile }: ProfileFormProps) {
   const [isProfileLoading, setIsProfileLoading] = useState(false);
   const [isPhotoLoading, setIsPhotoLoading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [alert, setAlert] = useState<AlertProps | null>(null);
 
   const [role, setRole] = useState<string | null>(null);
 
@@ -86,10 +88,20 @@ export default function ProfileForm({ initialProfile }: ProfileFormProps) {
         throw new Error(data.message || 'خطا در بروزرسانی پروفایل');
       }
 
-      alert("پروفایل با موفقیت بروزرسانی شد!");
+      setAlert({
+        message: "پروفایل با موفقیت بروزرسانی شد!",
+        type: "success",
+        duration: 3000,
+        onClose: () => setAlert(null)
+      });
     } catch (error: any) {
       console.error("Error updating profile:", error);
-      alert(error.message || "خطا در بروزرسانی پروفایل!");
+      setAlert({
+        message: error.message || "خطا در بروزرسانی پروفایل!",
+        type: "error",
+        duration: 3000,
+        onClose: () => setAlert(null)
+      });
     } finally {
       setIsProfileLoading(false);
     }
@@ -98,7 +110,12 @@ export default function ProfileForm({ initialProfile }: ProfileFormProps) {
   const handleSubmitPhoto = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!selectedFile) {
-      alert("لطفا یک عکس انتخاب کنید!");
+      setAlert({
+        message: "لطفا یک عکس انتخاب کنید!",
+        type: "error",
+        duration: 3000,
+        onClose: () => setAlert(null)
+      });
       return;
     }
 
@@ -135,11 +152,21 @@ export default function ProfileForm({ initialProfile }: ProfileFormProps) {
         ...prev,
         photo: newPhotoUrl,
       }));
-      alert("عکس پروفایل با موفقیت بروزرسانی شد!");
+      setAlert({
+        message: "عکس پروفایل با موفقیت بروزرسانی شد!",
+        type: "success",
+        duration: 3000,
+        onClose: () => setAlert(null)
+      });
       setSelectedFile(null);
     } catch (error: any) {
       console.error("Error uploading image:", error);
-      alert(error.message || "خطا در بروزرسانی عکس پروفایل");
+      setAlert({
+        message: error.message || "خطا در بروزرسانی عکس پروفایل",
+        type: "error",
+        duration: 3000,
+        onClose: () => setAlert(null)
+      });
     } finally {
       setIsPhotoLoading(false);
     }
@@ -147,6 +174,7 @@ export default function ProfileForm({ initialProfile }: ProfileFormProps) {
 
   return (
     <div className="flex flex-col gap-6">
+      {alert && <Alert {...alert} />}
       <div className="flex flex-col md:flex-row md:flex-row-reverse gap-6">
         {/* Profile Picture */}
         <form onSubmit={handleSubmitPhoto} className="flex flex-col items-center">

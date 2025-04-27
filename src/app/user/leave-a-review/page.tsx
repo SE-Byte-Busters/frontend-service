@@ -2,10 +2,11 @@
 
 import { useState } from "react";
 import Image from "next/image";
-
 import StarRating from "@/components/StarRating";
+import { Alert, AlertProps } from '@/components/Alert';
 
 export default function LeaveReview() {
+  const [alert, setAlert] = useState<AlertProps | null>(null);
   const [review, setReview] = useState({
     rating: 10,
     comment: '',
@@ -28,14 +29,25 @@ export default function LeaveReview() {
       // TODO: replace with API call
       console.log('Review submitted');
       setReview(prev => ({ ...prev, comment: '' }));
-      alert('Thank you for your review!');
+      setAlert({
+        message: "نظر شما با موفقیت ارسال شد!",
+        type: "success",
+        duration: 3000,
+        onClose: () => setAlert(null)
+      });
     } catch (error) {
-      alert('Failed to send review!');
+      setAlert({
+        message: "خطا در ارسال نظر! مجددا تلاش کنید.",
+        type: "error",
+        duration: 3000,
+        onClose: () => setAlert(null)
+      });
     }
   };
 
   return (
     <div className="flex items-center justify-center bg-gray-100 pt-20 py-4">
+      {alert && <Alert {...alert} />}
       <div className="w-full max-w-2xl mx-4">
         <div className="bg-light rounded-2xl shadow-md p-6">
           <h1 className="text-xl font-bold mb-6 text-dark">پیشنهاد و نظر من</h1>
