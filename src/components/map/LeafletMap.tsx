@@ -329,7 +329,6 @@ const IranMap = () => {
         <div className="absolute bottom-10 w-full flex justify-center z-10 gap-4">
           <button
             onClick={() => {
-              alert(`مکان ثبت شد: ${position[0]}, ${position[1]}`);
               setIsLocatedNeedle(true);
 
               setIsReporting(false);
