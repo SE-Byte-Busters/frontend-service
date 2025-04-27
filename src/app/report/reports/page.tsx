@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
+import Link from 'next/link';
 import { Alert, AlertProps } from '@/components/Alert';
 
 type UserData = {
@@ -186,7 +187,7 @@ export default function NewReport() {
           </div>
 
           {/* Profile Image + Name */}
-          <div className="flex flex-col items-center lg:items-end">
+          <div className="flex flex-col items-center">
             <Image
               src="/images/avatars/default-profile.png"
               alt="Profile"
@@ -322,8 +323,35 @@ export default function NewReport() {
             ))
           ) : (
             !loading && (
-              <div className="w-full text-center py-10 text-gray-500">
-                هیچ گزارشی یافت نشد
+              <div className="w-full px-4 sm:px-6 lg:px-8 py-12 sm:py-16">
+                <div className="flex flex-col items-center gap-8 sm:gap-12 lg:gap-16 sm:flex-row sm:items-center">
+                  <Image
+                    src="/images/special/no-report.png"
+                    width={373}
+                    height={276}
+                    alt="no report image"
+                    className="w-48 sm:w-56 md:w-64 lg:w-72 h-auto"
+                  />
+
+                  <div className="flex flex-col items-center text-center gap-4 sm:gap-6">
+                    <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-dark">
+                      تو هم می‌تونی اثر بذاری!
+                    </h1>
+
+                    <p className="text-base text-justify sm:text-lg md:text-xl text-dark max-w-md leading-relaxed">
+                      منتظرت بودیم! الان بهترین زمانه که صدات رو به گوش برسونی و کمک کنی شهری پاک‌تر و سالم‌تر داشته باشیم.
+                    </p>
+
+                    <Link
+                      href="/report/new-report"
+                      className="bg-accent text-white text-lg sm:text-xl md:text-2xl rounded-lg px-4 py-2 sm:px-6 sm:py-3
+                      transition duration-300 hover:text-black w-auto"
+                      aria-label="ثبت گزارش جدید"
+                    >
+                      ثبت گزارش جدید
+                    </Link>
+                  </div>
+                </div>
               </div>
             )
           )}
