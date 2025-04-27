@@ -82,7 +82,7 @@ export default function SignUp() {
       } else if (response.status >= 400 || response.status < 500) {
         setAlert({
           type: 'error',
-          message: 'در ثبت تغییرات مشکلی پیش آمد. لطفاً دوباره تلاش کنید.',
+          message: '.شما قبلا ثبت نام کرده اید',
           duration: 3000,
           onClose: () => setAlert(null)
         });
