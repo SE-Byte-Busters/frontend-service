@@ -3,11 +3,11 @@
 import { useActionState, useEffect, useState } from "react";
 import { Eye, EyeOff } from "lucide-react";
 import Link from "next/link";
-import { sendEmail } from "../../../lib/actions/sign-in";
+import { sendEmail } from "@/lib/actions/sign-in";
 
-// must imported for tailwind global
-import '../../../app/globals.css';
+import '@/app/globals.css';
 import { useRouter } from "next/navigation";
+import { Alert , AlertProps } from '@/components/Alert'
 
 interface FormData {
   userNameAndNumber: string;
@@ -23,22 +23,21 @@ const initialState = {
 };
 
 export default function SignIn() {
+  const router = useRouter();
+
   const [showPassword, setShowPassword] = useState(false);
   const [state, formAction] = useActionState(sendEmail, initialState);
+  const [alert, setAlert] = useState<AlertProps | null>(null);
 
   const [formData, setFormData] = useState<FormData>({
     userNameAndNumber: "",
     password: "",
   });
-  const [alert, setAlert] = useState({ type: '', message: '' });
-
-  const router = useRouter();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
-
 
   const handleSubmit = async () => {
     try {
@@ -56,17 +55,27 @@ export default function SignIn() {
       const data = await response.json();
 
       if (response.status >= 200 && response.status < 300) {
-        setAlert({ type: 'success', message: 'تغییرات شما با موفقیت ذخیره شد.' });
+        setAlert({
+          type: 'success',
+          message: 'تغییرات شما با موفقیت ذخیره شد.',
+          duration: 3000,
+          onClose: () => setAlert(null)});
       } else if (response.status >= 400 || response.status < 500) {
-        setAlert({ type: 'error', message: 'در ثبت تغییرات مشکلی پیش آمد. لطفاً دوباره تلاش کنید.' });
+        setAlert({
+          type: 'error',
+          message: 'در ثبت تغییرات مشکلی پیش آمد. لطفاً دوباره تلاش کنید.',
+          duration: 3000,
+          onClose: () => setAlert(null)
+        });
       } else if (response.status >= 500 || response.status < 600) {
-        setAlert({ type: 'error', message: 'خطای سرور. لطفاً بعداً تلاش کنید.' });
+        setAlert({
+          type: 'error',
+          message: 'خطای سرور. لطفاً بعداً تلاش کنید.',
+          duration: 3000,
+          onClose: () => setAlert(null)
+        });
       }
 
-      // مخفی شدن پیام بعد از ۲ ثانیه
-      setTimeout(() => {
-        setAlert({ type: '', message: '' });
-      }, 2000);
       if (response.status >= 200 && response.status < 300) {
         localStorage.setItem("token", data.data.token)
         localStorage.setItem("role", data.data.role)
@@ -76,10 +85,12 @@ export default function SignIn() {
       }
 
     } catch (error) {
-      setAlert({ type: 'error', message: 'خطای سرور. لطفاً بعداً تلاش کنید.' });
-      setTimeout(() => {
-        setAlert({ type: '', message: '' });
-      }, 2000);
+      setAlert({
+        type: 'error',
+        message: 'خطای سرور. لطفاً بعداً تلاش کنید.',
+        duration: 3000,
+        onClose: () => setAlert(null)
+      });
     }
   };
 
@@ -94,6 +105,7 @@ export default function SignIn() {
 
   return (
     <main>
+      {alert && <Alert {...alert} />}
       <form action={formAction}>
 
         <section className="sm:w-[416px]  w-[230px]  mt-[62px]  ">
@@ -161,27 +173,6 @@ export default function SignIn() {
           </Link>
         </section>
       </form>
-      {alert.message && (
-        <section
-          className={`fixed top-4 right-4 z-50
-      ${alert.type === 'success' ? 'alert-success' : ''}
-      ${alert.type === 'error' ? 'alert-error' : ''}
-    `}
-          role="alert"
-        >
-          <span>{alert.message}</span>
-          {alert.type === 'success' && (
-            <svg className="icon-success" fill="currentColor" viewBox="0 0 20 20">
-              <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414L8.414 15l-4.121-4.121a1 1 0 011.414-1.414L8.414 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-            </svg>
-          )}
-          {alert.type === 'error' && (
-            <svg className="icon-error" fill="currentColor" viewBox="0 0 20 20">
-              <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l6.518 11.597c.75 1.334-.214 2.995-1.743 2.995H3.482c-1.53 0-2.493-1.661-1.743-2.995L8.257 3.1z" clipRule="evenodd" />
-            </svg>
-          )}
-        </section>
-      )}
     </main>
   );
 }
