@@ -52,29 +52,25 @@ const UnSolvedProblemForm: React.FC<ReportFormProps> = ({ onSubmit, className })
                             onChange={(e) => setDescription(e.target.value)}
                         />
 
-                        <h2 className="inline-block border-b border-[#685752] pb-6 pt-4 m-2">
+
+                        <h2 className="flex border-b border-[#685752] pb-6 pt-4 m-2">
                             <span className="font-bold text-[20px] text-[#685752] font-vazirmatn ml-8">
-                                saraH
-                            </span>
+                                JAVADI334                            </span>
                             <span className="font-bold text-[20px] text-[#685752] font-vazirmatn">
-                                من دارم میایم شما کجتاینن
-                            </span>
+                                واقعا خطرناکه مخصوصاً شب‌ها که دیده نمی‌شه.                            </span>
                         </h2>
-                        <h2 className="inline-block border-b border-[#685752] pb-6 pt-4 m-2">
+                        <h2 className="flex border-b border-[#685752] pb-6 pt-4 m-2">
                             <span className="font-bold text-[20px] text-[#685752] font-vazirmatn ml-8">
-                                saraH
+                                saraH12
                             </span>
                             <span className="font-bold text-[20px] text-[#685752] font-vazirmatn">
-                                من دارم میایم شما کجتاینن
-                            </span>
+                                لطفاً یه تابلوی هشدار حداقل بذارید تا رسیدگی شه.                            </span>
                         </h2>
-                        <h2 className="inline-block border-b border-[#685752] pb-6 pt-4 m-2">
+                        <h2 className="flex border-b border-[#685752] pb-6 pt-4 m-2">
                             <span className="font-bold text-[20px] text-[#685752] font-vazirmatn ml-8">
-                                saraH
-                            </span>
+                                hamed_Gangi24                            </span>
                             <span className="font-bold text-[20px] text-[#685752] font-vazirmatn">
-                                من دارم میایم شما کجتاینن
-                            </span>
+                                امروز بارون اومد، چاله پر آب شده بود!                            </span>
                         </h2>
                     </div>
 

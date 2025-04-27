@@ -76,7 +76,7 @@ export default function SignUp() {
       if (response.status >= 200 && response.status < 300) {
         setAlert({ type: 'success', message: 'تغییرات شما با موفقیت ذخیره شد.' });
       } else if (response.status >= 400 || response.status < 500) {
-        setAlert({ type: 'error', message: 'در ثبت تغییرات مشکلی پیش آمد. لطفاً دوباره تلاش کنید.' });
+        setAlert({ type: 'error', message: 'شما قبلا ثبت نام کردع اید' });
       } else if (response.status >= 500 || response.status < 600) {
         setAlert({ type: 'error', message: 'خطای سرور. لطفاً بعداً تلاش کنید.' });
       }
