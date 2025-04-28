@@ -10,63 +10,40 @@ import Image from 'next/image';
 import { Icon } from '@/components/Icon';
 import { customSchema } from '@hookform/resolvers/standard-schema/src/__tests__/__fixtures__/data.js';
 import ReportForm from './ReportForm';
-<<<<<<< HEAD
 import HeaderMap from './HeaderMap';
 import UnSolvedProblemForm from './UnSolvedProblemForm';
 import SolvedProblemForm from './SolvedProblemForm';
 
 import '../../app/globals.css';
 
-=======
->>>>>>> 85e495d (add : add new design to map)
 
 
 const customIconNeedle = new L.Icon({
   iconUrl: '/images/icons/needle.png', // مسیر عکس از public
-<<<<<<< HEAD
   iconSize: [55, 55],          // اندازه دلخواه
-=======
-  iconSize: [35, 35],          // اندازه دلخواه
->>>>>>> 85e495d (add : add new design to map)
   iconAnchor: [17, 35],        // نقطه نوک آیکن
   popupAnchor: [0, -35],       // موقعیت پاپ‌آپ
 });
 
 const customIconRedNeedle = new L.Icon({
   iconUrl: '/images/icons/redNeedle.png', // مسیر عکس از public
-<<<<<<< HEAD
   iconSize: [55, 55],          // اندازه دلخواه
-=======
-  iconSize: [35, 35],          // اندازه دلخواه
->>>>>>> 85e495d (add : add new design to map)
   iconAnchor: [17, 35],        // نقطه نوک آیکن
   popupAnchor: [0, -35],       // موقعیت پاپ‌آپ
 });
 const customIconGreenNeedle = new L.Icon({
   iconUrl: '/images/icons/greenNeedle.png', // مسیر عکس از public
-<<<<<<< HEAD
   iconSize: [55, 55],          // اندازه دلخواه
-=======
-  iconSize: [35, 35],          // اندازه دلخواه
->>>>>>> 85e495d (add : add new design to map)
   iconAnchor: [17, 35],        // نقطه نوک آیکن
   popupAnchor: [0, -35],       // موقعیت پاپ‌آپ
 });
 // داده‌های ماک که نشان‌دهنده مکان‌های ثبت‌شده در تهران هستند
 const savedLocations = [
-<<<<<<< HEAD
   { latitude: 35.6892, longitude: 51.3890, label: "مکان 1", solved: "yes" },
   { latitude: 35.7023, longitude: 51.3510, label: "مکان 2", solved: "yes" },
   { latitude: 35.7310, longitude: 51.3890, label: "مکان 3", solved: "yes" },
   { latitude: 35.7110, longitude: 51.3890, label: "مکان 4", solved: "no" },
   { latitude: 35.7110, longitude: 51.3790, label: "مکان 5", solved: "no" },
-=======
-  { latitude: 35.6892, longitude: 51.3890, label: "مکان 1", condition: "yes" },
-  { latitude: 35.7023, longitude: 51.3510, label: "مکان 2", condition: "yes" },
-  { latitude: 35.7310, longitude: 51.3890, label: "مکان 3", condition: "yes" },
-  { latitude: 35.7110, longitude: 51.3890, label: "مکان 4", condition: "no" },
-  { latitude: 35.7110, longitude: 51.3790, label: "مکان 5", condition: "no" },
->>>>>>> 85e495d (add : add new design to map)
   // اضافه کردن مکان‌های بیشتر به همین شکل
 ];
 
@@ -144,15 +121,8 @@ const CustomZoomControls = ({ setUserPosition }: { setUserPosition: (pos: [numbe
     </div>
   );
 };
-<<<<<<< HEAD
 const ReportFormWithButton = ({ }) => {
   const { isVisible, setIsVisible } = useReport();
-=======
-
-const IranMap = () => {
-  const [position, setPosition] = useState<[number, number] | null>(null);
-  const [popupText, setPopupText] = useState<string>('');
->>>>>>> 85e495d (add : add new design to map)
 
 
   const toggleForm = () => {
@@ -269,10 +239,7 @@ const IranMap = () => {
   const [problemSolved, setProblemSolved] = useState(false);
   const [showUnSolvedProblemForm, setShowUnSolvedProblemForm] = useState(false);
   const [showSolvedProblemForm, setShowSolvedProblemForm] = useState(false);
-<<<<<<< HEAD
   const { alert, setAlert } = useReport();
-=======
->>>>>>> 87a8d77 (add : add options to map)
 
 
 
@@ -283,20 +250,12 @@ const IranMap = () => {
     setPopupText(text);
   };
 
-<<<<<<< HEAD
 
-=======
-  const handleMapClick = (e: L.LeafletMouseEvent) => {
-    const coords: [number, number] = [e.latlng.lat, e.latlng.lng];
-    setUserPosition(coords, "موقعیت انتخاب شده توسط شما");
-  };
->>>>>>> 85e495d (add : add new design to map)
 
   const [isReporting, setIsReporting] = useState(false);
 
   return (
     <div className="relative w-full h-screen">
-<<<<<<< HEAD
       <div
         className={`w-[50%] absolute top-2 z-10 bg-white shadow-lg rounded-lg transition-all duration-500
     ${isVisible ? 'left-0 translate-x-1/2 ' : 'left-1/2 -translate-x-0'}
@@ -309,9 +268,6 @@ const IranMap = () => {
       {showSolvedProblemForm ? <SolvedProblemFormWithLocation /> : <></>}
 
 
-=======
-      <ReportForm className='w-[50%] absolute top-0 left-0  h-[100%] z-10' />
->>>>>>> 85e495d (add : add new design to map)
       <MapContainer
         center={iranCenter}
         zoom={11}
@@ -326,7 +282,6 @@ const IranMap = () => {
 
         {/* نشان دادن موقعیت‌های ذخیره‌شده روی نقشه */}
         {savedLocations.map((location, index) => (
-<<<<<<< HEAD
           <section key={index}>
             {(problemUnSolved === true && location.solved === "no") ? <Marker key={index} position={[location.latitude, location.longitude]} icon={customIconRedNeedle} eventHandlers={{
               click: () => {
@@ -343,10 +298,6 @@ const IranMap = () => {
                   setIsReporting(true);
 
                   setShowSolvedProblemForm(true)
-<<<<<<< HEAD
-
-=======
->>>>>>> 87a8d77 (add : add options to map)
                 },
               }}>
                 <Popup>{location.label}</Popup>
@@ -359,14 +310,6 @@ const IranMap = () => {
         ))}
 
         {position && showNeedleOrange && (
-=======
-          <Marker key={index} position={[location.latitude, location.longitude]} icon={(location.condition == "yes" ? customIconGreenNeedle : customIconRedNeedle)}>
-            <Popup>{location.label}</Popup>
-          </Marker>
-        ))}
-
-        {position && (
->>>>>>> 85e495d (add : add new design to map)
           <Marker position={position} icon={customIconNeedle}>
             <Popup>{popupText}</Popup>
           </Marker>
@@ -379,20 +322,16 @@ const IranMap = () => {
             setUserPosition(coords, "موقعیت انتخاب شده توسط شما");
           }} />
         )}
-<<<<<<< HEAD
         {isLocatedNeedle && position && <FlyToPosition position={position} />}
         {(showUnSolvedProblemForm || showSolvedProblemForm) && position && <FlyToPosition position={position} />}
 
 
-=======
->>>>>>> 85e495d (add : add new design to map)
       </MapContainer>
 
       <section className="absolute top-7 right-10 w-[60px] h-[60px] bg-[#8EB486] flex justify-center items-center rounded-xl">
         <Icon name="User" />
       </section>
 
-<<<<<<< HEAD
       {!isReporting && !isLocatedNeedle &&
         <section className="absolute bottom-5 sm:bottom-10 w-full flex justify-center items-center sm:gap-8 gap-3 z-10 flex-col sm:flex-row text-center">
           <button onClick={() => {
@@ -414,18 +353,6 @@ const IranMap = () => {
             }
 
             }
-=======
-      {!isReporting &&
-        <section className="absolute bottom-5 sm:bottom-10 w-full flex justify-center items-center sm:gap-8 gap-3 z-10 flex-col sm:flex-row text-center">
-          <button className="w-[200px]  bg-[#00E083] text-sm px-4 py-2 rounded-3xl shadow hover:bg-gray-100 transition  text-black">
-            مشکلات حل شده
-          </button>
-          <button className="w-[200px]  bg-[#F45151] text-sm px-4 py-2 rounded-3xl shadow hover:bg-gray-100 transition  text-black">
-            مشکلات حل نشده
-          </button>
-          <button
-            onClick={() => setIsReporting(true)}
->>>>>>> 85e495d (add : add new design to map)
             className="w-[200px]  bg-[#F48B11] text-sm px-4 py-2 rounded-3xl shadow hover:bg-gray-100 transition  text-black"
           >
             ثبت گزارش جدید
@@ -437,29 +364,12 @@ const IranMap = () => {
         <div className="absolute bottom-10 w-full flex justify-center z-10 gap-4">
           <button
             onClick={() => {
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-              // alert(`مکان ثبت شد: ${position[0]}, ${position[1]}`);
->>>>>>> 87a8d77 (add : add options to map)
               setIsLocatedNeedle(true);
 
               setIsReporting(false);
             }}
-<<<<<<< HEAD
             className="bg-[#F48B11] text-white px-6 py-2 rounded-xl shadow">
 
-=======
-            className="bg-[#F48B11] text-white px-6 py-2 rounded-xl shadow"
-          >
->>>>>>> 87a8d77 (add : add options to map)
-=======
-              alert(`مکان ثبت شد: ${position[0]}, ${position[1]}`);
-              setIsReporting(false);
-            }}
-            className="bg-green-600 text-white px-6 py-2 rounded-xl shadow"
-          >
->>>>>>> 85e495d (add : add new design to map)
             ثبت مکان گزارش
           </button>
           <button
@@ -479,7 +389,6 @@ const IranMap = () => {
             />
           </button>
         </div>
-<<<<<<< HEAD
       )
       }
       {
@@ -641,11 +550,6 @@ const IranMap = () => {
       )}
 
     </div >
-=======
-      )}
-
-    </div>
->>>>>>> 85e495d (add : add new design to map)
   );
 };
 
