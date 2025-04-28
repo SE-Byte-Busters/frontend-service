@@ -15,6 +15,7 @@ import UnSolvedProblemForm from './UnSolvedProblemForm';
 import SolvedProblemForm from './SolvedProblemForm';
 
 import '../../app/globals.css';
+import Link from 'next/link';
 
 
 
@@ -28,14 +29,14 @@ const customIconNeedle = new L.Icon({
 const customIconRedNeedle = new L.Icon({
   iconUrl: '/images/icons/redNeedle.png', // مسیر عکس از public
   iconSize: [55, 55],          // اندازه دلخواه
-  iconAnchor: [17, 35],        // نقطه نوک آیکن
-  popupAnchor: [0, -35],       // موقعیت پاپ‌آپ
+  iconAnchor: [17, 35],
+  popupAnchor: [0, -35],
 });
 const customIconGreenNeedle = new L.Icon({
   iconUrl: '/images/icons/greenNeedle.png', // مسیر عکس از public
-  iconSize: [55, 55],          // اندازه دلخواه
-  iconAnchor: [17, 35],        // نقطه نوک آیکن
-  popupAnchor: [0, -35],       // موقعیت پاپ‌آپ
+  iconSize: [55, 55],
+  iconAnchor: [17, 35],
+  popupAnchor: [0, -35],
 });
 // داده‌های ماک که نشان‌دهنده مکان‌های ثبت‌شده در تهران هستند
 const savedLocations = [
@@ -335,7 +336,9 @@ const IranMap = () => {
       </MapContainer >
 
       <section className="absolute top-7 right-10 w-[60px] h-[60px] bg-[#8EB486] flex justify-center items-center rounded-xl">
-        <Icon name="User" />
+        <Link href="/user/profile/edit">
+          <Icon name="User" />
+        </Link>
       </section>
 
       {
