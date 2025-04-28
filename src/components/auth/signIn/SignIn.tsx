@@ -7,7 +7,7 @@ import { sendEmail } from "@/lib/actions/sign-in";
 
 import '@/app/globals.css';
 import { useRouter } from "next/navigation";
-import { Alert , AlertProps } from '@/components/Alert'
+import { Alert, AlertProps } from '@/components/Alert'
 
 interface FormData {
   userNameAndNumber: string;
@@ -57,9 +57,10 @@ export default function SignIn() {
       if (response.status >= 200 && response.status < 300) {
         setAlert({
           type: 'success',
-          message: 'تغییرات شما با موفقیت ذخیره شد.',
+          message: "ورود با موفقیت بود",
           duration: 3000,
-          onClose: () => setAlert(null)});
+          onClose: () => setAlert(null)
+        });
       } else if (response.status >= 400 || response.status < 500) {
         setAlert({
           type: 'error',
@@ -80,7 +81,7 @@ export default function SignIn() {
         localStorage.setItem("token", data.data.token)
         localStorage.setItem("role", data.data.role)
         setTimeout(() => {
-          router.push("/map"); // Navigate to map page after successful OTP verification
+          router.push("/"); // Navigate to main page after successful OTP verification
         }, 1000);
       }
 
