@@ -3,7 +3,7 @@ import React, { createContext, useContext, useState } from 'react';
 type AlertType = {
     type: string;
     message: string;
-};
+} | null;
 
 type ReportContextType = {
     isVisible: boolean;
@@ -18,6 +18,8 @@ type ReportContextType = {
     setPosition: (value: [number, number] | null) => void;
     alert: AlertType;
     setAlert: (value: AlertType) => void;
+    isReporting: Boolean;
+    setIsReporting: (value: boolean) => void;
 };
 
 const ReportContext = createContext<ReportContextType | undefined>(undefined);
@@ -30,6 +32,8 @@ export const ReportProvider = ({ children }: { children: React.ReactNode }) => {
     const [imagesToSend, setImagesToSend] = useState<File[]>([]);
     const [position, setPosition] = useState<[number, number] | null>(null);
     const [alert, setAlert] = useState<AlertType>({ type: '', message: '' });
+    const [isReporting, setIsReporting] = useState(false);
+
 
     return (
         <ReportContext.Provider value={{
@@ -45,6 +49,8 @@ export const ReportProvider = ({ children }: { children: React.ReactNode }) => {
             setPosition,
             alert,
             setAlert,
+            isReporting,
+            setIsReporting
         }}>
             {children}
         </ReportContext.Provider>

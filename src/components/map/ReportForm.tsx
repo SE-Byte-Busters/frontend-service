@@ -4,6 +4,7 @@ import { useReport } from '@/context/ ReportContext';
 import { Alert, AlertProps } from '@/components/Alert';
 import ImageUploader from './ImageUploader';
 import Category from './Category';
+import { setTimeout } from 'timers';
 
 interface ReportFormProps {
   onSubmit?: (data: any) => void;
@@ -28,6 +29,10 @@ const ReportForm: React.FC<ReportFormProps> = ({ onSubmit, className }) => {
 
   const { imagesToSend, setImagesToSend } = useReport();
   const { alert, setAlert } = useReport();
+
+
+  const { isReporting, setIsReporting } = useReport();
+
 
 
 
@@ -118,7 +123,14 @@ const ReportForm: React.FC<ReportFormProps> = ({ onSubmit, className }) => {
 
       const data = await response.json();
       console.log("Success:", data);
-      setAlert({ type: 'success', message: 'گزارش با موفقیت ارسال شد.' });
+      setAlert({
+        type: 'success', message: 'گزارش با موفقیت ارسال شد.'
+      });
+
+      setTimeout(() => {
+        setAlert(null)
+      }, 3000)
+
 
     } catch (error) {
       console.error("Error:", error);
@@ -208,22 +220,32 @@ const ReportForm: React.FC<ReportFormProps> = ({ onSubmit, className }) => {
 
 
 
-        <div className='col-span-12 text-center'>
+        <div className='col-span-12 text-center flex justify-center'>
           <button
             onClick={handleSubmit}
             className="bg-[#f89b2f] w-[234px] h-[44px] mt-4 py-2 rounded-full text-white shadow-md hover:bg-[#e38821] transition"
           >
             ثبت گزارش
           </button>
+          <button
+            onClick={() => {
+              setIsReporting(true);
+              setIsLocatedNeedle(false);
+              setIsVisible(true);
+
+            }}
+          // className="bg-transparent border-0 p-0"
+          >
+            <Image
+              src="/images/icons/X.png"  // مسیر تصویر لغو
+              alt="Background Image"
+              width={64}
+              height={64}
+              className="w-10 h-10"  // سایز دلخواه برای عکس
+            />
+          </button>
         </div>
 
-        <input
-          type="text"
-          className="w-full border border-[#685752] p-2 rounded-[30px] text-[#685752]"
-          placeholder="مثلا: تهران، خیابان ولیعصر، روبروی پارک دانشجو"
-          value={address}
-          onChange={(e) => setAddress(e.target.value)}
-        />
       </div>
 
 
@@ -277,14 +299,31 @@ const ReportForm: React.FC<ReportFormProps> = ({ onSubmit, className }) => {
         <Image src="/images/icons/smog.png" alt="smog" width={320} height={74} />
         <Image src="/images/icons/leaf.png" alt="leaf" width={320} height={74} />
       </div>
-      <div className='col-span-12 text-center'>
+      {/* <div className='col-span-12 text-center'>
         <button
           onClick={handleSubmit}
           className="bg-[#f89b2f] w-[234px] h-[44px] mt-4 py-2 rounded-full text-white shadow-md hover:bg-[#e38821] transition"
         >
-          ثبت گزارش
+          ثبت گزارشننننی
         </button>
-      </div>
+        <button
+          onClick={() => {
+            setIsReporting(true);
+            setIsLocatedNeedle(true);
+
+          }}
+        // className="bg-transparent border-0 p-0"
+        >
+          <Image
+            src="/images/icons/X.png"  // مسیر تصویر لغو
+            alt="Background Image"
+            width={64}
+            height={64}
+            className="w-10 h-10"  // سایز دلخواه برای عکس
+          />
+        </button>
+
+      </div> */}
 
 
 
