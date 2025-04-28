@@ -53,7 +53,7 @@ export default function DesktopHeader({
           <div className="flex items-center bg-accent rounded-lg px-6 py-2 animate-pulse w-32 h-10" />
         ) : username ? (
           <Link
-            href="/admin/profile/edit"
+            href={localStorage.getItem("role") !== "user" ? "/admin/profile/edit" : "/user/profile/edit"}
             className="flex items-center bg-accent rounded-lg px-3 py-2
             text-white hover:text-black transition-colors duration-300 text-sm"
           >

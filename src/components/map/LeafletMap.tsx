@@ -253,7 +253,7 @@ const IranMap = () => {
 
 
 
-  const [isReporting, setIsReporting] = useState(false);
+  const { isReporting, setIsReporting } = useReport();
 
   return (
     <div className="relative w-full h-screen">
@@ -472,10 +472,10 @@ const IranMap = () => {
           </div>
         )
       }
-      {
+      {alert &&
         alert.message && (
           <section
-            className={`fixed top-4 right-4 z-50
+            className={`fixed bottom-4 right-4 z-50
       ${alert.type === 'success' ? 'alert-success' : ''}
       ${alert.type === 'error' ? 'alert-error' : ''}
     `}
