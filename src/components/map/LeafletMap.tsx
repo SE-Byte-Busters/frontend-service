@@ -336,7 +336,7 @@ const IranMap = () => {
       </MapContainer >
 
       <section className="absolute top-7 right-10 w-[60px] h-[60px] bg-[#8EB486] flex justify-center items-center rounded-xl">
-        <Link href="/user/profile/edit">
+        <Link href={localStorage.getItem("role") === "user" ? "/user/profile/edit" : "/admin/profile/edit"}>
           <Icon name="User" />
         </Link>
       </section>
