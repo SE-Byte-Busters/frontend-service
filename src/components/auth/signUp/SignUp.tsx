@@ -5,7 +5,7 @@ import { Eye, EyeOff } from "lucide-react";
 import Link from "next/link";
 import { sendEmail } from "@/lib/actions/act";
 import { useRouter } from "next/navigation";
-import { Alert , AlertProps } from '@/components/Alert'
+import { Alert, AlertProps } from '@/components/Alert'
 
 import '@/app/globals.css';
 
@@ -75,7 +75,7 @@ export default function SignUp() {
       if (response.status >= 200 && response.status < 300) {
         setAlert({
           type: 'success',
-          message: 'تغییرات شما با موفقیت ذخیره شد.',
+          message: 'صبت نام اولیه شما با موفقیت انجام شد.',
           duration: 3000,
           onClose: () => setAlert(null)
         });
