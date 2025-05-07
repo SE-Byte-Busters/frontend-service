@@ -37,12 +37,15 @@ const UnSolvedProblemForm: React.FC<ReportFormProps> = ({ onSubmit, className })
                 <div className="flex justify-between items-start flex-row">
                     <div>
 
-
-                        <Image src="/images/icons/priorityMiddle.png" alt="profile" className="m-[10px]" width={150} height={150}></Image>
+                        <Image src="/images/icons/priorityHight.png" alt="priorityMiddle" className="m-[10px]" width={200} height={200} />
+                        <p className="text-center text-xl text-[#000000] font-vazirmatn max-w-[80%] mx-auto">
+                            منتظر اقدام یکی از شهریارها هستیم
+                            تو هم می‌تونی اولین گام رو برداری...
+                        </p>
                         <label className="font-bold text-[24px] text-[#685752] font-vazirmatn m-[10px]">نظرات و پیشنهادات</label>
 
                         <textarea
-                            className="w-[90%] border border-[#685752] p-3  m-2 rounded-[30px] text-[#685752]"
+                            className="w-[90%] border border-[#685752] p-3 m-2 rounded-[30px] text-[#685752]"
                             placeholder="مثلا: ترک عمیق به‌وجود آمده و ترس ریزش پل وجود دارد."
                             rows={4}
                             value={description}
@@ -69,53 +72,16 @@ const UnSolvedProblemForm: React.FC<ReportFormProps> = ({ onSubmit, className })
                             <span className="font-bold text-[20px] text-[#685752] font-vazirmatn">
                                 امروز بارون اومد، چاله پر آب شده بود!                            </span>
                         </h2>
-
                     </div>
 
-
-                    <Image src="/images/icons/solved.png" alt="profile" width={80} height={40}></Image>
-
-                    <textarea
-                        className="w-[90%] border border-[#685752] p-3 m-2 rounded-[30px] text-[#685752]"
-                        placeholder="مثلا: ترک عمیق به‌وجود آمده و ترس ریزش پل وجود دارد."
-                        rows={4}
-                        value={description}
-                        onChange={(e) => setDescription(e.target.value)}
-                    />
-
-                    <h2 className="inline-block border-b border-[#685752] pb-6 pt-4 m-2">
-                        <span className="font-bold text-[20px] text-[#685752] font-vazirmatn ml-8">
-                            saraH
-                        </span>
-                        <span className="font-bold text-[20px] text-[#685752] font-vazirmatn">
-                            من دارم میایم شما کجتاینن
-                        </span>
-                    </h2>
-                    <h2 className="inline-block border-b border-[#685752] pb-6 pt-4 m-2">
-                        <span className="font-bold text-[20px] text-[#685752] font-vazirmatn ml-8">
-                            saraH
-                        </span>
-                        <span className="font-bold text-[20px] text-[#685752] font-vazirmatn">
-                            من دارم میایم شما کجتاینن
-                        </span>
-                    </h2>
-                    <h2 className="inline-block border-b border-[#685752] pb-6 pt-4 m-2">
-                        <span className="font-bold text-[20px] text-[#685752] font-vazirmatn ml-8">
-                            saraH
-                        </span>
-                        <span className="font-bold text-[20px] text-[#685752] font-vazirmatn">
-                            من دارم میایم شما کجتاینن
-                        </span>
-                    </h2>
+                    <Image src="/images/icons/unSolved.png" alt="solved" width={80} height={40} />
                 </div>
-
-                <Image src="/images/icons/unSolved.png" alt="solved" width={80} height={40} />
             </div>
 
             {/* بخش تصویر و رأی‌دهی */}
-            < div className="col-span-12 md:col-span-5 space-y-3" >
+            <div className="col-span-12 md:col-span-5 space-y-3">
                 {/* تغییر عکس اینجاست */}
-                < div className="relative w-80 h-80 overflow-hidden rounded-xl mx-auto" >
+                <div className="relative w-80 h-80 overflow-hidden rounded-xl mx-auto">
 
                     <section className="flex items-center gap-2">
                         <Image src={images[currentIndex]}
@@ -149,10 +115,10 @@ const UnSolvedProblemForm: React.FC<ReportFormProps> = ({ onSubmit, className })
                             />
                         ))}
                     </div>
-                </div >
+                </div>
 
                 {/* نوار رأی‌دهی داینامیک */}
-                < div className="w-full space-y-1" >
+                <div className="w-full space-y-1">
                     <div className="flex w-full h-8 overflow-hidden rounded-full border border-gray-200 shadow-sm text-sm font-bold mt-[10px]">
                         {/* درصد مخالف */}
                         <span className="text-green-600 font-semibold rounded-full">
@@ -207,8 +173,8 @@ const UnSolvedProblemForm: React.FC<ReportFormProps> = ({ onSubmit, className })
                     </p>
 
                     <p className="text-[#000000] text-2xl font-bold m-4">تهران، نرسیده به میدان توحید</p>
-                </div >
-            </div >
+                </div>
+            </div>
         </div >
     );
 };
