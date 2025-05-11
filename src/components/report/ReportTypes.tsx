@@ -22,6 +22,7 @@ export type Report = {
   approvalStatus: number;
   voteScore: number;
   createdAt: string;
+  priority: "High" | "Medium" | "Low";
   updatedAt: string;
 };
 
