@@ -3,20 +3,19 @@
 import { MapContainer, TileLayer, Marker, useMap, ZoomControl, Popup } from 'react-leaflet';
 import { useReport } from '@/context/ ReportContext';
 
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import Image from 'next/image';
 import { Icon } from '@/components/Icon';
-import { customSchema } from '@hookform/resolvers/standard-schema/src/__tests__/__fixtures__/data.js';
 import ReportForm from './ReportForm';
 import HeaderMap from './HeaderMap';
 import UnSolvedProblemForm from './UnSolvedProblemForm';
 import SolvedProblemForm from './SolvedProblemForm';
 
-import '../../app/globals.css';
+import '@/app/globals.css';
 import Link from 'next/link';
-
+import { Report } from '@/components/report/ReportTypes'
 
 
 const customIconNeedle = new L.Icon({
@@ -38,15 +37,6 @@ const customIconGreenNeedle = new L.Icon({
   iconAnchor: [17, 35],
   popupAnchor: [0, -35],
 });
-// داده‌های ماک که نشان‌دهنده مکان‌های ثبت‌شده در تهران هستند
-const savedLocations = [
-  { latitude: 35.6892, longitude: 51.3890, label: "مکان 1", solved: "yes" },
-  { latitude: 35.7023, longitude: 51.3510, label: "مکان 2", solved: "yes" },
-  { latitude: 35.7310, longitude: 51.3890, label: "مکان 3", solved: "yes" },
-  { latitude: 35.7110, longitude: 51.3890, label: "مکان 4", solved: "no" },
-  { latitude: 35.7110, longitude: 51.3790, label: "مکان 5", solved: "no" },
-  // اضافه کردن مکان‌های بیشتر به همین شکل
-];
 
 const getLocationByIP = async () => {
   try {
@@ -241,8 +231,114 @@ const IranMap = () => {
   const [showUnSolvedProblemForm, setShowUnSolvedProblemForm] = useState(false);
   const [showSolvedProblemForm, setShowSolvedProblemForm] = useState(false);
   const { alert, setAlert } = useReport();
+  const [savedLocations, setSavedLocations] = useState<Report[]>([]);
+  const mapRef = useRef<L.Map | null>(null);
 
+  // get report withing current bound
+  const fetchReportsInBounds = async (map: L.Map, filter: string = 'all', retryCount = 0, signal?: AbortSignal) => {
+    try {
+      const bounds = map.getBounds();
+      const ne = bounds.getNorthEast();
+      const sw = bounds.getSouthWest();
 
+      const token = localStorage.getItem('token');
+      const response = await fetch(
+        `https://shahriar.thetechverse.ir:3000/api/v1/report/map-search?` +
+        `neLat=${ne.lat}&neLng=${ne.lng}&` +
+        `swLat=${sw.lat}&swLng=${sw.lng}&` +
+        `filter=${filter}&` +
+        `zoom=${map.getZoom()}`,
+        {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+          },
+          signal
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error('Failed to fetch reports');
+      }
+
+      const data = await response.json();
+      setSavedLocations(data.data);
+    } catch (error: unknown) {
+      if (error instanceof Error && error.name !== 'AbortError') {
+        console.error('Error fetching reports:', error);
+        setAlert({
+          type: 'error',
+          message: 'خطا در دریافت گزارش‌ها از سرور'
+        });
+        setSavedLocations([]);
+        throw error;
+      }
+    }
+  };
+
+  // Add event listener for map move
+  const WhenReady = ({ children }: { children: React.ReactNode }) => {
+    const map = useMap();
+    const fetchTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+    const abortControllerRef = useRef<AbortController | null>(null);
+
+    useEffect(() => {
+      const fetchWithDebounce = () => {
+        // Cancel previous request and timeout
+        if (abortControllerRef.current) {
+          abortControllerRef.current.abort();
+        }
+        if (fetchTimeoutRef.current) {
+          clearTimeout(fetchTimeoutRef.current);
+        }
+
+        abortControllerRef.current = new AbortController();
+
+        fetchTimeoutRef.current = setTimeout(() => {
+          fetchReportsInBounds(
+            map,
+            problemSolved ? 'done' : problemUnSolved ? 'notDone' : 'all',
+            0,
+            abortControllerRef.current?.signal
+          );
+        }, 500);
+      };
+
+      const handleMoveEnd = () => {
+        fetchWithDebounce();
+      };
+
+      // Initial fetch
+      fetchWithDebounce();
+
+      // Set up event listener
+      map.on('moveend', handleMoveEnd);
+
+      // Cleanup
+      return () => {
+        map.off('moveend', handleMoveEnd);
+        if (abortControllerRef.current) {
+          abortControllerRef.current.abort();
+        }
+        if (fetchTimeoutRef.current) {
+          clearTimeout(fetchTimeoutRef.current);
+        }
+      };
+    }, [map, problemSolved, problemUnSolved]); // Keep these dependencies
+
+    return children;
+  };
+
+  // Update reports when filter changes
+  useEffect(() => {
+    if (mapRef.current) {
+      fetchReportsInBounds(
+        mapRef.current,
+        problemSolved ? 'done' :
+        problemUnSolved ? 'notDone' :
+        'all'
+      );
+    }
+  }, [problemSolved, problemUnSolved]);
 
   const iranCenter: [number, number] = [35.6892, 51.3890];
 
@@ -279,60 +375,52 @@ const IranMap = () => {
         className="w-full h-full z-0"
         maxBounds={L.latLngBounds([25.0, 44.0], [40.0, 64.0])}
       >
-        <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
+        <WhenReady>
+          <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
 
-        {/* نشان دادن موقعیت‌های ذخیره‌شده روی نقشه */}
-        {savedLocations.map((location, index) => (
-          <section key={index}>
-            {(problemUnSolved === true && location.solved === "no") ? <Marker key={index} position={[location.latitude, location.longitude]} icon={customIconRedNeedle} eventHandlers={{
-              click: () => {
-                setIsReporting(true);
-                setPosition([location.latitude, location.longitude]);
-
-                setShowUnSolvedProblemForm(true)
-              },
-            }}>
-              <Popup>{location.label}</Popup>
-            </Marker> : <></>}{
-              (problemSolved === true && location.solved === "yes") ? <Marker key={index} position={[location.latitude, location.longitude]} icon={customIconGreenNeedle} eventHandlers={{
+          {/* نشان دادن موقعیت‌های ذخیره‌شده روی نقشه */}
+          {savedLocations.map((location, index) => (
+            <Marker
+              key={index}
+              position={[location.location.coordinates[0], location.location.coordinates[1]]}
+              icon={location.status === 1 || location.status === 2 ?
+                customIconGreenNeedle :
+                customIconRedNeedle
+              }
+              eventHandlers={{
                 click: () => {
                   setIsReporting(true);
-                  setPosition([location.latitude, location.longitude]);
-
-
-                  setShowSolvedProblemForm(true)
+                  setPosition([location.location.coordinates[0], location.location.coordinates[1]]);
+                  if (location.status === 1 || location.status === 2) {
+                    setShowSolvedProblemForm(true);
+                  } else {
+                    setShowUnSolvedProblemForm(true);
+                  }
                 },
-              }}>
-                <Popup>{location.label}</Popup>
-              </Marker> : <></>}
-            {/* {isLocatedNeedle && position && <FlyToPosition position={position} />} */}
-
-
-          </section >
-
-        ))}
-
-        {
-          position && showNeedleOrange && (
-            <Marker position={position} icon={customIconNeedle}>
-              <Popup>{popupText}</Popup>
+              }}
+            >
+              <Popup>{location.title}</Popup>
             </Marker>
-          )
-        }
-
-        <CustomZoomControls setUserPosition={setUserPosition} />
-        {
-          isReporting && (
-            <MapClickHandler onClick={(e) => {
-              const coords: [number, number] = [e.latlng.lat, e.latlng.lng];
-              setUserPosition(coords, "موقعیت انتخاب شده توسط شما");
-            }} />
-          )
-        }
-        {isLocatedNeedle && position && <FlyToPosition position={position} />}
-        {(showUnSolvedProblemForm || showSolvedProblemForm) && position && <FlyToPosition position={position} />}
-
-
+          ))}
+          {
+            position && showNeedleOrange && (
+              <Marker position={position} icon={customIconNeedle}>
+                <Popup>{popupText}</Popup>
+              </Marker>
+            )
+          }
+          <CustomZoomControls setUserPosition={setUserPosition} />
+          {
+            isReporting && (
+              <MapClickHandler onClick={(e) => {
+                const coords: [number, number] = [e.latlng.lat, e.latlng.lng];
+                setUserPosition(coords, "موقعیت انتخاب شده توسط شما");
+              }} />
+            )
+          }
+          {isLocatedNeedle && position && <FlyToPosition position={position} />}
+          {(showUnSolvedProblemForm || showSolvedProblemForm) && position && <FlyToPosition position={position} />}
+        </WhenReady>
       </MapContainer >
 
       <section className="absolute top-7 right-10 w-[60px] h-[60px] bg-[#8EB486] flex justify-center items-center rounded-xl">
@@ -344,18 +432,31 @@ const IranMap = () => {
       {
         !isReporting && !isLocatedNeedle &&
         <section className="absolute bottom-5 sm:bottom-10 w-full flex justify-center items-center sm:gap-8 gap-3 z-10 flex-col sm:flex-row text-center">
-          <button onClick={() => {
-            setProblemSolved(!problemSolved)
+        <button
+          onClick={() => {
+            setProblemSolved(!problemSolved);
+            setProblemUnSolved(false);
+            if (mapRef.current) {
+              fetchReportsInBounds(mapRef.current, problemSolved ? 'all' : 'done');
+            }
           }}
-            className="w-[200px]  bg-[#00E083] text-sm px-4 py-2 rounded-3xl shadow hover:bg-gray-100 transition  text-black">
-            مشکلات حل شده
-          </button>
-          <button onClick={() => {
-            setProblemUnSolved(!problemUnSolved)
+          className="w-[200px] bg-[#00E083] text-sm px-4 py-2 rounded-3xl shadow hover:bg-gray-100 transition text-black"
+        >
+          مشکلات حل شده
+        </button>
 
-          }} className="w-[200px]  bg-[#F45151] text-sm px-4 py-2 rounded-3xl shadow hover:bg-gray-100 transition  text-black">
-            مشکلات حل نشده
-          </button>
+        <button
+          onClick={() => {
+            setProblemUnSolved(!problemUnSolved);
+            setProblemSolved(false);
+            if (mapRef.current) {
+              fetchReportsInBounds(mapRef.current, problemUnSolved ? 'all' : 'notDone');
+            }
+          }}
+          className="w-[200px] bg-[#F45151] text-sm px-4 py-2 rounded-3xl shadow hover:bg-gray-100 transition text-black"
+        >
+          مشکلات حل نشده
+        </button>
           <button
             onClick={() => {
               setIsReporting(true)
