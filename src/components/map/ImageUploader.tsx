@@ -1,6 +1,6 @@
 "use client";
 
-import { useReport } from '@/context/ ReportContext';
+import { useReport } from '@/context/ReportContext';
 import Image from 'next/image';
 import React from 'react';
 import ImageUploading, { ImageListType } from "react-images-uploading";

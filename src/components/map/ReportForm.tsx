@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import Image from 'next/image';
-import { useReport } from '@/context/ ReportContext';
+import { useReport } from '@/context/ReportContext';
 import { Alert, AlertProps } from '@/components/Alert';
 import ImageUploader from './ImageUploader';
 import Category from './Category';

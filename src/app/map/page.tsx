@@ -1,6 +1,6 @@
 'use client';
 
-import { ReportProvider } from '@/context/ ReportContext';
+import { ReportProvider } from '@/context/ReportContext';
 import dynamic from 'next/dynamic';
 
 const LazyMap = dynamic(
