@@ -80,6 +80,8 @@ export default function SignIn() {
       if (response.status >= 200 && response.status < 300) {
         localStorage.setItem("token", data.data.token)
         localStorage.setItem("role", data.data.role)
+        document.cookie = `token=${data.data.token}; path=/; max-age=${60 * 60 * 24 * 7}; secure; samesite=lax`
+        document.cookie = `role=${data.data.role}; path=/; max-age=${60 * 60 * 24 * 7}; secure; samesite=lax`      
         setTimeout(() => {
           router.push("/"); // Navigate to main page after successful OTP verification
         }, 1000);
