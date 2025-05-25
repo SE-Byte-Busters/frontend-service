@@ -1,51 +1,46 @@
 'use client';
 
 import { MapContainer, TileLayer, Marker, useMap, ZoomControl, Popup } from 'react-leaflet';
-import { useReport } from '@/context/ ReportContext';
-
+import { useReport } from '@/context/ReportContext';
 import { useState } from 'react';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import Image from 'next/image';
 import { Icon } from '@/components/Icon';
-import { customSchema } from '@hookform/resolvers/standard-schema/src/__tests__/__fixtures__/data.js';
 import ReportForm from './ReportForm';
 import HeaderMap from './HeaderMap';
 import UnSolvedProblemForm from './UnSolvedProblemForm';
 import SolvedProblemForm from './SolvedProblemForm';
-
-import '../../app/globals.css';
+import '@/app/globals.css';
 import Link from 'next/link';
 
-
-
 const customIconNeedle = new L.Icon({
-  iconUrl: '/images/icons/needle.png', // مسیر عکس از public
-  iconSize: [55, 55],          // اندازه دلخواه
-  iconAnchor: [17, 35],        // نقطه نوک آیکن
-  popupAnchor: [0, -35],       // موقعیت پاپ‌آپ
-});
-
-const customIconRedNeedle = new L.Icon({
-  iconUrl: '/images/icons/redNeedle.png', // مسیر عکس از public
-  iconSize: [55, 55],          // اندازه دلخواه
-  iconAnchor: [17, 35],
-  popupAnchor: [0, -35],
-});
-const customIconGreenNeedle = new L.Icon({
-  iconUrl: '/images/icons/greenNeedle.png', // مسیر عکس از public
+  iconUrl: '/images/icons/needle.png',
   iconSize: [55, 55],
   iconAnchor: [17, 35],
   popupAnchor: [0, -35],
 });
-// داده‌های ماک که نشان‌دهنده مکان‌های ثبت‌شده در تهران هستند
+
+const customIconRedNeedle = new L.Icon({
+  iconUrl: '/images/icons/redNeedle.png',
+  iconSize: [55, 55],
+  iconAnchor: [17, 35],
+  popupAnchor: [0, -35],
+});
+
+const customIconGreenNeedle = new L.Icon({
+  iconUrl: '/images/icons/greenNeedle.png',
+  iconSize: [55, 55],
+  iconAnchor: [17, 35],
+  popupAnchor: [0, -35],
+});
+
 const savedLocations = [
   { latitude: 35.6892, longitude: 51.3890, label: "مکان 1", solved: "yes" },
   { latitude: 35.7023, longitude: 51.3510, label: "مکان 2", solved: "yes" },
   { latitude: 35.7310, longitude: 51.3890, label: "مکان 3", solved: "yes" },
   { latitude: 35.7110, longitude: 51.3890, label: "مکان 4", solved: "no" },
   { latitude: 35.7110, longitude: 51.3790, label: "مکان 5", solved: "no" },
-  // اضافه کردن مکان‌های بیشتر به همین شکل
 ];
 
 const getLocationByIP = async () => {
@@ -104,9 +99,8 @@ const CustomZoomControls = ({ setUserPosition }: { setUserPosition: (pos: [numbe
   const map = useMap();
 
   return (
-    <div className="absolute sm:bottom-10 bottom-5 right-3 z-[1000] flex flex-col gap-2 ">
+    <div className="absolute sm:bottom-10 bottom-5 right-3 z-[1000] flex flex-col gap-2">
       <LocateButton setUserPosition={setUserPosition} />
-
       <button
         onClick={() => map.zoomIn()}
         className="w-12 h-12 rounded-full bg-[#fefaf8] shadow-md flex items-center justify-center hover:bg-[#f2ece8] transition"
@@ -122,9 +116,9 @@ const CustomZoomControls = ({ setUserPosition }: { setUserPosition: (pos: [numbe
     </div>
   );
 };
-const ReportFormWithButton = ({ }) => {
-  const { isVisible, setIsVisible } = useReport();
 
+const ReportFormWithButton = () => {
+  const { isVisible, setIsVisible } = useReport();
 
   const toggleForm = () => {
     setIsVisible(!isVisible);
@@ -144,22 +138,17 @@ const ReportFormWithButton = ({ }) => {
           height={61}
         />
       </div>
-
-
-      {/* ReportForm */}
       <div
-        className={`w-[50%] fixed top-0 left-0 z-10 bg-white shadow-lg rounded-lg transition-all duration-500 ${!isVisible ? 'translate-x-0' : '-translate-x-full'
-          }`}
+        className={`w-[50%] fixed top-0 left-0 z-10 bg-white shadow-lg rounded-lg transition-all duration-500 ${!isVisible ? 'translate-x-0' : '-translate-x-full'}`}
       >
-        {/* محتویات فرم شما در اینجا */}
         <ReportForm />
       </div>
-    </div >
+    </div>
   );
 };
-const UnSolvedProblemFormWithLocation = ({ }) => {
-  const { isVisible, setIsVisible } = useReport();
 
+const UnSolvedProblemFormWithLocation = () => {
+  const { isVisible, setIsVisible } = useReport();
 
   const toggleForm = () => {
     setIsVisible(!isVisible);
@@ -179,20 +168,17 @@ const UnSolvedProblemFormWithLocation = ({ }) => {
           height={61}
         />
       </div>
-      {/* ReportForm */}
       <div
-        className={`w-[50%] fixed top-0 left-0 z-10 bg-white shadow-lg rounded-lg transition-all duration-500 ${!isVisible ? 'translate-x-0' : '-translate-x-full'
-          }`}
+        className={`w-[50%] fixed top-0 left-0 z-10 bg-white shadow-lg rounded-lg transition-all duration-500 ${!isVisible ? 'translate-x-0' : '-translate-x-full'}`}
       >
-        {/* محتویات فرم شما در اینجا */}
         <UnSolvedProblemForm />
       </div>
-    </div >
+    </div>
   );
 };
-const SolvedProblemFormWithLocation = ({ }) => {
-  const { isVisible, setIsVisible } = useReport();
 
+const SolvedProblemFormWithLocation = () => {
+  const { isVisible, setIsVisible } = useReport();
 
   const toggleForm = () => {
     setIsVisible(!isVisible);
@@ -212,20 +198,23 @@ const SolvedProblemFormWithLocation = ({ }) => {
           height={61}
         />
       </div>
-      {/* ReportForm */}
       <div
-        className={`w-[50%] fixed top-0 left-0 z-10 bg-white shadow-lg rounded-lg transition-all duration-500 ${!isVisible ? 'translate-x-0' : '-translate-x-full'
-          }`}
+        className={`w-[50%] fixed top-0 left-0 z-10 bg-white shadow-lg rounded-lg transition-all duration-500 ${!isVisible ? 'translate-x-0' : '-translate-x-full'}`}
       >
-        {/* محتویات فرم شما در اینجا */}
         <SolvedProblemForm />
       </div>
-    </div >
+    </div>
   );
 };
+
 const FlyToPosition = ({ position }: { position: [number, number] }) => {
   const map = useMap();
   map.flyTo([position[0] - 0.005, position[1] - 0.005], 16, { duration: 1.5 });
+  return null;
+};
+
+const MapClickHandler = ({ onClick }: { onClick: (e: L.LeafletMouseEvent) => void }) => {
+  useMap().on('click', onClick);
   return null;
 };
 
@@ -235,39 +224,30 @@ const IranMap = () => {
   const { isLocatedNeedle, setIsLocatedNeedle } = useReport();
   const { isVisible, setIsVisible } = useReport();
   const { showNeedleOrange, setShowNeedleOrange } = useReport();
-
   const [problemUnSolved, setProblemUnSolved] = useState(false);
   const [problemSolved, setProblemSolved] = useState(false);
   const [showUnSolvedProblemForm, setShowUnSolvedProblemForm] = useState(false);
   const [showSolvedProblemForm, setShowSolvedProblemForm] = useState(false);
   const { alert, setAlert } = useReport();
-
-
-
   const iranCenter: [number, number] = [35.6892, 51.3890];
+  const { isReporting, setIsReporting } = useReport();
 
   const setUserPosition = (pos: [number, number], text: string) => {
     setPosition(pos);
     setPopupText(text);
   };
 
-
-
-  const { isReporting, setIsReporting } = useReport();
-
   return (
     <div className="relative w-full h-screen">
       <div
         className={`w-[50%] absolute top-2 z-10 bg-white shadow-lg rounded-lg transition-all duration-500
-      ${isVisible ? 'left-0 translate-x-1/2 ' : 'left-1/2 -translate-x-0'}
-  `}
+      ${isVisible ? 'left-0 translate-x-1/2 ' : 'left-1/2 -translate-x-0'}`}
       >
         <HeaderMap />
       </div>
-      {isLocatedNeedle ? <ReportFormWithButton /> : <></>}
-      {showUnSolvedProblemForm ? <UnSolvedProblemFormWithLocation /> : <></>}
-      {showSolvedProblemForm ? <SolvedProblemFormWithLocation /> : <></>}
-
+      {isLocatedNeedle && <ReportFormWithButton />}
+      {showUnSolvedProblemForm && <UnSolvedProblemFormWithLocation />}
+      {showSolvedProblemForm && <SolvedProblemFormWithLocation />}
 
       <MapContainer
         center={iranCenter}
@@ -281,59 +261,57 @@ const IranMap = () => {
       >
         <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
 
-        {/* نشان دادن موقعیت‌های ذخیره‌شده روی نقشه */}
         {savedLocations.map((location, index) => (
           <section key={index}>
-            {(problemUnSolved === true && location.solved === "no") ? <Marker key={index} position={[location.latitude, location.longitude]} icon={customIconRedNeedle} eventHandlers={{
-              click: () => {
-                setIsReporting(true);
-                setPosition([location.latitude, location.longitude]);
-
-                setShowUnSolvedProblemForm(true)
-              },
-            }}>
-              <Popup>{location.label}</Popup>
-            </Marker> : <></>}{
-              (problemSolved === true && location.solved === "yes") ? <Marker key={index} position={[location.latitude, location.longitude]} icon={customIconGreenNeedle} eventHandlers={{
-                click: () => {
-                  setIsReporting(true);
-                  setPosition([location.latitude, location.longitude]);
-
-
-                  setShowSolvedProblemForm(true)
-                },
-              }}>
+            {(problemUnSolved === true && location.solved === "no") && (
+              <Marker
+                position={[location.latitude, location.longitude]}
+                icon={customIconRedNeedle}
+                eventHandlers={{
+                  click: () => {
+                    setIsReporting(true);
+                    setPosition([location.latitude, location.longitude]);
+                    setShowUnSolvedProblemForm(true);
+                  },
+                }}
+              >
                 <Popup>{location.label}</Popup>
-              </Marker> : <></>}
-            {/* {isLocatedNeedle && position && <FlyToPosition position={position} />} */}
-
-
-          </section >
-
+              </Marker>
+            )}
+            {(problemSolved === true && location.solved === "yes") && (
+              <Marker
+                position={[location.latitude, location.longitude]}
+                icon={customIconGreenNeedle}
+                eventHandlers={{
+                  click: () => {
+                    setIsReporting(true);
+                    setPosition([location.latitude, location.longitude]);
+                    setShowSolvedProblemForm(true);
+                  },
+                }}
+              >
+                <Popup>{location.label}</Popup>
+              </Marker>
+            )}
+          </section>
         ))}
 
-        {
-          position && showNeedleOrange && (
-            <Marker position={position} icon={customIconNeedle}>
-              <Popup>{popupText}</Popup>
-            </Marker>
-          )
-        }
+        {position && showNeedleOrange && (
+          <Marker position={position} icon={customIconNeedle}>
+            <Popup>{popupText}</Popup>
+          </Marker>
+        )}
 
         <CustomZoomControls setUserPosition={setUserPosition} />
-        {
-          isReporting && (
-            <MapClickHandler onClick={(e) => {
-              const coords: [number, number] = [e.latlng.lat, e.latlng.lng];
-              setUserPosition(coords, "موقعیت انتخاب شده توسط شما");
-            }} />
-          )
-        }
+        {isReporting && (
+          <MapClickHandler onClick={(e) => {
+            const coords: [number, number] = [e.latlng.lat, e.latlng.lng];
+            setUserPosition(coords, "موقعیت انتخاب شده توسط شما");
+          }} />
+        )}
         {isLocatedNeedle && position && <FlyToPosition position={position} />}
         {(showUnSolvedProblemForm || showSolvedProblemForm) && position && <FlyToPosition position={position} />}
-
-
-      </MapContainer >
+      </MapContainer>
 
       <section className="absolute top-7 right-10 w-[60px] h-[60px] bg-[#8EB486] flex justify-center items-center rounded-xl">
         <Link href={localStorage.getItem("role") === "user" ? "/user/profile/edit" : "/admin/profile/edit"}>
@@ -341,238 +319,142 @@ const IranMap = () => {
         </Link>
       </section>
 
-      {
-        !isReporting && !isLocatedNeedle &&
+      {!isReporting && !isLocatedNeedle && (
         <section className="absolute bottom-5 sm:bottom-10 w-full flex justify-center items-center sm:gap-8 gap-3 z-10 flex-col sm:flex-row text-center">
-          <button onClick={() => {
-            setProblemSolved(!problemSolved)
-          }}
-            className="w-[200px]  bg-[#00E083] text-sm px-4 py-2 rounded-3xl shadow hover:bg-gray-100 transition  text-black">
+          <button
+            onClick={() => setProblemSolved(!problemSolved)}
+            className="w-[200px] bg-[#00E083] text-sm px-4 py-2 rounded-3xl shadow hover:bg-gray-100 transition text-black"
+          >
             مشکلات حل شده
           </button>
-          <button onClick={() => {
-            setProblemUnSolved(!problemUnSolved)
-
-          }} className="w-[200px]  bg-[#F45151] text-sm px-4 py-2 rounded-3xl shadow hover:bg-gray-100 transition  text-black">
+          <button
+            onClick={() => setProblemUnSolved(!problemUnSolved)}
+            className="w-[200px] bg-[#F45151] text-sm px-4 py-2 rounded-3xl shadow hover:bg-gray-100 transition text-black"
+          >
             مشکلات حل نشده
           </button>
           <button
             onClick={() => {
-              setIsReporting(true)
-              setShowNeedleOrange(true)
-            }
-
-            }
-            className="w-[200px]  bg-[#F48B11] text-sm px-4 py-2 rounded-3xl shadow hover:bg-gray-100 transition  text-black"
+              setIsReporting(true);
+              setShowNeedleOrange(true);
+            }}
+            className="w-[200px] bg-[#F48B11] text-sm px-4 py-2 rounded-3xl shadow hover:bg-gray-100 transition text-black"
           >
             ثبت گزارش جدید
           </button>
         </section>
-      }
+      )}
 
-      {
-        isReporting && position && (
-          <div className="absolute bottom-10 w-full flex justify-center z-10 gap-4">
-            <button
-              onClick={() => {
-                setIsLocatedNeedle(true);
-
-                setIsReporting(false);
-              }}
-              className="bg-[#F48B11] text-white px-6 py-2 rounded-xl shadow">
-
-              ثبت مکان گزارش
-            </button>
-            <button
-              onClick={() => {
-                setIsReporting(false);
-                setPosition(null);
-                setPopupText('');
-              }}
-              className="bg-transparent border-0 p-0"
-            >
-              <Image
-                src="/images/icons/X.png"  // مسیر تصویر لغو
-                alt="Background Image"
-                width={64}
-                height={64}
-                className="w-10 h-10"  // سایز دلخواه برای عکس
-              />
-            </button>
-          </div>
-        )
-      }
-      {
-        showSolvedProblemForm && (
-          <div className="absolute bottom-10 w-full flex justify-center z-10 gap-4">
-            <button
-              onClick={() => {
-                // alert(`مکان ثبت شد: ${position[0]}, ${position[1]}`);
-                setProblemSolved(!problemSolved)
-
-              }}
-              className="bg-green-600 text-white px-6 py-2 rounded-xl shadow"
-            >
-              مشکلات حل شده
-            </button>
-            <button
-              onClick={() => {
-                setIsReporting(false);
-                setPosition(null);
-                setPopupText('');
-                setProblemSolved(!problemSolved)
-
-                setShowSolvedProblemForm(false);
-              }}
-              className="bg-transparent border-0 p-0"
-            >
-              <Image
-                src="/images/icons/X.png"  // مسیر تصویر لغو
-                alt="Background Image"
-                width={64}
-                height={64}
-                className="w-10 h-10"  // سایز دلخواه برای عکس
-              />
-            </button>
-          </div>
-        )
-      }
-      {
-        showUnSolvedProblemForm && (
-          <div className="absolute bottom-10 w-full flex justify-center z-10 gap-4">
-            <button
-              onClick={() => {
-                // alert(`مکان ثبت شد: ${position[0]}, ${position[1]}`);
-                setProblemUnSolved(!problemUnSolved)
-
-              }}
-              className="bg-[#F45151] text-white px-6 py-2 rounded-xl shadow"
-            >
-              مشکلات حل نشده
-            </button>
-            <button
-              onClick={() => {
-                setIsReporting(false);
-                setPosition(null);
-                setPopupText('');
-                setProblemUnSolved(!problemUnSolved)
-
-                setShowUnSolvedProblemForm(false);
-              }}
-              className="bg-transparent border-0 p-0"
-            >
-              <Image
-                src="/images/icons/X.png"  // مسیر تصویر لغو
-                alt="Background Image"
-                width={64}
-                height={64}
-                className="w-10 h-10"  // سایز دلخواه برای عکس
-              />
-            </button>
-          </div>
-        )
-      }
-      {alert &&
-        alert.message && (
-          <section
-            className={`fixed bottom-4 right-4 z-50
-      ${alert.type === 'success' ? 'alert-success' : ''}
-      ${alert.type === 'error' ? 'alert-error' : ''}
-    `}
-            role="alert"
+      {isReporting && position && (
+        <div className="absolute bottom-10 w-full flex justify-center z-10 gap-4">
+          <button
+            onClick={() => {
+              setIsLocatedNeedle(true);
+              setIsReporting(false);
+            }}
+            className="bg-[#F48B11] text-white px-6 py-2 rounded-xl shadow"
           >
-            <span>{alert.message}</span>
-            {alert.type === 'success' && (
-              <svg className="icon-success" fill="currentColor" viewBox="0 0 20 20">
-                <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414L8.414 15l-4.121-4.121a1 1 0 011.414-1.414L8.414 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-              </svg>
-            )}
-            {alert.type === 'error' && (
-              <svg className="icon-error" fill="currentColor" viewBox="0 0 20 20">
-                <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l6.518 11.597c.75 1.334-.214 2.995-1.743 2.995H3.482c-1.53 0-2.493-1.661-1.743-2.995L8.257 3.1z" clipRule="evenodd" />
-              </svg>
-            )}
-          </section>
-        )
-      }
-      {
-        showSolvedProblemForm && (
-          <div className="absolute bottom-10 w-full flex justify-center z-10 gap-4">
-            <button
-              onClick={() => {
-                // alert(`مکان ثبت شد: ${position[0]}, ${position[1]}`);
-                setProblemSolved(!problemSolved)
+            ثبت مکان گزارش
+          </button>
+          <button
+            onClick={() => {
+              setIsReporting(false);
+              setPosition(null);
+              setPopupText('');
+            }}
+            className="bg-transparent border-0 p-0"
+          >
+            <Image
+              src="/images/icons/X.png"
+              alt="Background Image"
+              width={64}
+              height={64}
+              className="w-10 h-10"
+            />
+          </button>
+        </div>
+      )}
 
-              }}
-              className="bg-green-600 text-white px-6 py-2 rounded-xl shadow"
-            >
-              مشکلات حل شده
-            </button>
-            <button
-              onClick={() => {
-                setIsReporting(false);
-                setPosition(null);
-                setPopupText('');
-                setProblemSolved(!problemSolved)
+      {showSolvedProblemForm && (
+        <div className="absolute bottom-10 w-full flex justify-center z-10 gap-4">
+          <button
+            onClick={() => setProblemSolved(!problemSolved)}
+            className="bg-green-600 text-white px-6 py-2 rounded-xl shadow"
+          >
+            مشکلات حل شده
+          </button>
+          <button
+            onClick={() => {
+              setIsReporting(false);
+              setPosition(null);
+              setPopupText('');
+              setProblemSolved(!problemSolved);
+              setShowSolvedProblemForm(false);
+            }}
+            className="bg-transparent border-0 p-0"
+          >
+            <Image
+              src="/images/icons/X.png"
+              alt="Background Image"
+              width={64}
+              height={64}
+              className="w-10 h-10"
+            />
+          </button>
+        </div>
+      )}
 
-                setShowSolvedProblemForm(false);
-              }}
-              className="bg-transparent border-0 p-0"
-            >
-              <Image
-                src="/images/icons/X.png"  // مسیر تصویر لغو
-                alt="Background Image"
-                width={64}
-                height={64}
-                className="w-10 h-10"  // سایز دلخواه برای عکس
-              />
-            </button>
-          </div>
-        )
-      }
-      {
-        showUnSolvedProblemForm && (
-          <div className="absolute bottom-10 w-full flex justify-center z-10 gap-4">
-            <button
-              onClick={() => {
-                // alert(`مکان ثبت شد: ${position[0]}, ${position[1]}`);
-                setProblemUnSolved(!problemUnSolved)
+      {showUnSolvedProblemForm && (
+        <div className="absolute bottom-10 w-full flex justify-center z-10 gap-4">
+          <button
+            onClick={() => setProblemUnSolved(!problemUnSolved)}
+            className="bg-[#F45151] text-white px-6 py-2 rounded-xl shadow"
+          >
+            مشکلات حل نشده
+          </button>
+          <button
+            onClick={() => {
+              setIsReporting(false);
+              setPosition(null);
+              setPopupText('');
+              setProblemUnSolved(!problemUnSolved);
+              setShowUnSolvedProblemForm(false);
+            }}
+            className="bg-transparent border-0 p-0"
+          >
+            <Image
+              src="/images/icons/X.png"
+              alt="Background Image"
+              width={64}
+              height={64}
+              className="w-10 h-10"
+            />
+          </button>
+        </div>
+      )}
 
-              }}
-              className="bg-[#F45151] text-white px-6 py-2 rounded-xl shadow"
-            >
-              مشکلات حل نشده
-            </button>
-            <button
-              onClick={() => {
-                setIsReporting(false);
-                setPosition(null);
-                setPopupText('');
-                setProblemUnSolved(!problemUnSolved)
-
-                setShowUnSolvedProblemForm(false);
-              }}
-              className="bg-transparent border-0 p-0"
-            >
-              <Image
-                src="/images/icons/X.png"  // مسیر تصویر لغو
-                alt="Background Image"
-                width={64}
-                height={64}
-                className="w-10 h-10"  // سایز دلخواه برای عکس
-              />
-            </button>
-          </div>
-        )
-      }
-
-    </div >
+      {alert && alert.message && (
+        <section
+          className={`fixed bottom-4 right-4 z-50
+            ${alert.type === 'success' ? 'alert-success' : ''}
+            ${alert.type === 'error' ? 'alert-error' : ''}`}
+          role="alert"
+        >
+          <span>{alert.message}</span>
+          {alert.type === 'success' && (
+            <svg className="icon-success" fill="currentColor" viewBox="0 0 20 20">
+              <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414L8.414 15l-4.121-4.121a1 1 0 011.414-1.414L8.414 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+            </svg>
+          )}
+          {alert.type === 'error' && (
+            <svg className="icon-error" fill="currentColor" viewBox="0 0 20 20">
+              <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l6.518 11.597c.75 1.334-.214 2.995-1.743 2.995H3.482c-1.53 0-2.493-1.661-1.743-2.995L8.257 3.1z" clipRule="evenodd" />
+            </svg>
+          )}
+        </section>
+      )}
+    </div>
   );
-};
-
-const MapClickHandler = ({ onClick }: { onClick: (e: L.LeafletMouseEvent) => void }) => {
-  useMap().on('click', onClick);
-  return null;
 };
 
 export default IranMap;
