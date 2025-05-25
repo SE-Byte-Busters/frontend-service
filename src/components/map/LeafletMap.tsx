@@ -2,7 +2,7 @@
 
 import { MapContainer, TileLayer, Marker, useMap, ZoomControl, Popup } from 'react-leaflet';
 import { useReport } from '@/context/ReportContext';
-import { useState } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import Image from 'next/image';
@@ -13,6 +13,7 @@ import UnSolvedProblemForm from './UnSolvedProblemForm';
 import SolvedProblemForm from './SolvedProblemForm';
 import '@/app/globals.css';
 import Link from 'next/link';
+import { Report, ReportsResponse } from '@/components/report/ReportTypes'
 
 const customIconNeedle = new L.Icon({
   iconUrl: '/images/icons/needle.png',
@@ -34,14 +35,6 @@ const customIconGreenNeedle = new L.Icon({
   iconAnchor: [17, 35],
   popupAnchor: [0, -35],
 });
-
-const savedLocations = [
-  { latitude: 35.6892, longitude: 51.3890, label: "مکان 1", solved: "yes" },
-  { latitude: 35.7023, longitude: 51.3510, label: "مکان 2", solved: "yes" },
-  { latitude: 35.7310, longitude: 51.3890, label: "مکان 3", solved: "yes" },
-  { latitude: 35.7110, longitude: 51.3890, label: "مکان 4", solved: "no" },
-  { latitude: 35.7110, longitude: 51.3790, label: "مکان 5", solved: "no" },
-];
 
 const getLocationByIP = async () => {
   try {
@@ -218,6 +211,30 @@ const MapClickHandler = ({ onClick }: { onClick: (e: L.LeafletMouseEvent) => voi
   return null;
 };
 
+const MapBoundsHandler = ({ onBoundsChange }: { onBoundsChange: (bounds: L.LatLngBounds, zoom: number) => void }) => {
+  const map = useMap();
+
+  useEffect(() => {
+    const handleViewChange = () => {
+      const bounds = map.getBounds();
+      const zoom = map.getZoom();
+      onBoundsChange(bounds, zoom);
+    };
+
+    map.on('moveend', handleViewChange);
+    map.on('zoomend', handleViewChange);
+
+    handleViewChange();
+
+    return () => {
+      map.off('moveend', handleViewChange);
+      map.off('zoomend', handleViewChange);
+    };
+  }, [map, onBoundsChange]);
+
+  return null;
+};
+
 const IranMap = () => {
   const { position, setPosition } = useReport();
   const [popupText, setPopupText] = useState<string>('');
@@ -231,10 +248,149 @@ const IranMap = () => {
   const { alert, setAlert } = useReport();
   const iranCenter: [number, number] = [35.6892, 51.3890];
   const { isReporting, setIsReporting } = useReport();
+  const [reportLocations, setReportLocations] = useState<Report[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [currentBounds, setCurrentBounds] = useState<L.LatLngBounds | null>(null);
+  const [currentZoom, setCurrentZoom] = useState<number>(11);
+  const lastFetchRef = useRef<string>('');
+  const abortControllerRef = useRef<AbortController | null>(null);
+
+  const fetchReports = useCallback(async (bounds: L.LatLngBounds, zoom: number, filter: string = 'all') => {
+    if (!bounds) return;
+
+    const ne = bounds.getNorthEast();
+    const sw = bounds.getSouthWest();
+
+    const requestKey = `${ne.lat}-${ne.lng}-${sw.lat}-${sw.lng}-${zoom}-${filter}`;
+    if (requestKey === lastFetchRef.current) return;
+
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort();
+    }
+
+    abortControllerRef.current = new AbortController();
+    lastFetchRef.current = requestKey;
+
+    setLoading(true);
+    setError(null);
+
+    try {
+      const params = new URLSearchParams({
+        neLat: ne.lat.toString(),
+        neLng: ne.lng.toString(),
+        swLat: sw.lat.toString(),
+        swLng: sw.lng.toString(),
+        filter,
+        zoom: zoom.toString()
+      });
+
+      const token = localStorage.getItem('token');
+      const response = await fetch(
+        `https://shahriar.thetechverse.ir:3000/api/v1/report/map-search?${params}`,
+        {
+          method: 'GET',
+          signal: abortControllerRef.current.signal,
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`,
+          }
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const data: ReportsResponse = await response.json();
+
+      if (requestKey === lastFetchRef.current) {
+        setReportLocations(data.reports || []);
+      }
+    } catch (err) {
+      if (err instanceof Error && err.name === 'AbortError') {
+        return;
+      }
+
+      if (requestKey === lastFetchRef.current) {
+        setError(err instanceof Error ? err.message : 'An error occurred');
+        setReportLocations([]);
+      }
+    } finally {
+      if (requestKey === lastFetchRef.current) {
+        setLoading(false);
+      }
+    }
+  }, []);
+
+  const handleBoundsChange = useCallback(
+    (bounds: L.LatLngBounds, zoom: number) => {
+      setCurrentBounds(bounds);
+      setCurrentZoom(zoom);
+
+      let filter = 'all';
+      if (problemSolved && !problemUnSolved) {
+        filter = 'done';
+      } else if (problemUnSolved && !problemSolved) {
+        filter = 'notDone';
+      }
+
+      const timeoutId = setTimeout(() => {
+        fetchReports(bounds, zoom, filter);
+      }, 300);
+
+      return () => clearTimeout(timeoutId);
+    },
+    [fetchReports, problemSolved, problemUnSolved]
+  );
+
+  useEffect(() => {
+    if (currentBounds) {
+      let filter = 'all';
+      if (problemSolved && !problemUnSolved) {
+        filter = 'done';
+      } else if (problemUnSolved && !problemSolved) {
+        filter = 'notDone';
+      }
+
+      fetchReports(currentBounds, currentZoom, filter);
+    }
+  }, [problemSolved, problemUnSolved, currentBounds, currentZoom, fetchReports]);
+
+  const getMarkerIcon = (report: Report) => {
+    if (report.status === 2) {
+      return customIconGreenNeedle;
+    } else if (report.status === 0 || report.status === 1) {
+      return customIconRedNeedle;
+    }
+    return customIconNeedle;
+  };
+
+  const shouldShowReport = (report: Report) => {
+    if (problemSolved && !problemUnSolved) {
+      return report.status === 2;
+    } else if (problemUnSolved && !problemSolved) {
+      return report.status === 0 || report.status === 1;
+    }
+    return true;
+  };
 
   const setUserPosition = (pos: [number, number], text: string) => {
     setPosition(pos);
     setPopupText(text);
+  };
+
+  const handleReportClick = (report: Report) => {
+    setIsReporting(true);
+    setPosition([report.location.coordinates[1], report.location.coordinates[0]]);
+
+    if (report.status === 2) {
+      setShowSolvedProblemForm(true);
+      setProblemSolved(true);
+    } else {
+      setShowUnSolvedProblemForm(true);
+      setProblemUnSolved(true);
+    }
   };
 
   return (
@@ -261,40 +417,42 @@ const IranMap = () => {
       >
         <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
 
-        {savedLocations.map((location, index) => (
-          <section key={index}>
-            {(problemUnSolved === true && location.solved === "no") && (
-              <Marker
-                position={[location.latitude, location.longitude]}
-                icon={customIconRedNeedle}
-                eventHandlers={{
-                  click: () => {
-                    setIsReporting(true);
-                    setPosition([location.latitude, location.longitude]);
-                    setShowUnSolvedProblemForm(true);
-                  },
-                }}
-              >
-                <Popup>{location.label}</Popup>
-              </Marker>
-            )}
-            {(problemSolved === true && location.solved === "yes") && (
-              <Marker
-                position={[location.latitude, location.longitude]}
-                icon={customIconGreenNeedle}
-                eventHandlers={{
-                  click: () => {
-                    setIsReporting(true);
-                    setPosition([location.latitude, location.longitude]);
-                    setShowSolvedProblemForm(true);
-                  },
-                }}
-              >
-                <Popup>{location.label}</Popup>
-              </Marker>
-            )}
-          </section>
-        ))}
+        {/* Map bounds handler for API calls */}
+        <MapBoundsHandler onBoundsChange={handleBoundsChange} />
+
+        {/* Render markers from API */}
+        {reportLocations
+          .filter(shouldShowReport)
+          .map((report) => (
+            <Marker
+              key={report._id}
+              position={[report.location.coordinates[1], report.location.coordinates[0]]}
+              icon={getMarkerIcon(report)}
+              eventHandlers={{
+                click: () => handleReportClick(report),
+              }}
+            >
+              <Popup>
+                <div className="p-2">
+                  <h3 className="font-bold text-sm mb-1">{report.title}</h3>
+                  <p className="text-xs text-gray-600 mb-2">{report.description}</p>
+                  {report.city && <p className="text-xs text-gray-500">📍 {report.city}</p>}
+                  <p className="text-xs text-gray-500">
+                    وضعیت: {report.status === 0 ? 'جدید' : report.status === 1 ? 'در حال بررسی' : report.status === 2 ? 'حل شده' : 'رد شده'}
+                  </p>
+                  {report.images && report.images.length > 0 && (
+                    <div className="mt-2">
+                      <img
+                        src={report.images[0].url}
+                        alt="Report"
+                        className="w-full h-20 object-cover rounded"
+                      />
+                    </div>
+                  )}
+                </div>
+              </Popup>
+            </Marker>
+          ))}
 
         {position && showNeedleOrange && (
           <Marker position={position} icon={customIconNeedle}>
@@ -314,7 +472,7 @@ const IranMap = () => {
       </MapContainer>
 
       <section className="absolute top-7 right-10 w-[60px] h-[60px] bg-[#8EB486] flex justify-center items-center rounded-xl">
-        <Link href={localStorage.getItem("role") === "user" ? "/user/profile/edit" : "/admin/profile/edit"}>
+        <Link href={typeof window !== 'undefined' && localStorage.getItem("role") === "user" ? "/user/profile/edit" : "/admin/profile/edit"}>
           <Icon name="User" />
         </Link>
       </section>
@@ -323,13 +481,13 @@ const IranMap = () => {
         <section className="absolute bottom-5 sm:bottom-10 w-full flex justify-center items-center sm:gap-8 gap-3 z-10 flex-col sm:flex-row text-center">
           <button
             onClick={() => setProblemSolved(!problemSolved)}
-            className="w-[200px] bg-[#00E083] text-sm px-4 py-2 rounded-3xl shadow hover:bg-gray-100 transition text-black"
+            className={`w-[200px] ${problemSolved ? 'bg-[#00E083]' : 'bg-gray-300'} text-sm px-4 py-2 rounded-3xl shadow hover:bg-gray-100 transition text-black`}
           >
             مشکلات حل شده
           </button>
           <button
             onClick={() => setProblemUnSolved(!problemUnSolved)}
-            className="w-[200px] bg-[#F45151] text-sm px-4 py-2 rounded-3xl shadow hover:bg-gray-100 transition text-black"
+            className={`w-[200px] ${problemUnSolved ? 'bg-[#F45151]' : 'bg-gray-300'} text-sm px-4 py-2 rounded-3xl shadow hover:bg-gray-100 transition text-black`}
           >
             مشکلات حل نشده
           </button>
@@ -343,6 +501,20 @@ const IranMap = () => {
             ثبت گزارش جدید
           </button>
         </section>
+      )}
+
+      {/* Loading indicator */}
+      {loading && (
+        <div className="absolute top-20 left-1/2 transform -translate-x-1/2 z-20 bg-white px-4 py-2 rounded-lg shadow-md">
+          <span className="text-sm text-black">در حال بارگذاری...</span>
+        </div>
+      )}
+
+      {/* Error indicator */}
+      {error && (
+        <div className="absolute top-20 left-1/2 transform -translate-x-1/2 z-20 bg-red-100 border border-red-400 text-red-700 px-4 py-2 rounded-lg">
+          <span className="text-sm text-black">خطا: {error}</span>
+        </div>
       )}
 
       {isReporting && position && (
