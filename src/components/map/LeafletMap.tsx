@@ -140,7 +140,11 @@ const ReportFormWithButton = () => {
   );
 };
 
-const UnSolvedProblemFormWithLocation = () => {
+interface UnSolvedProblemFormWithLocationProps {
+  selectedReportId: string | null;
+}
+
+const UnSolvedProblemFormWithLocation: React.FC<UnSolvedProblemFormWithLocationProps> = ({ selectedReportId }) => {
   const { isVisible, setIsVisible } = useReport();
 
   const toggleForm = () => {
@@ -164,13 +168,17 @@ const UnSolvedProblemFormWithLocation = () => {
       <div
         className={`w-[50%] fixed top-0 left-0 z-10 bg-white shadow-lg rounded-lg transition-all duration-500 ${!isVisible ? 'translate-x-0' : '-translate-x-full'}`}
       >
-        <UnSolvedProblemForm />
+        <UnSolvedProblemForm reportId={selectedReportId || undefined} />
       </div>
     </div>
   );
 };
 
-const SolvedProblemFormWithLocation = () => {
+interface SolvedProblemFormWithLocationProps {
+  selectedReportId: string | null;
+}
+
+const SolvedProblemFormWithLocation: React.FC<SolvedProblemFormWithLocationProps> = ({ selectedReportId }) => {
   const { isVisible, setIsVisible } = useReport();
 
   const toggleForm = () => {
@@ -194,7 +202,7 @@ const SolvedProblemFormWithLocation = () => {
       <div
         className={`w-[50%] fixed top-0 left-0 z-10 bg-white shadow-lg rounded-lg transition-all duration-500 ${!isVisible ? 'translate-x-0' : '-translate-x-full'}`}
       >
-        <SolvedProblemForm />
+        <UnSolvedProblemForm reportId={selectedReportId || undefined} />
       </div>
     </div>
   );
@@ -255,6 +263,7 @@ const IranMap = () => {
   const [currentZoom, setCurrentZoom] = useState<number>(11);
   const lastFetchRef = useRef<string>('');
   const abortControllerRef = useRef<AbortController | null>(null);
+  const [selectedReportId, setSelectedReportId] = useState<string | null>(null);
 
   const fetchReports = useCallback(async (bounds: L.LatLngBounds, zoom: number, filter: string = 'all') => {
     if (!bounds) return;
@@ -383,6 +392,7 @@ const IranMap = () => {
   const handleReportClick = (report: Report) => {
     setIsReporting(true);
     setPosition([report.location.coordinates[1], report.location.coordinates[0]]);
+    setSelectedReportId(report._id);
 
     if (report.status === 2) {
       setShowSolvedProblemForm(true);
@@ -402,8 +412,8 @@ const IranMap = () => {
         <HeaderMap />
       </div>
       {isLocatedNeedle && <ReportFormWithButton />}
-      {showUnSolvedProblemForm && <UnSolvedProblemFormWithLocation />}
-      {showSolvedProblemForm && <SolvedProblemFormWithLocation />}
+      {showUnSolvedProblemForm && <UnSolvedProblemFormWithLocation selectedReportId={selectedReportId}/>}
+      {showSolvedProblemForm && <SolvedProblemFormWithLocation selectedReportId={selectedReportId}/>}
 
       <MapContainer
         center={iranCenter}
