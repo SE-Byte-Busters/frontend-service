@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
 import { Alert, AlertProps } from '@/components/Alert';
@@ -15,17 +16,22 @@ type UserData = {
 };
 
 export default function NewReport() {
+  const router = useRouter();
   const [userData, setUserData] = useState<UserData | null>(null);
   const [reports, setReports] = useState<Report[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [alert, setAlert] = useState<AlertProps | null>(null);
+  const [showAuthAlert, setShowAuthAlert] = useState<boolean>(false);
 
   useEffect(() => {
     const fetchData = async () => {
-      try {
-        const token = localStorage.getItem('token');
+      const token = localStorage.getItem('token');
+      if (!token) {
+        setShowAuthAlert(true);
+        return;
+      }
 
-        // fetch user profile data
+      try {
         const userRes = await fetch(
           'https://shahriar.thetechverse.ir:3000/api/v1/user-profile/score-and-rank', {
             method: 'GET',
@@ -34,11 +40,11 @@ export default function NewReport() {
             },
           }
         );
-        if (!userRes.ok) throw new Error('Failed to fetch user data');
+
+        if (!userRes.ok) throw new Error('Invalid token');
         const userData = await userRes.json();
         setUserData(userData.data);
 
-        // fetch reports data
         const reportsRes = await fetch(
           'https://shahriar.thetechverse.ir:3000/api/v1/report/reports', {
             method: 'GET',
@@ -47,16 +53,22 @@ export default function NewReport() {
             },
           }
         );
+
         if (!reportsRes.ok) throw new Error('Failed to fetch reports');
         const reportsData = await reportsRes.json();
         setReports(reportsData.data.reports);
-      } catch (err) {
-        setAlert({
-          type: 'error',
-          message: 'خطا در دریافت اطلاعات. لطفاً دوباره تلاش کنید.',
-          duration: 3000,
-          onClose: () => setAlert(null)
-        });
+      } catch (err: any) {
+        if (err.message === 'Invalid token') {
+          localStorage.removeItem('token');
+          setShowAuthAlert(true);
+        } else {
+          setAlert({
+            type: 'error',
+            message: 'خطا در دریافت اطلاعات. لطفاً دوباره تلاش کنید.',
+            duration: 3000,
+            onClose: () => setAlert(null)
+          });
+        }
         console.error(err);
       } finally {
         setLoading(false);
@@ -66,14 +78,13 @@ export default function NewReport() {
     fetchData();
   }, []);
 
-  // placeholder data for loading state
   const placeholderReports: Report[] = Array(3).fill(null).map((_, index) => ({
     _id: `placeholder-${index}`,
     user: '',
     title: 'در حال بارگذاری...',
     description: 'توضیحات گزارش در حال بارگذاری می‌باشد',
     approximatePosition: 'موقعیت نامشخص',
-    location: {type: '', coordinates: [0, 0]},
+    location: { type: '', coordinates: [0, 0] },
     city: 'شهر نامشخص',
     category: [],
     images: [],
@@ -91,6 +102,19 @@ export default function NewReport() {
     rank: 0,
     username: 'کاربر'
   } : userData;
+
+  if (showAuthAlert) {
+    return (
+      <div className="bg-light min-h-screen flex items-center justify-center">
+        <div className="bg-yellow-50 border-l-4 border-yellow-500 p-4 rounded-md shadow-lg max-w-md">
+          <div className="flex items-center gap-2 text-yellow-700" dir="rtl">
+            <span>⚠️</span>
+            <span>برای مشاهده گزارش‌های خود ابتدا وارد حساب کاربری شوید</span>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="bg-light min-h-screen flex flex-col items-center px-4 pt-20 pb-12 lg:pt-10 lg:pb-10">

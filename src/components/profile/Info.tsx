@@ -1,22 +1,31 @@
 import ProfileForm from './ProfileForm';
 
-export default function InfoSection() {
-  // TODO: replace with API call
-  const user = {
-    username: "Ali_rezaei22",
-    phone: "09124325465",
-    first_name: "علی",
-    last_name: "رضایی",
-    email: "AliRezaei1382@gmail.com",
+type InfoSectionProps = {
+  userData: {
+    username: string;
+    phoneNumber: string;
+    firstName: string;
+    lastName: string;
+    email: string;
+  };
+};
+
+export default function InfoSection({ userData }: InfoSectionProps) {
+  const formInitialValues = {
+    username: userData.username || '',
+    phone: userData.phoneNumber || '',
+    first_name: userData.firstName || '',
+    last_name: userData.lastName || '',
+    email: userData.email || '',
     photo: "",
   };
 
   return (
-    <section className="bg-light rounded-2xl shadow-md p-6">
-      <h1 className="text-xl font-bold text-dark">
+    <section className="bg-light rounded-2xl shadow-md p-6" dir="rtl">
+      <h1 className="text-xl font-bold text-dark mb-4">
         مشخصات پروفایل کاربری من
       </h1>
-      <ProfileForm initialProfile={user} />
+      <ProfileForm initialProfile={formInitialValues} />
     </section>
   );
 }
