@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 // import { Geist, Geist_Mono, Vazirmatn } from "next/font/google";
-import HeaderMap from "@/components/map/HeaderMap";
 
 export const metadata: Metadata = {
   title: "نقشه هوشمند ایران | مکان‌یابی دقیق و سریع",
@@ -25,7 +24,6 @@ export default function RootLayout({
 }>) {
   return (
     <main>
-      <HeaderMap />
       <section>{children}</section>
     </main>
   );

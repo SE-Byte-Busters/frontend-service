@@ -1,4 +1,4 @@
-"use client";
+"use client"; // Ensure this is a client-side component
 
 import Link from "next/link";
 import Image from "next/image";
@@ -18,6 +18,35 @@ export default function MobileHeader({
 }) {
   const pathname = usePathname();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [username, setUsername] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true); // 🔥
+
+  // Fetch username from API using the token stored in localStorage
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (token) {
+      fetch("https://shahriar.thetechverse.ir:3000/api/v1/user-profile/score-and-rank", {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      })
+        .then((response) => response.json())
+        .then((data) => {
+          if (data?.data?.username) {
+            setUsername(data.data.username); // Set the username from the API response
+          }
+        })
+        .catch((error) => {
+          console.error("Error fetching user data:", error);
+        })
+        .finally(() => {
+          setLoading(false); // 🔥
+        });
+    } else {
+      setLoading(false); // 🔥
+    }
+  }, []);
 
   useEffect(() => {
     setIsMobileMenuOpen(false);
@@ -27,14 +56,25 @@ export default function MobileHeader({
     <>
       {/* Mobile header */}
       <div className="flex items-center justify-between w-full py-1">
-        {/* Auth */}
-        <Link
-          href="/auth/sign-up"
-          className="p-2 bg-accent rounded-lg hover:text-black transition-colors"
-          aria-label="ورود / ثبت نام"
-        >
-          <Icon name="User" className="text-2xl" />
-        </Link>
+        {/* Auth or username display */}
+        {loading ? (
+          <div className="p-2 bg-accent rounded-lg w-24 h-10 animate-pulse" />
+        ) : username ? (
+          <Link
+            href="/admin/profile/edit" // ⬅️ Navigate to profile edit when username exists
+            className="p-2 bg-accent rounded-lg hover:text-black transition-colors"
+          >
+            {username}
+          </Link>
+        ) : (
+          <Link
+            href="/auth/sign-up"
+            className="p-2 bg-accent rounded-lg hover:text-black transition-colors"
+            aria-label="ورود / ثبت نام"
+          >
+            <Icon name="User" className="text-2xl" />
+          </Link>
+        )}
 
         {/* Logo */}
         <Link href="/" className="flex items-center">

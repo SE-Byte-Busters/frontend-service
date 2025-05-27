@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useState } from 'react';
 import { useRouter, useSearchParams } from "next/navigation";
+import { Alert , AlertProps } from '@/components/Alert'
 
 export default function Otp() {
   const [seconds, setSeconds] = useState(60);
@@ -10,15 +11,14 @@ export default function Otp() {
   const searchParams = useSearchParams();
   const id = searchParams.get('id');
   const phoneNumber = searchParams.get('phonenumber');
-  const [alert, setAlert] = useState({ type: '', message: '' });
-
+  const [alert, setAlert] = useState<AlertProps | null>(null);
 
   const handleSubmit = async () => {
     console.log(JSON.stringify({
       code: code,
       method: "phone",
       _id: id,
-      phoneNumber
+      phoneNumber: "+" + phoneNumber
 
 
     }))
@@ -38,31 +38,133 @@ export default function Otp() {
         }),
       });
       const data = await response.json();
-      if (response.status >= 200 || response.status < 300) {
-        setAlert({ type: 'success', message: 'تغییرات شما با موفقیت ذخیره شد.' });
+      console.log(data)
+      if (response.status >= 200 && response.status < 300) {
+        setAlert({
+          type: 'success',
+          message: 'تغییرات شما با موفقیت ذخیره شد.',
+          duration: 3000,
+          onClose: () => setAlert(null)
+        });
       } else if (response.status == 400) {
-        setAlert({ type: 'error', message: 'مقدار ورودی را درست وارد نمایید' });
+        setAlert({
+          type: 'error',
+          message: 'مقدار ورودی را درست وارد نمایید',
+          duration: 3000,
+          onClose: () => setAlert(null)
+        });
       } else if (response.status == 403) {
-        setAlert({ type: 'error', message: 'بیش از حد تلاش کرده اید' });
+        setAlert({
+          type: 'error',
+          message: 'بیش از حد تلاش کرده اید',
+          duration: 3000,
+          onClose: () => setAlert(null)
+        });
       } else if (response.status == 404) {
-        setAlert({ type: 'error', message: 'مدت زمان استفاده از توکن گذشته است' });
+        setAlert({
+          type: 'error',
+          message: 'مدت زمان استفاده از توکن گذشته است',
+          duration: 3000,
+          onClose: () => setAlert(null)
+        });
       } else if (response.status >= 500 || response.status < 600) {
-        setAlert({ type: 'error', message: 'خطای سرور. لطفاً بعداً تلاش کنید.' });
+        setAlert({
+          type: 'error',
+          message: 'خطای سرور. لطفاً بعداً تلاش کنید.',
+          duration: 3000,
+          onClose: () => setAlert(null)
+        });
       }
 
-      // مخفی شدن پیام بعد از ۲ ثانیه
-      setTimeout(() => {
-        setAlert({ type: '', message: '' });
-      }, 2000);
-      if (response.status >= 200 || response.status < 300) {
+      if (response.status >= 200 && response.status < 300) {
         router.push("/map"); // Navigate to map page after successful OTP verification
       }
     }
     catch (error) {
-      setAlert({ type: 'error', message: 'خطای سرور. لطفاً بعداً تلاش کنید.' });
-      setTimeout(() => {
-        setAlert({ type: '', message: '' });
-      }, 2000);
+      setAlert({
+        type: 'error',
+        message: 'خطای سرور. لطفاً بعداً تلاش کنید.',
+        duration: 3000,
+        onClose: () => setAlert(null)
+      });
+    }
+  }
+  const handleResendOtp = async () => {
+    // console.log(JSON.stringify({
+    //   code: code,
+    //   method: "phone",
+    //   _id: id,
+    //   phoneNumber: "+" + phoneNumber
+
+
+    // }))
+    try {
+      const response = await fetch('https://shahriar.thetechverse.ir:3000/api/v1/auth/resend-signup-otp', {
+        method: "PUT",
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          method: "phone",
+          _id: id,
+
+        }),
+      });
+      const data = await response.json();
+      console.log(data)
+      if (response.status >= 200 && response.status < 300) {
+        setAlert({
+          type: 'success',
+          message: 'ارسال مجدد انجام شد',
+          duration: 3000,
+          onClose: () => setAlert(null)
+        });
+      } else if (response.status == 400) {
+        setAlert({
+          type: 'error',
+          message: 'مقدار ورودی را درست وارد نمایید',
+          duration: 3000,
+          onClose: () => setAlert(null)
+        });
+      } else if (response.status == 403) {
+        setAlert({
+          type: 'error',
+          message: 'بیش از حد تلاش کرده اید',
+          duration: 3000,
+          onClose: () => setAlert(null)
+        });
+      } else if (response.status == 404) {
+        setAlert({
+          type: 'error',
+          message: 'مدت زمان استفاده از توکن گذشته است',
+          duration: 3000,
+          onClose: () => setAlert(null)
+        });
+      } else if (response.status >= 500 || response.status < 600) {
+        setAlert({
+          type: 'error',
+          message: 'خطای سرور. لطفاً بعداً تلاش کنید.',
+          duration: 3000,
+          onClose: () => setAlert(null)
+        });
+      }
+
+      // if (response.status >= 200 && response.status < 300) {
+      //   setAlert({
+      //     type: 'success',
+      //     message: '',
+      //     duration: 3000,
+      //     onClose: () => setAlert(null)
+      //   });
+      // }
+    }
+    catch (error) {
+      setAlert({
+        type: 'error',
+        message: 'خطای سرور. لطفاً بعداً تلاش کنید.',
+        duration: 3000,
+        onClose: () => setAlert(null)
+      });
     }
   }
 
@@ -77,8 +179,8 @@ export default function Otp() {
     }
   }, [seconds]);
 
-  const handleResendOtp = () => {
-    setSeconds(60); // Reset the timer
+  const handleSendOtp = () => {
+    setSeconds(10); // Reset the timer
     setIsDisabled(true);
     // Add the resend OTP logic here (e.g., make an API request)
     handleSubmit(); // Trigger the submit handler to send the request again
@@ -86,6 +188,7 @@ export default function Otp() {
 
   return (
     <main>
+      {alert && <Alert {...alert} />}
       <section className="sm:w-[416px] w-[230px] mt-[62px]">
         <label className="block text-right text-[18px] font-semibold font-vazirmatn text-[#685752] uppercase mb-[8px]">
           لطفا برای احراز هویت عدد ارسالی به شماره تلفن خود را وارد کنید
@@ -101,34 +204,28 @@ export default function Otp() {
 
       <section className="sm:w-[416px] sm:h-[62px] w-[230px] h-[50px] mt-[2px]">
         <button
-          onClick={handleResendOtp}
+          onClick={handleSendOtp}
           className={`sm:w-[418px] sm:h-[52px] w-[231.81px] h-[42.15px] mt-[24px] sm:mt-[32px] text-[18px] font-semibold font-vazirmatn bg-accent bg-cover bg-center text-white py-2 px-6 rounded-[12px] hover:opacity-90 transition ${isDisabled ? 'opacity-50 cursor-not-allowed' : ''}`}
         // disabled={isDisabled}
         >
-          ارسال مجدد پیامک ({seconds}s)
+          تایید
         </button>
+        <div className="flex  flex-col  items-start mt-1.5 px-2 text-[14px] text-[#685752] font-vazirmatn">
+          <button
+            onClick={handleResendOtp}
+            disabled={isDisabled}
+            className={` ${isDisabled ? "opacity-50 cursor-not-allowed" : "hover:opacity-80"}`}
+          >
+            ارسال مجدد ({seconds}s)
+          </button>
+          <button
+            onClick={() => router.push('/auth/sign-up')}
+            className=" hover:opacity-80 "
+          >
+            تغییر شماره
+          </button>
+        </div>
       </section>
-      {alert.message && (
-        <section
-          className={`fixed top-4 right-4 z-50
-    ${alert.type === 'success' ? 'alert-success' : ''}
-    ${alert.type === 'error' ? 'alert-error' : ''}
-  `}
-          role="alert"
-        >
-          <span>{alert.message}</span>
-          {alert.type === 'success' && (
-            <svg className="icon-success" fill="currentColor" viewBox="0 0 20 20">
-              <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414L8.414 15l-4.121-4.121a1 1 0 011.414-1.414L8.414 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-            </svg>
-          )}
-          {alert.type === 'error' && (
-            <svg className="icon-error" fill="currentColor" viewBox="0 0 20 20">
-              <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l6.518 11.597c.75 1.334-.214 2.995-1.743 2.995H3.482c-1.53 0-2.493-1.661-1.743-2.995L8.257 3.1z" clipRule="evenodd" />
-            </svg>
-          )}
-        </section>
-      )}
     </main>
   );
 }
