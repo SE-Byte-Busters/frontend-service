@@ -27,7 +27,6 @@ export default function ProfileForm({ initialProfile }: ProfileFormProps) {
   const [isPhotoLoading, setIsPhotoLoading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [alert, setAlert] = useState<AlertProps | null>(null);
-
   const [role, setRole] = useState<string | null>(null);
 
   useEffect(() => {
@@ -145,8 +144,6 @@ export default function ProfileForm({ initialProfile }: ProfileFormProps) {
         throw new Error(data.message || 'خطا در بروزرسانی عکس پروفایل');
       }
 
-      // update local state with the new photo URL if the API returns it
-      // otherwise keep the preview URL
       const newPhotoUrl = data.photoUrl || previewUrl;
       setProfile((prev) => ({
         ...prev,
@@ -172,6 +169,19 @@ export default function ProfileForm({ initialProfile }: ProfileFormProps) {
     }
   };
 
+  const getPhotoSource = () => {
+    if (previewUrl) return previewUrl;
+    if (!profile.photo) return '/images/avatars/default-profile.png';
+    if (profile.photo.startsWith('data:image') || profile.photo.startsWith('http')) {
+      return profile.photo;
+    }
+
+    const basePath = role === 'admin'
+      ? 'https://shahriar.thetechverse.ir:3000/uploads/admins/'
+      : 'https://shahriar.thetechverse.ir:3000/uploads/users/';
+    return basePath + profile.photo;
+  };
+
   return (
     <div className="flex flex-col gap-6">
       {alert && <Alert {...alert} />}
@@ -194,11 +204,11 @@ export default function ProfileForm({ initialProfile }: ProfileFormProps) {
             aria-label="Change profile picture"
           >
             <UserAvatar
-              picture={previewUrl || profile.photo}
+              picture={getPhotoSource()}
               username={profile.username}
               width={120}
               height={120}
-              className="border-2 border-gray-200"
+              className="border-2 border-gray-200 rounded-full"
             />
           </button>
           <button

@@ -1,7 +1,7 @@
 "use client";
 
-import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import InfoSection from "@/components/profile/Info";
 import PasswordSection from "@/components/profile/Password";
 import LoadingSpinner from "@/components/LoadingSpinner";
@@ -15,6 +15,7 @@ type UserProfile = {
   firstName: string;
   lastName: string;
   isVerified: boolean;
+  profileUrl?: string | null; 
 };
 
 export default function EditAdminProfile() {
@@ -27,39 +28,41 @@ export default function EditAdminProfile() {
   useEffect(() => {
     const checkAuthAndFetchProfile = async () => {
       try {
-        const token = typeof window !== 'undefined' ? localStorage.getItem("token") : null;
-        
+        const token =
+          typeof window !== "undefined" ? localStorage.getItem("token") : null;
+
         if (!token) {
-          setError('لطفاً ابتدا وارد حساب کاربری خود شوید');
+          setError("لطفاً ابتدا وارد حساب کاربری خود شوید");
           setIsLoading(false);
           return;
         }
 
-        // Verify token validity and get user profile
-        const response = await fetch("https://shahriar.thetechverse.ir:3000/api/v1/user-profile/", {
-          method: "GET",
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
+        const response = await fetch(
+          "https://shahriar.thetechverse.ir:3000/api/v1/admin/profile",
+          {
+            method: "GET",
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
 
         const data = await response.json();
 
         if (!response.ok || !data?.data) {
-          throw new Error(data.message || 'خطا در دریافت اطلاعات کاربر');
+          throw new Error(data.message || "خطا در دریافت اطلاعات کاربر");
         }
 
-        // Check if user is admin
-        if (data.data.role !== 'admin') {
-          throw new Error('شما دسترسی ادمین ندارید');
+        if (data.data.role !== "admin") {
+          throw new Error("شما دسترسی ادمین ندارید");
         }
 
         setUserProfile(data.data);
         setIsAuthenticated(true);
-      } catch (err) {
+      } catch (err: any) {
         console.error("Error:", err);
-        setError(err.message || 'خطا در احراز هویت');
-        if (typeof window !== 'undefined') {
+        setError(err.message || "خطا در احراز هویت");
+        if (typeof window !== "undefined") {
           localStorage.removeItem("token");
         }
       } finally {
@@ -85,7 +88,7 @@ export default function EditAdminProfile() {
           <h2 className="text-xl font-bold text-red-600 mb-4">خطا</h2>
           <p className="mb-6">{error}</p>
           <button
-            onClick={() => router.push('/auth/sign-in')}
+            onClick={() => router.push("/auth/sign-in")}
             className="bg-blue-500 hover:bg-blue-600 text-white py-2 px-6 rounded-md"
           >
             رفتن به صفحه ورود
@@ -102,20 +105,21 @@ export default function EditAdminProfile() {
   return (
     <div className="min-h-screen bg-gray-100 pt-20 py-8 px-4 sm:px-8 lg:px-20">
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-20 items-start mt-40">
-        <InfoSection 
+        <InfoSection
           userData={{
             username: userProfile.username,
             phoneNumber: userProfile.phoneNumber,
             firstName: userProfile.firstName,
             lastName: userProfile.lastName,
-            email: userProfile.email
-          }} 
+            email: userProfile.email,
+            profileUrl: userProfile.profileUrl ?? null, // Pass profileUrl here
+          }}
         />
-        <PasswordSection 
+        <PasswordSection
           userData={{
             email: userProfile.email,
-            isVerified: userProfile.isVerified
-          }} 
+            isVerified: userProfile.isVerified,
+          }}
         />
       </div>
     </div>

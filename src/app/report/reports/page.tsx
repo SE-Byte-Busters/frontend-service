@@ -13,6 +13,7 @@ type UserData = {
   score: number;
   rank: number;
   username: string;
+  profileUrl?: string | null; // added for profile image URL
 };
 
 export default function NewReport() {
@@ -28,10 +29,12 @@ export default function NewReport() {
       const token = localStorage.getItem('token');
       if (!token) {
         setShowAuthAlert(true);
+        setLoading(false);
         return;
       }
 
       try {
+        // Fetch score and rank
         const userRes = await fetch(
           'https://shahriar.thetechverse.ir:3000/api/v1/user-profile/score-and-rank', {
             method: 'GET',
@@ -42,9 +45,29 @@ export default function NewReport() {
         );
 
         if (!userRes.ok) throw new Error('Invalid token');
-        const userData = await userRes.json();
-        setUserData(userData.data);
+        const userDataResponse = await userRes.json();
 
+        // Fetch user profile to get profile image
+        const profileRes = await fetch(
+          'https://shahriar.thetechverse.ir:3000/api/v1/user-profile/', {
+            method: 'GET',
+            headers: {
+              'Authorization': `Bearer ${token}`,
+            },
+          }
+        );
+
+        if (!profileRes.ok) throw new Error('Failed to fetch profile image');
+        const profileData = await profileRes.json();
+        const profileImageUrl = profileData.data?.profileUrl || null;
+
+        // Combine all user data into one object
+        setUserData({
+          ...userDataResponse.data,
+          profileUrl: profileImageUrl,
+        });
+
+        // Fetch reports as before
         const reportsRes = await fetch(
           'https://shahriar.thetechverse.ir:3000/api/v1/report/reports', {
             method: 'GET',
@@ -100,7 +123,8 @@ export default function NewReport() {
     _id: 'placeholder',
     score: 0,
     rank: 0,
-    username: 'کاربر'
+    username: 'کاربر',
+    profileUrl: null,
   } : userData;
 
   if (showAuthAlert) {
@@ -141,7 +165,7 @@ export default function NewReport() {
           {/* Profile Image + Name */}
           <div className="flex flex-col items-center">
             <Image
-              src="/images/avatars/default-profile.png"
+              src={displayUserData?.profileUrl || "/images/avatars/default-profile.png"}
               alt="Profile"
               width={120}
               height={120}

@@ -7,6 +7,7 @@ type InfoSectionProps = {
     firstName: string;
     lastName: string;
     email: string;
+    profileUrl?: string | null;
   };
 };
 
@@ -17,7 +18,7 @@ export default function InfoSection({ userData }: InfoSectionProps) {
     first_name: userData.firstName || '',
     last_name: userData.lastName || '',
     email: userData.email || '',
-    photo: "",
+    photo: userData.profileUrl || '',
   };
 
   return (

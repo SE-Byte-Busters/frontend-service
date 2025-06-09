@@ -18,6 +18,7 @@ type UserProfile = {
   status: number;
   createdAt: string;
   updatedAt: string;
+  profileUrl?: string | null; // added optional profileUrl
 };
 
 export default function EditProfile() {
@@ -30,7 +31,7 @@ export default function EditProfile() {
     const checkAuth = async () => {
       try {
         const token = typeof window !== 'undefined' ? localStorage.getItem("token") : null;
-        
+
         if (!token) {
           setIsLoading(false);
           return;
@@ -102,7 +103,8 @@ export default function EditProfile() {
                 email: userProfile.email,
                 phoneNumber: userProfile.phoneNumber,
                 firstName: userProfile.firstName,
-                lastName: userProfile.lastName
+                lastName: userProfile.lastName,
+                profileUrl: userProfile.profileUrl || "", // pass profileUrl here
               }} 
             />
             <PasswordSection 
