@@ -31,7 +31,6 @@ export default function EditProfile() {
     const checkAuth = async () => {
       try {
         const token = typeof window !== 'undefined' ? localStorage.getItem("token") : null;
-
         if (!token) {
           setIsLoading(false);
           return;
