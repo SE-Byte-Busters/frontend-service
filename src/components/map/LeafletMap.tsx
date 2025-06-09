@@ -412,6 +412,7 @@ const IranMap = () => {
         <HeaderMap />
       </div>
       {isLocatedNeedle && <ReportFormWithButton />}
+
       {showUnSolvedProblemForm && <UnSolvedProblemFormWithLocation selectedReportId={selectedReportId}/>}
       {showSolvedProblemForm && <SolvedProblemFormWithLocation selectedReportId={selectedReportId}/>}
 

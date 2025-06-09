@@ -4,7 +4,6 @@ import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { useReport } from '@/context/ReportContext';
 
-// Types for API responses (matching UnSolvedProblemForm)
 interface User {
   _id: string;
   username: string;
