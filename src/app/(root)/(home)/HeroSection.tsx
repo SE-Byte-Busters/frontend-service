@@ -33,15 +33,23 @@ export default function HeroSection() {
           </p>
         </header>
 
-        {/* New Report Link */}
-        <nav className="flex justify-center">
+        {/* Buttons */}
+        <nav className="flex flex-col sm:flex-row justify-center gap-4">
           <Link
             href="/map"
             className="bg-accent text-white text-lg sm:text-xl md:text-2xl rounded-lg px-4 py-2 sm:px-6 sm:py-3
-            transition duration-300 hover:text-black w-auto"
+            transition duration-300 hover:text-black w-auto text-center"
             aria-label="ثبت گزارش جدید"
           >
             ثبت گزارش جدید
+          </Link>
+          <Link
+            href="http://localhost:3000/user/leave-a-review"
+            className="bg-primary text-white text-lg sm:text-xl md:text-2xl rounded-lg px-4 py-2 sm:px-6 sm:py-3
+            transition duration-300 hover:text-black w-auto text-center"
+            aria-label="نظرت درباره ما"
+          >
+            نظرت درباره ما
           </Link>
         </nav>
       </div>
