@@ -104,8 +104,9 @@ const UnSolvedProblemForm: React.FC<UnSolvedProblemFormProps> = ({
 
     try {
       const token = getAuthToken();
+
       const response = await fetch(
-        `https://shahriar.thetechverse.ir:3000/api/v1/reports/${id}/`,
+        `https://shahriar.thetechverse.ir:3000/api/v1/report/reports/${id}/`,
         {
           method: 'GET',
           headers: {
@@ -136,7 +137,7 @@ const UnSolvedProblemForm: React.FC<UnSolvedProblemFormProps> = ({
     try {
       const token = getAuthToken();
       const response = await fetch(
-        `https://shahriar.thetechverse.ir:3000/api/v1/reports/${id}/comments`,
+        `https://shahriar.thetechverse.ir:3000/api/v1/report/reports/${id}/comments`,
         {
           method: 'GET',
           headers: {
@@ -387,12 +388,11 @@ const UnSolvedProblemForm: React.FC<UnSolvedProblemFormProps> = ({
           <div className="bg-white rounded-lg p-6 shadow-md">
             <div className="flex justify-between items-start mb-4">
               <h1 className="text-2xl font-bold text-[#685752]">{report.title}</h1>
-              <span className={`px-3 py-1 rounded-full text-sm ${
-                report.status === 0 ? 'bg-blue-100 text-blue-800' :
+              <span className={`px-3 py-1 rounded-full text-sm ${report.status === 0 ? 'bg-blue-100 text-blue-800' :
                 report.status === 1 ? 'bg-yellow-100 text-yellow-800' :
-                report.status === 2 ? 'bg-green-100 text-green-800' :
-                'bg-red-100 text-red-800'
-              }`}>
+                  report.status === 2 ? 'bg-green-100 text-green-800' :
+                    'bg-red-100 text-red-800'
+                }`}>
                 {getStatusText(report.status)}
               </span>
             </div>
@@ -435,7 +435,7 @@ const UnSolvedProblemForm: React.FC<UnSolvedProblemFormProps> = ({
                 </button>
               </div>
               <div className="text-sm text-[#87878B]">
-                گزارش‌دهنده: {report.user.username} |
+                گزارش‌دهنده: {report.user?.username} |
                 تاریخ: {formatDate(report.createdAt)}
               </div>
             </div>

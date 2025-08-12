@@ -1,6 +1,6 @@
 'use client';
 
-import { MapContainer, TileLayer, Marker, useMap, ZoomControl, Popup } from 'react-leaflet';
+import { MapContainer, TileLayer, Marker, useMap, ZoomControl, Popup, useMapEvents } from 'react-leaflet';
 import { useReport } from '@/context/ReportContext';
 import { useState, useEffect, useCallback, useRef } from 'react';
 import L from 'leaflet';
@@ -14,6 +14,7 @@ import SolvedProblemForm from './SolvedProblemForm';
 import '@/app/globals.css';
 import Link from 'next/link';
 import { Report, ReportsResponse } from '@/components/report/ReportTypes'
+
 
 const customIconNeedle = new L.Icon({
   iconUrl: '/images/icons/needle.png',
@@ -210,7 +211,7 @@ const SolvedProblemFormWithLocation: React.FC<SolvedProblemFormWithLocationProps
 
 const FlyToPosition = ({ position }: { position: [number, number] }) => {
   const map = useMap();
-  map.flyTo([position[0] - 0.005, position[1] - 0.005], 16, { duration: 1.5 });
+  map.flyTo([position[0], position[1]], 16, { duration: 1.5 });
   return null;
 };
 
@@ -259,11 +260,25 @@ const IranMap = () => {
   const [reportLocations, setReportLocations] = useState<Report[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [currentBounds, setCurrentBounds] = useState<L.LatLngBounds | null>(null);
-  const [currentZoom, setCurrentZoom] = useState<number>(11);
+  // const [currentBounds, setCurrentBounds] = useState<L.LatLngBounds | null>(null);
+  // const [currentZoom, setCurrentZoom] = useState<number>(11);
   const lastFetchRef = useRef<string>('');
   const abortControllerRef = useRef<AbortController | null>(null);
   const [selectedReportId, setSelectedReportId] = useState<string | null>(null);
+
+
+
+  const NewReportLocationHandler = ({ setUserPosition }: { setUserPosition: (pos: [number, number], msg: string) => void }) => {
+    useMapEvents({
+      click(e: L.LeafletMouseEvent) {
+        const coords: [number, number] = [e.latlng.lat, e.latlng.lng];
+        setUserPosition(coords, "chosed location");
+      },
+    });
+
+    return null;
+  };
+
 
   const fetchReports = useCallback(async (bounds: L.LatLngBounds, zoom: number, filter: string = 'all') => {
     if (!bounds) return;
@@ -294,7 +309,6 @@ const IranMap = () => {
         zoom: zoom.toString()
       });
 
-      const token = localStorage.getItem('token');
       const response = await fetch(
         `https://shahriar.thetechverse.ir:3000/api/v1/report/map-search?${params}`,
         {
@@ -302,19 +316,19 @@ const IranMap = () => {
           signal: abortControllerRef.current.signal,
           headers: {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`,
           }
         }
       );
 
       if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+        // throw new Error(`HTTP error! status: ${response.status}`);
       }
 
-      const data: ReportsResponse = await response.json();
-
+      const data = await response.json();
+      console.log("_________________________________");
+      console.log(data.data);
       if (requestKey === lastFetchRef.current) {
-        setReportLocations(data.reports || []);
+        setReportLocations(data.data || []);
       }
     } catch (err) {
       if (err instanceof Error && err.name === 'AbortError') {
@@ -334,8 +348,8 @@ const IranMap = () => {
 
   const handleBoundsChange = useCallback(
     (bounds: L.LatLngBounds, zoom: number) => {
-      setCurrentBounds(bounds);
-      setCurrentZoom(zoom);
+      // setCurrentBounds(bounds);
+      // setCurrentZoom(zoom);
 
       let filter = 'all';
       if (problemSolved && !problemUnSolved) {
@@ -353,18 +367,18 @@ const IranMap = () => {
     [fetchReports, problemSolved, problemUnSolved]
   );
 
-  useEffect(() => {
-    if (currentBounds) {
-      let filter = 'all';
-      if (problemSolved && !problemUnSolved) {
-        filter = 'done';
-      } else if (problemUnSolved && !problemSolved) {
-        filter = 'notDone';
-      }
+  // useEffect(() => {
+  //   if (currentBounds) {
+  //     let filter = 'all';
+  //     if (problemSolved && !problemUnSolved) {
+  //       filter = 'done';
+  //     } else if (problemUnSolved && !problemSolved) {
+  //       filter = 'notDone';
+  //     }
 
-      fetchReports(currentBounds, currentZoom, filter);
-    }
-  }, [problemSolved, problemUnSolved, currentBounds, currentZoom, fetchReports]);
+  //     fetchReports(currentBounds, currentZoom, filter);
+  //   }
+  // }, [problemSolved, problemUnSolved, currentBounds, currentZoom, fetchReports]);
 
   const getMarkerIcon = (report: Report) => {
     if (report.status === 2) {
@@ -389,17 +403,18 @@ const IranMap = () => {
     setPopupText(text);
   };
 
+
+
+  // Corrected version
   const handleReportClick = (report: Report) => {
     setIsReporting(true);
-    setPosition([report.location.coordinates[1], report.location.coordinates[0]]);
+    setPosition([report.location.coordinates[0], report.location.coordinates[1]]);
     setSelectedReportId(report._id);
 
     if (report.status === 2) {
       setShowSolvedProblemForm(true);
-      setProblemSolved(true);
     } else {
       setShowUnSolvedProblemForm(true);
-      setProblemUnSolved(true);
     }
   };
 
@@ -413,8 +428,8 @@ const IranMap = () => {
       </div>
       {isLocatedNeedle && <ReportFormWithButton />}
 
-      {showUnSolvedProblemForm && <UnSolvedProblemFormWithLocation selectedReportId={selectedReportId}/>}
-      {showSolvedProblemForm && <SolvedProblemFormWithLocation selectedReportId={selectedReportId}/>}
+      {showUnSolvedProblemForm && <UnSolvedProblemFormWithLocation selectedReportId={selectedReportId} />}
+      {showSolvedProblemForm && <SolvedProblemFormWithLocation selectedReportId={selectedReportId} />}
 
       <MapContainer
         center={iranCenter}
@@ -437,7 +452,7 @@ const IranMap = () => {
           .map((report) => (
             <Marker
               key={report._id}
-              position={[report.location.coordinates[1], report.location.coordinates[0]]}
+              position={[report.location.coordinates[0], report.location.coordinates[1]]}
               icon={getMarkerIcon(report)}
               eventHandlers={{
                 click: () => handleReportClick(report),
@@ -472,12 +487,8 @@ const IranMap = () => {
         )}
 
         <CustomZoomControls setUserPosition={setUserPosition} />
-        {isReporting && (
-          <MapClickHandler onClick={(e) => {
-            const coords: [number, number] = [e.latlng.lat, e.latlng.lng];
-            setUserPosition(coords, "موقعیت انتخاب شده توسط شما");
-          }} />
-        )}
+        {isReporting && <NewReportLocationHandler setUserPosition={setUserPosition} />}
+
         {isLocatedNeedle && position && <FlyToPosition position={position} />}
         {(showUnSolvedProblemForm || showSolvedProblemForm) && position && <FlyToPosition position={position} />}
       </MapContainer>
@@ -491,13 +502,13 @@ const IranMap = () => {
       {!isReporting && !isLocatedNeedle && (
         <section className="absolute bottom-5 sm:bottom-10 w-full flex justify-center items-center sm:gap-8 gap-3 z-10 flex-col sm:flex-row text-center">
           <button
-            onClick={() => setProblemSolved(!problemSolved)}
+            onClick={() => { setProblemSolved(!problemSolved); setShowNeedleOrange(false); }}
             className={`w-[200px] ${problemSolved ? 'bg-[#00E083]' : 'bg-gray-300'} text-sm px-4 py-2 rounded-3xl shadow hover:bg-gray-100 transition text-black`}
           >
             مشکلات حل شده
           </button>
           <button
-            onClick={() => setProblemUnSolved(!problemUnSolved)}
+            onClick={() => { setProblemUnSolved(!problemUnSolved); setShowNeedleOrange(false); }}
             className={`w-[200px] ${problemUnSolved ? 'bg-[#F45151]' : 'bg-gray-300'} text-sm px-4 py-2 rounded-3xl shadow hover:bg-gray-100 transition text-black`}
           >
             مشکلات حل نشده
@@ -543,6 +554,7 @@ const IranMap = () => {
             onClick={() => {
               setIsReporting(false);
               setPosition(null);
+              setShowNeedleOrange(false);
               setPopupText('');
             }}
             className="bg-transparent border-0 p-0"
@@ -571,7 +583,6 @@ const IranMap = () => {
               setIsReporting(false);
               setPosition(null);
               setPopupText('');
-              setProblemSolved(!problemSolved);
               setShowSolvedProblemForm(false);
             }}
             className="bg-transparent border-0 p-0"
@@ -600,7 +611,6 @@ const IranMap = () => {
               setIsReporting(false);
               setPosition(null);
               setPopupText('');
-              setProblemUnSolved(!problemUnSolved);
               setShowUnSolvedProblemForm(false);
             }}
             className="bg-transparent border-0 p-0"
