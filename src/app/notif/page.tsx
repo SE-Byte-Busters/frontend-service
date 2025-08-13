@@ -22,7 +22,7 @@ const NotificationsPage = () => {
             setSocketConnected(false);
         });
 
-        socket.on('notification', (data) => {
+        socket.on('notification', (data: any) => {
             console.log('📩 Notification received:', data);
             setNotifications((prev) => [...prev, JSON.stringify(data)]);
         });

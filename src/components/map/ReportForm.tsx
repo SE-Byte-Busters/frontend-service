@@ -43,26 +43,22 @@ const ReportForm: React.FC<ReportFormProps> = ({ onSubmit, className }) => {
   };
 
 
-  // const handleSubmit = () => {
-  //     setIsLocatedNeedle(false)
-  //     setIsVisible(true)
-  //     setShowNeedleOrange(false)
-  //     const formData = {
-  //         title,
-  //         description,
-  //         approximatePosition: address,
-  //         city: "Tehran",
-  //         category,
-  //         imagesToSend,
-  //         position
-  //     };
-  //     // if (onSubmit) onSubmit(formData);
 
-  //     console.log(formData)
-  // };
 
   const handleSubmit = async () => {
     try {
+
+      if (!images || !title || !description || !address || !category) {
+        setAlert({
+          type: 'error',
+          message: "لطفا تمام فیلد هارا پر کنید!!"
+        });
+        setTimeout(() => {
+          setAlert(null)
+        }, 3000);
+        return;
+
+      }
       setIsLocatedNeedle(false);
       setIsVisible(true);
       setShowNeedleOrange(false);
@@ -140,48 +136,65 @@ const ReportForm: React.FC<ReportFormProps> = ({ onSubmit, className }) => {
           ? error.message
           : 'خطا در ارسال گزارش'
       });
+      setTimeout(() => {
+        setAlert(null)
+      }, 3000)
     }
   };
+
+
+  // State to track if the user has interacted with the field
+  const [isTitleTouched, setIsTitleTouched] = useState(false);
+  const [isDescriptionTouched, setIsDescriptionTouched] = useState(false);
+  const [isAddressTouched, setIsAddressTouched] = useState(false);
+
+  // Helper function to determine border color class
+  const getBorderClass = (value: any, isTouched: any) => {
+    if (value) return 'border-green-500'; // If there's a value, border is green
+    if (isTouched) return 'border-red-500';  // If touched and empty, border is red
+    return 'border-[#685752]';             // Default border color
+  };
+
 
 
   return (
     <div className={className}>
       <div className=" grid grid-cols-12 md:flex-row gap-6 w-full p-6 bg-[#fff9f5] rounded-lg shadow-md min-h-screen" >
-        {/* فرم */}
         <div className="col-span-5 space-y-4">
           <div>
             <label className="block mb-1 text-right text-[#685752] text-[24px] font-vazirmatn">عنوان گزارش</label>
             <label className="block mb-1 text-right text-[#685752]">یک جمله کوتاه و واضح برای عنوان مشکلت بنویس.</label>
             <input
               type="text"
-              className="w-full border border-[#685752] p-2 rounded-[30px] text-[#685752]"
+              className={`w-full border p-2 rounded-[30px] text-[#685752] ${getBorderClass(title, isTitleTouched)}`}
               placeholder="مثلا: دیواره کنار پل ترک برداشته"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
+              onBlur={() => setIsTitleTouched(true)} // Mark as touched when the user clicks away
             />
           </div>
           <div>
             <label className="block mb-1 text-right text-[#685752] text-[24px] font-vazirmatn">توضیح مشکل</label>
             <label className="block mb-1 text-right text-[#685752]">یک جمله کوتاه و واضح برای عنوان مشکلت بنویس.</label>
-
             <textarea
-              className="w-full border border-[#685752] p-2 rounded-[30px] text-[#685752]"
+              className={`w-full border p-2 rounded-[30px] text-[#685752] ${getBorderClass(description, isDescriptionTouched)}`}
               placeholder="مثلا: ترک عمیق به‌وجود آمده و ترس ریزش پل وجود دارد."
               rows={4}
               value={description}
               onChange={(e) => setDescription(e.target.value)}
+              onBlur={() => setIsDescriptionTouched(true)} // Mark as touched
             />
           </div>
           <div>
             <label className="block mb-1 text-right text-[#685752] text-[24px] font-vazirmatn">آدرس حدودی</label>
             <label className="block mb-1 text-right text-[#685752]">یک جمله کوتاه و واضح برای عنوان مشکلت بنویس.</label>
-
             <input
               type="text"
-              className="w-full border border-[#685752] p-2 rounded-[30px] text-[#685752]"
+              className={`w-full border p-2 rounded-[30px] text-[#685752] ${getBorderClass(address, isAddressTouched)}`}
               placeholder="مثلا: تهران، خیابان ولیعصر، روبروی پارک دانشجو"
               value={address}
               onChange={(e) => setAddress(e.target.value)}
+              onBlur={() => setIsAddressTouched(true)} // Mark as touched
             />
           </div>
 
@@ -299,33 +312,6 @@ const ReportForm: React.FC<ReportFormProps> = ({ onSubmit, className }) => {
         <Image src="/images/icons/smog.png" alt="smog" width={320} height={74} />
         <Image src="/images/icons/leaf.png" alt="leaf" width={320} height={74} />
       </div>
-      {/* <div className='col-span-12 text-center'>
-        <button
-          onClick={handleSubmit}
-          className="bg-[#f89b2f] w-[234px] h-[44px] mt-4 py-2 rounded-full text-white shadow-md hover:bg-[#e38821] transition"
-        >
-          ثبت گزارشننننی
-        </button>
-        <button
-          onClick={() => {
-            setIsReporting(true);
-            setIsLocatedNeedle(true);
-
-          }}
-        // className="bg-transparent border-0 p-0"
-        >
-          <Image
-            src="/images/icons/X.png"  // مسیر تصویر لغو
-            alt="Background Image"
-            width={64}
-            height={64}
-            className="w-10 h-10"  // سایز دلخواه برای عکس
-          />
-        </button>
-
-      </div> */}
-
-
 
 
     </div >

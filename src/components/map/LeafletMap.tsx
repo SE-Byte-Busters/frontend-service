@@ -360,7 +360,7 @@ const IranMap = () => {
 
       const timeoutId = setTimeout(() => {
         fetchReports(bounds, zoom, filter);
-      }, 300);
+      }, 3000);
 
       return () => clearTimeout(timeoutId);
     },
@@ -533,11 +533,12 @@ const IranMap = () => {
       )}
 
       {/* Error indicator */}
-      {error && (
+      {/* {error && (
         <div className="absolute top-20 left-1/2 transform -translate-x-1/2 z-20 bg-red-100 border border-red-400 text-red-700 px-4 py-2 rounded-lg">
           <span className="text-sm text-black">خطا: {error}</span>
         </div>
-      )}
+        {}
+      )} */}
 
       {isReporting && position && (
         <div className="absolute bottom-10 w-full flex justify-center z-10 gap-4">

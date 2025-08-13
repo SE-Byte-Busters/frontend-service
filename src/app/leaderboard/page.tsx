@@ -15,14 +15,14 @@ export default function ProcessedReports() {
 
   useEffect(() => {
     const token = localStorage.getItem("token");
-    
-/*     if (!token) {
-      setShowAuthAlert(true);
-      const timer = setTimeout(() => {
-        router.push("/auth/sign-up");
-      }, 3000);
-      return () => clearTimeout(timer);
-    } */
+
+    /*     if (!token) {
+          setShowAuthAlert(true);
+          const timer = setTimeout(() => {
+            router.push("/auth/sign-up");
+          }, 3000);
+          return () => clearTimeout(timer);
+        } */
 
     const fetchReports = async () => {
       try {
@@ -75,7 +75,7 @@ export default function ProcessedReports() {
 
         setLastTenReports(lastTen);
 
-      } catch (err) {
+      } catch (err: any) {
         console.error("Error:", err);
         if (err.message === "Invalid token") {
           localStorage.removeItem("token");
@@ -112,12 +112,12 @@ export default function ProcessedReports() {
         {/* Top 3 Approved Reports */}
         <div className="w-full">
           <h2 className="text-xl font-semibold text-gray-900 mb-1 pb-2 flex items-center gap-2" dir="rtl">
-            <Image 
-              src="/images/icons/worldcrown.jpg" 
-              alt="Top reports icon" 
-              width={24} 
-              height={24} 
-              className="shrink-0" 
+            <Image
+              src="/images/icons/worldcrown.jpg"
+              alt="Top reports icon"
+              width={24}
+              height={24}
+              className="shrink-0"
             />
             صدر لیست گزارشات محبوب
           </h2>
@@ -138,12 +138,12 @@ export default function ProcessedReports() {
         {/* Last 10 Approved Reports */}
         <div className="w-full">
           <h2 className="text-xl font-semibold text-gray-900 mb-1 pb-2 flex items-center gap-2" dir="rtl">
-            <Image 
-              src="/images/icons/handguy.jpg" 
-              alt="Recent reports icon" 
-              width={24} 
-              height={24} 
-              className="shrink-0" 
+            <Image
+              src="/images/icons/handguy.jpg"
+              alt="Recent reports icon"
+              width={24}
+              height={24}
+              className="shrink-0"
             />
             آخرین گزارش‌های ثبت‌شده
           </h2>

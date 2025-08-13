@@ -37,11 +37,11 @@ export default function NewReport() {
         // Fetch score and rank
         const userRes = await fetch(
           'https://shahriar.thetechverse.ir:3000/api/v1/user-profile/score-and-rank', {
-            method: 'GET',
-            headers: {
-              'Authorization': `Bearer ${token}`,
-            },
-          }
+          method: 'GET',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+          },
+        }
         );
 
         if (!userRes.ok) throw new Error('Invalid token');
@@ -50,11 +50,11 @@ export default function NewReport() {
         // Fetch user profile to get profile image
         const profileRes = await fetch(
           'https://shahriar.thetechverse.ir:3000/api/v1/user-profile/', {
-            method: 'GET',
-            headers: {
-              'Authorization': `Bearer ${token}`,
-            },
-          }
+          method: 'GET',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+          },
+        }
         );
 
         if (!profileRes.ok) throw new Error('Failed to fetch profile image');
@@ -70,11 +70,11 @@ export default function NewReport() {
         // Fetch reports as before
         const reportsRes = await fetch(
           'https://shahriar.thetechverse.ir:3000/api/v1/report/reports', {
-            method: 'GET',
-            headers: {
-              'Authorization': `Bearer ${token}`,
-            },
-          }
+          method: 'GET',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+          },
+        }
         );
 
         if (!reportsRes.ok) throw new Error('Failed to fetch reports');
@@ -115,6 +115,7 @@ export default function NewReport() {
     approvalStatus: 0,
     voteScore: 0,
     createdAt: new Date().toISOString(),
+    priority: "Low",
     updatedAt: new Date().toISOString(),
   }));
 
