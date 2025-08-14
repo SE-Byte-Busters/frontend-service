@@ -67,6 +67,19 @@ export const Box = () => {
         </>
       )}
 
+      {role === "admin" && (
+        <>
+          {/* آمار button */}
+          <button
+            onClick={() => router.push("/admin/statistic")}
+            className="flex items-center justify-start gap-2 w-full rounded-md px-3 py-2 text-sm text-purple-600 hover:text-purple-800 hover:bg-purple-50 transition-colors duration-200"
+          >
+            <span>آمار</span>
+            <Icon name="BarChart" className="w-4 h-4" />
+          </button>
+        </>
+      )}
+
       {/* Logout */}
       <button
         onClick={handleLogout}
