@@ -36,7 +36,7 @@ export default function LeaveReview() {
     }
 
     try {
-      // 1) Post the comment
+      // 1) ارسال نظر
       const commentRes = await fetch(
         "https://shahriar.thetechverse.ir:3000/api/v1/comment",
         {
@@ -55,7 +55,7 @@ export default function LeaveReview() {
       }
       const commentId = commentData._id;
 
-      // 2) Post the rating (1 decimal place)
+      // 2) ارسال امتیاز (1 رقم اعشار)
       const ratingRes = await fetch(
         `https://shahriar.thetechverse.ir:3000/api/v1/comment/${commentId}/rate`,
         {
@@ -73,7 +73,7 @@ export default function LeaveReview() {
         throw new Error(ratingData.message || "خطا در ارسال امتیاز");
       }
 
-      // Success
+      // موفقیت
       setReview({ comment: "", rating: 4.5 });
       setAlert({
         type: "success",
@@ -82,10 +82,17 @@ export default function LeaveReview() {
         onClose: () => setAlert(null),
       });
     } catch (err: any) {
-      console.error("Submit failed:", err);
+      console.error("ارسال ناموفق:", err);
+
+      // بررسی خطای ارسال بیش از ۳ نظر
+      let message = "مشکلی پیش آمد، مجدداً تلاش کنید.";
+      if (err.message?.includes("maximum of 3 comments")) {
+        message = "شما فقط می‌توانید حداکثر ۳ نظر ارسال کنید.";
+      }
+
       setAlert({
         type: "error",
-        message: err.message || "مشکلی پیش آمد، مجدداً تلاش کنید.",
+        message,
         duration: 3000,
         onClose: () => setAlert(null),
       });
