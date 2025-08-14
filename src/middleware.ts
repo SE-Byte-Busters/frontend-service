@@ -13,7 +13,7 @@ export function middleware(request: NextRequest) {
   // Define routes
   const publicRoutes = ['/', '/map', '/auth/sign-up', '/auth/sign-in', '/leaderboard', '/report/reports' ]
   const adminRoutes = ['/admin', '/admin/reports/processed', '/admin/profile/edit']
-  const userRoutes = ['/report', '/report/reports', '/user/profile/edit']
+  const userRoutes = ['/report', '/report/reports', '/user/profile/edit', '/user/leave-a-review']
 
   // Check if path matches any route category
   const isPublic = publicRoutes.some(route => 
