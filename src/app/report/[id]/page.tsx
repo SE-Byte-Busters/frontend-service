@@ -6,6 +6,14 @@ import dynamic from 'next/dynamic';
 import { Report } from '@/components/report/ReportTypes';
 import { useParams } from 'next/navigation';
 import { Alert, AlertProps } from '@/components/Alert';
+import {
+  priorityTranslations,
+  priorityColors,
+  approvalStatusTranslations,
+  completionStatusTranslations,
+  reportStatusTranslations,
+  formatReportDate
+} from '@/components/report/reportTranslations'
 
 const ReportMap = dynamic(
   () => import('@/components/report/ReportMap'),
@@ -14,29 +22,6 @@ const ReportMap = dynamic(
     loading: () => <p>در حال بارگیری نقشه...</p>
   }
 );
-
-const priorityTranslations: Record<string, string> = {
-  High: 'بالا',
-  Medium: 'متوسط',
-  Low: 'پایین'
-};
-
-const approvalStatusTranslations: Record<number, string> = {
-  0: 'در انتظار بررسی',
-  1: 'تایید شده',
-  2: 'رد شده'
-};
-
-const completionStatusTranslations: Record<number, string> = {
-  0: 'شروع نشده',
-  1: 'در حال انجام',
-  2: 'کامل شده'
-};
-
-const reportStatusTranslations: Record<number, string> = {
-  0: 'بسته',
-  1: 'باز'
-};
 
 async function getReportData(id: string, token: string | null): Promise<Report> {
   const res = await fetch(
@@ -105,20 +90,7 @@ export default function ReportPage() {
     );
   }
 
-  const formattedDate = new Date(report.createdAt).toLocaleDateString('fa-IR', {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit'
-  });
-
-  const priorityColors = {
-    High: 'bg-red-500',
-    Medium: 'bg-yellow-500',
-    Low: 'bg-green-500'
-  };
-
+  const formattedDate = formatReportDate(report.createdAt)
   const images = report.images || [];
 
   return (
