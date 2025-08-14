@@ -587,7 +587,7 @@ const IranMap = () => {
               setIsReporting(false);
               setPosition(null);
               setPopupText('');
-              setShowSolvedProblemForm(true);
+              setShowSolvedProblemForm(false);
             }}
             className="bg-transparent border-0 p-0"
           >
@@ -615,7 +615,7 @@ const IranMap = () => {
               setIsReporting(false);
               setPosition(null);
               setPopupText('');
-              setShowUnSolvedProblemForm(true);
+              setShowUnSolvedProblemForm(false);
             }}
             className="bg-transparent border-0 p-0"
           >

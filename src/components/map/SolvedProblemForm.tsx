@@ -527,7 +527,7 @@ const SolvedProblemForm: React.FC<SolvedProblemFormProps> = ({
               <h2 className="font-bold text-lg text-gray-800 mr-0">
                 تاریخ ثبت گزارش: {formatDate(report.createdAt)}
               </h2>
-              <h4 className="font-bold text-sm text-gray-800">{report.user.username}</h4>
+              <h4 className="font-bold text-sm text-gray-800">{report.user?.username}</h4>
             </section>
           </section>
 
