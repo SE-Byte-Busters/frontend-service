@@ -11,12 +11,12 @@ export function middleware(request: NextRequest) {
   }
 
   // Define routes
-  const publicRoutes = ['/', '/map', '/auth/sign-up', '/auth/sign-in', '/leaderboard', '/report/reports' ]
+  const publicRoutes = ['/', '/map', '/auth/sign-up', '/auth/sign-in', '/auth/otp', '/leaderboard', '/report/reports']
   const adminRoutes = ['/admin', '/admin/reports/processed', '/admin/profile/edit']
   const userRoutes = ['/report', '/report/reports', '/user/profile/edit']
 
   // Check if path matches any route category
-  const isPublic = publicRoutes.some(route => 
+  const isPublic = publicRoutes.some(route =>
     path === route || path.startsWith(`${route}/`)
   )
   const isAdminRoute = adminRoutes.some(route =>
@@ -31,8 +31,8 @@ export function middleware(request: NextRequest) {
 
   // Block non-authenticated users from protected routes
   if (!token || role === 'nonuser') {
-    return isPublic 
-      ? NextResponse.next() 
+    return isPublic
+      ? NextResponse.next()
       : NextResponse.redirect(new URL('/auth/sign-in', request.url))
   }
 

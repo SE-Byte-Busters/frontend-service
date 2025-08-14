@@ -4,6 +4,7 @@ import { connectSocket } from '@/lib/socket';
 import { useEffect, useState } from 'react';
 
 const NotificationsPage = () => {
+
     const [socketConnected, setSocketConnected] = useState(false);
     const [notifications, setNotifications] = useState<string[]>([]);
 

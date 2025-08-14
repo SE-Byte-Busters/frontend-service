@@ -15,12 +15,7 @@ const ReportForm: React.FC<ReportFormProps> = ({ onSubmit, className }) => {
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [address, setAddress] = useState('');
-  const [category, setCategory] = useState([
-    { id: 'cleaning', label: 'زباله و پاکسازی', icon: '/images/icons/bin.png' },
-    { id: 'maintenance', label: 'خرابی یا تعمیرات', icon: '/images/icons/wrench.png' },
-    { id: 'danger', label: 'خطرات احتمالی', icon: '/images/icons/danger.png' },
-    { id: 'other', label: 'سایر موارد', icon: '/images/icons/question.png' },
-  ]);
+
   const [images, setImages] = useState<File[]>([]);
   const { isLocatedNeedle, setIsLocatedNeedle } = useReport();
   const { isVisible, setIsVisible } = useReport();
@@ -48,7 +43,7 @@ const ReportForm: React.FC<ReportFormProps> = ({ onSubmit, className }) => {
   const handleSubmit = async () => {
     try {
 
-      if (!images || !title || !description || !address || !category) {
+      if (!images || !title || !description || !address) {
         setAlert({
           type: 'error',
           message: "لطفا تمام فیلد هارا پر کنید!!"
@@ -72,14 +67,25 @@ const ReportForm: React.FC<ReportFormProps> = ({ onSubmit, className }) => {
       formData.append("approximatePosition", address);
       formData.append("city", "Tehran");
 
-      // مدیریت category با مقدار پیش‌فرض
-      const defaultCategory = "cleaning"; // مقدار پیش‌فرض
-      let categoryString = defaultCategory;
 
-      if (Array.isArray(category) && category.length > 0) {
-        categoryString = category.join(",");
-      } else if (typeof category === 'string') {
-        categoryString = category;
+      {/* 
+          failure => tools
+          lightbulb => lightbulb
+          trash => trash
+          unsafe = < Barrier
+            smog => smog
+          nature => leaf */}
+      let categoryList = [];
+      if (isSelTools) categoryList.push("failure")
+      if (isSelLightbulb) categoryList.push("lightbulb")
+      if (isSelBarrier) categoryList.push("unsafe")
+      if (isSelTrash) categoryList.push("trash")
+      if (isSelSmog) categoryList.push("smog")
+      if (isSelLeaf) categoryList.push("leaf")
+
+      let categoryString = "";
+      if (categoryList.length > 0) {
+        categoryString = categoryList.join(",");
       }
 
       formData.append("category", categoryString);
@@ -148,6 +154,17 @@ const ReportForm: React.FC<ReportFormProps> = ({ onSubmit, className }) => {
   const [isDescriptionTouched, setIsDescriptionTouched] = useState(false);
   const [isAddressTouched, setIsAddressTouched] = useState(false);
 
+  const [isSelTools, setIsSelTools] = useState(false);
+  const [isSelLightbulb, setIsSelLightbulb] = useState(false);
+  const [isSelTrash, setIsSelTrash] = useState(false);
+  const [isSelBarrier, setIsSelBarrier] = useState(false);
+  const [isSelSmog, setIsSelSmog] = useState(false);
+  const [isSelLeaf, setIsSelLeaf] = useState(false);
+
+
+
+
+
   // Helper function to determine border color class
   const getBorderClass = (value: any, isTouched: any) => {
     if (value) return 'border-green-500'; // If there's a value, border is green
@@ -211,23 +228,80 @@ const ReportForm: React.FC<ReportFormProps> = ({ onSubmit, className }) => {
 
           <p className="text-sm text-[#87878B]">نوع مشکلی که میخوای گزارش بدی را انتخاب کن. این کمک می کنه گزارش سریع تر بررسی بشه</p>
         </div>
-
         <div className='col-span-6 space-y-0'>
 
+          {/* انتخاب دسته‌بندی */}
+          <button onClick={() => setIsSelTools(!isSelTools)} className='flex justify-start items-start gap-x-[10px]'>
 
-          <Image src="/images/icons/tools.png" alt="tools" width={280} height={54} />
+            {!isSelTools ? <Image src="/images/icons/category/tools.svg" alt="tools" width={56} height={54} /> : <Image src="/images/icons/category/tools-green.svg" alt="tools" width={56} height={54} />}
 
-          <Image src="/images/icons/lightbulb.png" alt="lightbulb" width={280} height={54} />
+            <div className='flex flex-col items-start mt-1'>
+              <span className={`${!isSelTools ? "text-[#685752]" : "text-[#8EB486]"} text-sm font-bold`}>خرابی یا آسیب دیدگی</span>
+              <span className={`${!isSelTools ? "text-[#685752]" : "text-[#8EB486]"} text-sm`}>چاله، جدول شکسته یا تجهیزات خراب</span>
+            </div>
+          </button>
+          {/* text-[#8EB486] */}
+          <button onClick={() => setIsSelLightbulb(!isSelLightbulb)} className='flex justify-start items-start gap-x-[10px]'>
 
-          <Image src="/images/icons/trash.png" alt="trash" width={280} height={54} />
+            {!isSelLightbulb ?
+              <Image src="/images/icons/category/lightbulb.svg" alt="lightbulb" width={56} height={54} /> : <Image src="/images/icons/category/lightbulb-green.svg" alt="lightbulb" width={56} height={54} />
+            }
+            <div className='flex flex-col items-start mt-1'>
+              <span className={`${!isSelLightbulb ? "text-[#685752]" : "text-[#8EB486]"} text-sm font-bold`}>روشنایی معابر</span>
+              <span className={`${!isSelLightbulb ? "text-[#685752]" : "text-[#8EB486]"} text-sm`}>چراغ خاموش یا نور ناکافی در خیابان</span>
+            </div>
+          </button>
 
-          {/* <Category /> */}
+          <button onClick={() => setIsSelTrash(!isSelTrash)} className='flex justify-start items-start gap-x-[10px]'>
+
+            {!isSelTrash ?
+              <Image src="/images/icons/category/trash.svg" alt="trash" width={56} height={54} /> : <Image src="/images/icons/category/trash-green.svg" alt="trash" width={56} height={54} />
+            }
+            <div className='flex flex-col items-start mt-1'>
+              <span className={`${!isSelTrash ? "text-[#685752]" : "text-[#8EB486]"} text-sm font-bold`}> زباله و نظافت</span>
+              <span className={`${!isSelTrash ? "text-[#685752]" : "text-[#8EB486]"} text-sm`}>رها شدن زباله یا سطل‌های پر و آلوده</span>
+            </div>
+          </button>
+
+
+
+
+
         </div>
         <div className='col-span-6 space-y-2'>
-          <Image src="/images/icons/barrier.png" alt="barrier" width={320} height={74} />
+          <button onClick={() => setIsSelBarrier(!isSelBarrier)} className='flex justify-start items-start gap-x-[10px]'>
 
-          <Image src="/images/icons/smog.png" alt="smog" width={320} height={74} />
-          <Image src="/images/icons/leaf.png" alt="leaf" width={320} height={74} />
+            {!isSelBarrier ?
+              <Image src="/images/icons/category/barrier.svg" alt="barrier" width={56} height={74} /> : <Image src="/images/icons/category/barrier-green.svg" alt="barrier" width={56} height={54} />
+            }
+            <div className='flex flex-col items-start mt-1'>
+              <span className={`${!isSelBarrier ? "text-[#685752]" : "text-[#8EB486]"} text-sm font-bold`}> ایمنی و خطرات شهری</span>
+              <span className={`${!isSelBarrier ? "text-[#685752]" : "text-[#8EB486]"} text-sm`}>محل ناایمن مثل چاه باز یا مانع خطرناک</span>
+            </div>
+          </button>
+
+          <button onClick={() => setIsSelSmog(!isSelSmog)} className='flex justify-start items-start gap-x-[10px]'>
+
+            {!isSelSmog ?
+              <Image src="/images/icons/category/smog.svg" alt="smog" width={56} height={74} /> : <Image src="/images/icons/category/smog-green.svg" alt="smog" width={56} height={54} />
+            }
+            <div className='flex flex-col items-start mt-1'>
+              <span className={`${!isSelSmog ? "text-[#685752]" : "text-[#8EB486]"} text-sm font-bold`}> دیوارنویسی و آلودگی بصری</span>
+              <span className={`${!isSelSmog ? "text-[#685752]" : "text-[#8EB486]"} text-sm`}>نوشته‌ها یا تبلیغات نازیبا روی دیوارها</span>
+            </div>
+          </button>
+          <button onClick={() => setIsSelLeaf(!isSelLeaf)} className='flex justify-start items-start gap-x-[10px]'>
+
+            {!isSelLeaf ?
+              <Image src="/images/icons/category/leaf.svg" alt="leaf" width={56} height={74} /> : <Image src="/images/icons/category/leaf-green.svg" alt="leaf" width={56} height={54} />
+            }
+            <div className='flex flex-col items-start mt-1'>
+              <span className={`${!isSelLeaf ? "text-[#685752]" : "text-[#8EB486]"} text-sm font-bold`}> ایمنی و خطرات شهری</span>
+              <span className={`${!isSelLeaf ? "text-[#685752]" : "text-[#8EB486]"} text-sm`}>آسیب به درختان یا وضعیت نامناسب پارک</span>
+            </div>
+          </button>
+
+
         </div>
 
 
@@ -259,11 +333,11 @@ const ReportForm: React.FC<ReportFormProps> = ({ onSubmit, className }) => {
           </button>
         </div>
 
-      </div>
+      </div >
 
 
       {/* تصاویر */}
-      <div className="col-span-7">
+      < div className="col-span-7" >
         <h3 className="text-right mb-2 text-[#685752] ">ارسال عکس ها</h3>
         <div className="border border-dashed border-[#c1a291] p-6 rounded-md text-center flex flex-col justify-center items-center ">
 
@@ -287,32 +361,11 @@ const ReportForm: React.FC<ReportFormProps> = ({ onSubmit, className }) => {
             </label>
           </div>
         </div>
-      </div>
+      </div >
       <div className='col-span-12'>
         <p className="text-md text-[#685752]">عکس‌های مربوط به گزارش را اینجا بکشید و رها کنید یا برای انتخاب از دستگاه خود کلیک کنید.</p>
         <p className="text-sm text-[#87878B]">حداکثر ۵ تصویر | فرمت‌های مجاز: JPG, PNG | حجم هر تصویر تا ۵ مگابایت</p>
       </div>
-
-      <div className='col-span-6 space-y-0'>
-
-        {/* انتخاب دسته‌بندی */}
-        <Image src="/images/icons/tools.png" alt="tools" width={280} height={54} />
-
-        <Image src="/images/icons/lightbulb.png" alt="lightbulb" width={280} height={54} />
-
-        <Image src="/images/icons/trash.png" alt="trash" width={280} height={54} />
-
-
-
-
-      </div>
-      <div className='col-span-6 space-y-2'>
-        <Image src="/images/icons/barrier.png" alt="barrier" width={320} height={74} />
-
-        <Image src="/images/icons/smog.png" alt="smog" width={320} height={74} />
-        <Image src="/images/icons/leaf.png" alt="leaf" width={320} height={74} />
-      </div>
-
 
     </div >
 

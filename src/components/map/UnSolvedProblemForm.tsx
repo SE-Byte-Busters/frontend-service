@@ -76,7 +76,13 @@ const UnSolvedProblemForm: React.FC<UnSolvedProblemFormProps> = ({
   const [error, setError] = useState<string | null>(null);
 
   const [newComment, setNewComment] = useState('');
+  const [newRepReqSolve, setNewRepReqSolve] = useState('');
+
   const [isSubmittingComment, setIsSubmittingComment] = useState(false);
+  const [isSolveRequest, setIsSolveRequest] = useState(false);
+
+  const [showSolveRequest, setShowSolveRequest] = useState(true);
+
 
   const { setAlert } = useReport();
 
@@ -87,6 +93,17 @@ const UnSolvedProblemForm: React.FC<UnSolvedProblemFormProps> = ({
     }
     return null;
   };
+
+  // This map object remains the same
+  const categoryIconMap: any = {
+    failure: { src: "/images/icons/category/tools.svg", alt: "tools" },
+    lightbulb: { src: "/images/icons/category/lightbulb.svg", alt: "lightbulb" },
+    unsafe: { src: "/images/icons/category/barrier.svg", alt: "barrier" },
+    trash: { src: "/images/icons/category/trash.svg", alt: "trash" },
+    smog: { src: "/images/icons/category/smog.svg", alt: "smog" },
+    leaf: { src: "/images/icons/category/leaf.svg", alt: "leaf" },
+  };
+
 
   const fetchReportDetails = async (id: string) => {
     setLoading(true);
@@ -127,7 +144,47 @@ const UnSolvedProblemForm: React.FC<UnSolvedProblemFormProps> = ({
       console.error('Error fetching comments:', err);
     }
   };
+  const handleReportReqSolve = async () => {
 
+    if (!newRepReqSolve.trim() || !reportId) return;
+    try {
+      setIsSolveRequest(true);
+      setShowSolveRequest(true);
+
+      const token = getAuthToken();
+      const response = await fetch(
+
+        `https://shahriar.thetechverse.ir:3000/api/v1/report/reports/${reportId}/reqsolved`,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+          body: JSON.stringify({ text: newRepReqSolve }),
+        }
+
+      );
+
+      if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+      setNewRepReqSolve('');
+
+      setAlert({ type: 'success', message: 'گزارش حل مشکل با موفقیت ثبت شد' });
+      setTimeout(() => {
+        setAlert(null)
+      }, 3000)
+
+    } catch (err) {
+
+      setAlert({ type: 'error', message: 'خطا در ثبت گزارش حل مشکل' });
+      setTimeout(() => {
+        setAlert(null)
+      }, 3000)
+
+      console.error('Error submitting comment:', err);
+
+    } finally {
+      setIsSolveRequest(false);
+    }
+
+  }
   const handleCommentSubmit = async () => {
     if (!newComment.trim() || !reportId) return;
     setIsSubmittingComment(true);
@@ -145,8 +202,14 @@ const UnSolvedProblemForm: React.FC<UnSolvedProblemFormProps> = ({
       setNewComment('');
       await fetchComments(reportId);
       setAlert({ type: 'success', message: 'نظر با موفقیت ثبت شد' });
+      setTimeout(() => {
+        setAlert(null)
+      }, 3000)
     } catch (err) {
       setAlert({ type: 'error', message: 'خطا در ثبت نظر' });
+      setTimeout(() => {
+        setAlert(null)
+      }, 3000)
       console.error('Error submitting comment:', err);
     } finally {
       setIsSubmittingComment(false);
@@ -169,8 +232,14 @@ const UnSolvedProblemForm: React.FC<UnSolvedProblemFormProps> = ({
       // Refetch report details to get the latest vote count and score
       await fetchReportDetails(reportId);
       setAlert({ type: 'success', message: `رای ${direction === 'Up' ? 'مثبت' : 'منفی'} شما ثبت شد` });
+      setTimeout(() => {
+        setAlert(null)
+      }, 3000)
     } catch (err) {
       setAlert({ type: 'error', message: 'خطا در ثبت رای' });
+      setTimeout(() => {
+        setAlert(null)
+      }, 3000)
       console.error('Error voting:', err);
     }
   };
@@ -241,11 +310,12 @@ const UnSolvedProblemForm: React.FC<UnSolvedProblemFormProps> = ({
     );
   }
 
+
   // --- DYNAMIC UI RENDER ---
   return (
     <div dir="rtl" className="grid grid-cols-12 gap-6 p-6 bg-[#fff5f3] rounded-xl shadow-sm min-h-screen">
       {/* بخش اطلاعات و کامنت‌ها */}
-      <div className="col-span-12 md:col-span-7 flex flex-col">
+      <div className="col-span-12 md:col-span-7 flex flex-col items-center">
         <div className="flex justify-between items-start">
           <div>
             <Image src={getPriorityIcon(report.priority)} alt={`Priority: ${report.priority}`} className="m-[10px]" width={200} height={200} />
@@ -253,25 +323,55 @@ const UnSolvedProblemForm: React.FC<UnSolvedProblemFormProps> = ({
               منتظر اقدام یکی از شهریارها هستیم
               تو هم می‌تونی اولین گام رو برداری...
             </p>
+
           </div>
+
           <Image src="/images/icons/unSolved.png" alt="Unsolved" width={80} height={40} />
         </div>
-        <div className='flex-grow'>
-          <label className="font-bold text-[24px] text-[#685752] font-vazirmatn m-[10px]">نظرات و پیشنهادات</label>
+
+
+        <button
+          onClick={() => { setIsSolveRequest(true); setShowSolveRequest(false); }}
+          className={`w-[251px] h-[56px] bg-[#8EB486] rounded-[10px] mt-12 mb-12 active:brightness-90 ${!showSolveRequest ? 'hidden' : ''}`}>
+          <span className="font-bold text-[18px] text-[#fff] font-vazirmatn ">
+            گزارش حل مشکل
+          </span>
+        </button>
+
+
+        <div className={`flex-grow ${!showSolveRequest ? 'mt-12' : ''}`}>
+          <label className="font-bold text-[24px] text-[#685752] font-vazirmatn m-[10px]">{isSolveRequest ? 'گزارش حل مشکل' : 'نظرات و پیشنهادات'}</label>
           <textarea
             className="w-[90%] border border-[#685752] p-3 m-2 rounded-[30px] text-[#685752]"
-            placeholder="مثلا: ترک عمیق به‌وجود آمده و ترس ریزش پل وجود دارد."
+            placeholder={isSolveRequest ? ' لطفا گزارش حل مشکل خود را بنویسید' : "مثلا: ترک عمیق به‌وجود آمده و ترس ریزش پل وجود دارد."}
             rows={4}
-            value={newComment}
-            onChange={(e) => setNewComment(e.target.value)}
+            value={isSolveRequest ? newRepReqSolve : newComment}
+            onChange={(e) => isSolveRequest ? setNewRepReqSolve(e.target.value) : setNewComment(e.target.value)}
           />
-          <button
-            onClick={handleCommentSubmit}
-            disabled={isSubmittingComment || !newComment.trim()}
-            className="bg-[#f89b2f] text-white px-6 py-2 rounded-full m-2 hover:bg-[#e38821] transition disabled:opacity-50"
-          >
-            {isSubmittingComment ? 'در حال ارسال...' : 'ثبت نظر'}
-          </button>
+          <div className="flex justify-center">
+            <button
+              onClick={isSolveRequest ? handleReportReqSolve : handleCommentSubmit}
+              disabled={isSolveRequest ? (!isSolveRequest || !newRepReqSolve.trim()) : (isSubmittingComment || !newComment.trim())}
+              className="bg-[#f89b2f] text-white px-6 py-2 rounded-full m-2 hover:bg-[#e38821] transition disabled:opacity-50"
+            >
+              {isSolveRequest ? 'ثبت حل مشکل' : 'ثبت نظر'}
+            </button>
+            <button
+              onClick={() => {
+                setShowSolveRequest(true);
+                setIsSolveRequest(false);
+              }}
+              className={`bg-transparent ${showSolveRequest ? 'hidden' : ''}`}
+            >
+              <Image
+                src="/images/icons/X.png"
+                alt="Background Image"
+                width={64}
+                height={64}
+                className="w-10 h-10"
+              />
+            </button>
+          </div>
 
           <div className='mt-4 w-[90%] mx-auto'>
             {comments.length > 0 ? comments.map(comment => (
@@ -373,6 +473,30 @@ const UnSolvedProblemForm: React.FC<UnSolvedProblemFormProps> = ({
         </p>
 
         <p className="text-[#000000] text-2xl font-bold m-4 text-right">{report.approximatePosition}</p>
+        <div className="flex items-center gap-2 absolute bottom-10">
+          {
+            // Make sure report and its category array exist before mapping
+            report?.category?.map(categoryName => {
+              if (typeof categoryName !== "string") {
+                return <></>;
+              }
+              const iconData = categoryIconMap[categoryName];
+              if (iconData) {
+                return (
+                  <Image
+                    key={categoryName}
+                    src={iconData.src}
+                    alt={iconData.alt}
+                    width={56}
+                    height={54}
+                  />
+                );
+              }
+              return null;
+            })
+              .filter(Boolean) // This is a clever way to remove nulls, but not needed if you map directly
+          }
+        </div>
       </div>
     </div >
   );
