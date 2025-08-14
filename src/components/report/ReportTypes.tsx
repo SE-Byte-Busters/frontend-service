@@ -1,6 +1,7 @@
 type ReportImage = {
   key: string;
   url: string;
+  _id: string;
 };
 
 type Location = {
@@ -8,9 +9,14 @@ type Location = {
   coordinates: [number, number];
 };
 
+type User = {
+  _id: string;
+  username: string;
+};
+
 export type Report = {
   _id: string;
-  user: string;
+  user: User;
   title: string;
   description: string;
   approximatePosition: string;
@@ -20,6 +26,8 @@ export type Report = {
   images: ReportImage[];
   status: number;
   approvalStatus: number;
+  completionStatus: number;
+  score: number;
   voteScore: number;
   createdAt: string;
   priority: "High" | "Medium" | "Low";
