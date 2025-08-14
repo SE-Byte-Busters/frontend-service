@@ -55,7 +55,7 @@ export default function LeaveReview() {
       }
       const commentId = commentData._id;
 
-      // 2) Post the rating
+      // 2) Post the rating (1 decimal place)
       const ratingRes = await fetch(
         `https://shahriar.thetechverse.ir:3000/api/v1/comment/${commentId}/rate`,
         {
@@ -64,7 +64,7 @@ export default function LeaveReview() {
             "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,
           },
-          body: JSON.stringify({ score: review.rating }),
+          body: JSON.stringify({ score: Number(review.rating.toFixed(1)) }),
         }
       );
 
@@ -93,7 +93,7 @@ export default function LeaveReview() {
   };
 
   return (
-    <div className="flex items-center justify-center bg-gray-100 pt-20 py-4">
+    <div className="min-h-screen flex items-center justify-center bg-gray-100 pt-20 py-4">
       {alert && <Alert {...alert} />}
       <div className="w-full max-w-2xl mx-4">
         <div className="bg-light rounded-2xl shadow-md p-6">
