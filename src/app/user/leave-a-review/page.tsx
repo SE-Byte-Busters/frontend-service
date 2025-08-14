@@ -26,6 +26,7 @@ export default function LeaveReview() {
   const handleSubmitReview = async (e: React.FormEvent) => {
     e.preventDefault();
     const token = localStorage.getItem("token");
+
     if (!token) {
       return setAlert({
         type: "error",
@@ -36,7 +37,7 @@ export default function LeaveReview() {
     }
 
     try {
-      // 1) ارسال نظر
+      // 1) Post the comment
       const commentRes = await fetch(
         "https://shahriar.thetechverse.ir:3000/api/v1/comment",
         {
@@ -50,12 +51,20 @@ export default function LeaveReview() {
       );
 
       const commentData = await commentRes.json();
+
       if (!commentRes.ok) {
-        throw new Error(commentData.message || "خطا در ارسال نظر");
+        let message = commentData.message || "خطا در ارسال نظر";
+        if (message.includes("maximum of 3 comments")) {
+          message = "شما فقط می‌توانید حداکثر 3 نظر ارسال کنید.";
+        }
+        throw new Error(message);
       }
+
       const commentId = commentData._id;
 
-      // 2) ارسال امتیاز (1 رقم اعشار)
+      // 2) Post the rating (1 decimal place, clamp 0–5)
+      const score = Math.min(Math.max(Math.round(review.rating * 10) / 10, 0), 5);
+
       const ratingRes = await fetch(
         `https://shahriar.thetechverse.ir:3000/api/v1/comment/${commentId}/rate`,
         {
@@ -64,16 +73,17 @@ export default function LeaveReview() {
             "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,
           },
-          body: JSON.stringify({ score: Number(review.rating.toFixed(1)) }),
+          body: JSON.stringify({ score }),
         }
       );
 
       const ratingData = await ratingRes.json();
+
       if (!ratingRes.ok) {
         throw new Error(ratingData.message || "خطا در ارسال امتیاز");
       }
 
-      // موفقیت
+      // Success
       setReview({ comment: "", rating: 4.5 });
       setAlert({
         type: "success",
@@ -82,17 +92,10 @@ export default function LeaveReview() {
         onClose: () => setAlert(null),
       });
     } catch (err: any) {
-      console.error("ارسال ناموفق:", err);
-
-      // بررسی خطای ارسال بیش از ۳ نظر
-      let message = "مشکلی پیش آمد، مجدداً تلاش کنید.";
-      if (err.message?.includes("maximum of 3 comments")) {
-        message = "شما فقط می‌توانید حداکثر ۳ نظر ارسال کنید.";
-      }
-
+      console.error("Submit failed:", err);
       setAlert({
         type: "error",
-        message,
+        message: err.message || "مشکلی پیش آمد، مجدداً تلاش کنید.",
         duration: 3000,
         onClose: () => setAlert(null),
       });

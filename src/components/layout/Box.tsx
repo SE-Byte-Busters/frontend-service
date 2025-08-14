@@ -46,15 +46,28 @@ export const Box = () => {
       dir="rtl"
     >
       {role === "user" && (
-        <button
-          onClick={() => router.push("/user/leave-a-review")}
-          className="flex items-center justify-start gap-2 w-full rounded-md px-3 py-2 text-sm text-blue-600 hover:text-blue-800 hover:bg-blue-50 transition-colors duration-200"
-        >
-          <span>به سایت نظر بده</span>
-          <Icon name="MessageSquare" className="w-4 h-4" />
-        </button>
+        <>
+          {/* گزارشات من button */}
+          <button
+            onClick={() => router.push("/user/my-reports")}
+            className="flex items-center justify-start gap-2 w-full rounded-md px-3 py-2 text-sm text-green-600 hover:text-green-800 hover:bg-green-50 transition-colors duration-200"
+          >
+            <span>گزارشات من</span>
+            <Icon name="FileText" className="w-4 h-4" />
+          </button>
+
+          {/* به سایت نظر بده button */}
+          <button
+            onClick={() => router.push("/user/leave-a-review")}
+            className="flex items-center justify-start gap-2 w-full rounded-md px-3 py-2 text-sm text-blue-600 hover:text-blue-800 hover:bg-blue-50 transition-colors duration-200"
+          >
+            <span>به سایت نظر بده</span>
+            <Icon name="MessageSquare" className="w-4 h-4" />
+          </button>
+        </>
       )}
 
+      {/* Logout */}
       <button
         onClick={handleLogout}
         className="flex items-center justify-start gap-2 w-full rounded-md px-3 py-2 text-sm text-red-600 hover:text-red-800 hover:bg-red-50 transition-colors duration-200"

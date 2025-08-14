@@ -75,7 +75,12 @@ export function ReviewsList({ reviewsPerPage = 4 }: { reviewsPerPage?: number })
                 <time className="text-xs md:text-sm text-black">
                   {new Date(review.createdAt).toLocaleDateString("fa-IR")}
                 </time>
-                <StarRating rating={review.averageScore} className="justify-end" />
+
+                {/* ✅ Clamp rating between 0 and 5 so 5 stars always shows full */}
+                <StarRating
+                  rating={Math.min(Math.max(review.averageScore, 0), 5)}
+                  className="justify-end"
+                />
               </div>
               <UserAvatar
                 picture={review.user?.avatar || ""}
