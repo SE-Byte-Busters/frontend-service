@@ -203,7 +203,7 @@ const SolvedProblemFormWithLocation: React.FC<SolvedProblemFormWithLocationProps
       <div
         className={`w-[50%] fixed top-0 left-0 z-10 bg-white shadow-lg rounded-lg transition-all duration-500 ${!isVisible ? 'translate-x-0' : '-translate-x-full'}`}
       >
-        <UnSolvedProblemForm reportId={selectedReportId || undefined} />
+        <SolvedProblemForm reportId={selectedReportId || undefined} />
       </div>
     </div>
   );
@@ -381,9 +381,9 @@ const IranMap = () => {
   // }, [problemSolved, problemUnSolved, currentBounds, currentZoom, fetchReports]);
 
   const getMarkerIcon = (report: Report) => {
-    if (report.status === 2) {
+    if (report.status === 1) {
       return customIconGreenNeedle;
-    } else if (report.status === 0 || report.status === 1) {
+    } else if (report.status === 0) {
       return customIconRedNeedle;
     }
     return customIconNeedle;
@@ -391,11 +391,14 @@ const IranMap = () => {
 
   const shouldShowReport = (report: Report) => {
     if (problemSolved && !problemUnSolved) {
-      return report.status === 2;
+      return report.status === 1;
     } else if (problemUnSolved && !problemSolved) {
-      return report.status === 0 || report.status === 1;
+      return report.status === 0;
+    } else if (!problemUnSolved && !problemSolved) {
+      return false;
+    } else {
+      return true;
     }
-    return true;
   };
 
   const setUserPosition = (pos: [number, number], text: string) => {
@@ -411,7 +414,7 @@ const IranMap = () => {
     setPosition([report.location.coordinates[0], report.location.coordinates[1]]);
     setSelectedReportId(report._id);
 
-    if (report.status === 2) {
+    if (report.status === 1) {
       setShowSolvedProblemForm(true);
     } else {
       setShowUnSolvedProblemForm(true);

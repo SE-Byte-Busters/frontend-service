@@ -106,7 +106,7 @@ const SolvedProblemForm: React.FC<SolvedProblemFormProps> = ({
     try {
       const token = getAuthToken();
       const response = await fetch(
-        `https://shahriar.thetechverse.ir:3000/api/v1/reports/${id}/`,
+        `https://shahriar.thetechverse.ir:3000/api/v1/report/reports/${id}/`,
         {
           method: 'GET',
           headers: {
@@ -137,7 +137,7 @@ const SolvedProblemForm: React.FC<SolvedProblemFormProps> = ({
     try {
       const token = getAuthToken();
       const response = await fetch(
-        `https://shahriar.thetechverse.ir:3000/api/v1/reports/${id}/comments`,
+        `https://shahriar.thetechverse.ir:3000/api/v1/report/reports/${id}/comments`,
         {
           method: 'GET',
           headers: {
@@ -166,7 +166,7 @@ const SolvedProblemForm: React.FC<SolvedProblemFormProps> = ({
     try {
       const token = getAuthToken();
       const response = await fetch(
-        `https://shahriar.thetechverse.ir:3000/api/v1/reports/${reportId}/comments`,
+        `https://shahriar.thetechverse.ir:3000/api/v1/report/reports/${reportId}/comments`,
         {
           method: 'POST',
           headers: {
@@ -207,7 +207,7 @@ const SolvedProblemForm: React.FC<SolvedProblemFormProps> = ({
     try {
       const token = getAuthToken();
       const response = await fetch(
-        `https://shahriar.thetechverse.ir:3000/api/v1/reports/${reportId}/vote`,
+        `https://shahriar.thetechverse.ir:3000/api/v1/report/reports/${reportId}/vote`,
         {
           method: 'POST',
           headers: {
@@ -372,11 +372,10 @@ const SolvedProblemForm: React.FC<SolvedProblemFormProps> = ({
 
             {/* Priority Display */}
             <div className="m-[10px]">
-              <span className={`px-4 py-2 rounded-full text-sm font-bold ${
-                report.priority === 'high' ? 'bg-red-100 text-red-800' :
+              <span className={`px-4 py-2 rounded-full text-sm font-bold ${report.priority === 'high' ? 'bg-red-100 text-red-800' :
                 report.priority === 'medium' ? 'bg-yellow-100 text-yellow-800' :
-                'bg-green-100 text-green-800'
-              }`}>
+                  'bg-green-100 text-green-800'
+                }`}>
                 اولویت: {getPriorityText(report.priority)}
               </span>
             </div>
@@ -461,9 +460,8 @@ const SolvedProblemForm: React.FC<SolvedProblemFormProps> = ({
                     {report.images.map((_, idx) => (
                       <div
                         key={idx}
-                        className={`w-2 h-2 rounded-full ${
-                          idx === currentIndex ? "bg-green-400" : "bg-gray-300"
-                        }`}
+                        className={`w-2 h-2 rounded-full ${idx === currentIndex ? "bg-green-400" : "bg-gray-300"
+                          }`}
                       />
                     ))}
                   </div>
