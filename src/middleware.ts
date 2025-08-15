@@ -11,7 +11,7 @@ export function middleware(request: NextRequest) {
   }
 
   // Define routes
-  const publicRoutes = ['/', '/map', '/auth/sign-up', '/auth/sign-in', '/auth/otp', '/leaderboard', '/report/reports']
+  const publicRoutes = ['/', '/map', '/auth/sign-up', '/auth/sign-in', '/auth/otp', '/auth/forget-password', '/leaderboard', '/report/reports']
   const adminRoutes = ['/admin', '/admin/reports/processed', '/admin/profile/edit']
   const userRoutes = ['/report', '/report/reports', '/user/profile/edit']
 
