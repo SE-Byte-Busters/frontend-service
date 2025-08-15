@@ -53,6 +53,7 @@ export default function ProcessedReports() {
         const pendingData = await pendingRes.json();
         const statedData = await statedRes.json();
 
+        // Filter main reports
         const approved = mainData.data.reports.filter(
           (r: Report) => r.approvalStatus === 1
         );
@@ -63,6 +64,7 @@ export default function ProcessedReports() {
           (r: Report) => r.approvalStatus === 2
         );
 
+        // Filter stated reports
         const statedApproved = statedData.data.reports.filter(
           (r: Report) => r.approvalStatus === 1
         );
@@ -70,9 +72,16 @@ export default function ProcessedReports() {
           (r: Report) => r.approvalStatus === 2
         );
 
-        setApprovedReports([...approved, ...statedApproved]);
-        setUnapprovedReports([...pendingData.data.reports, ...unapproved]);
-        setDeniedReports([...denied, ...statedDenied]);
+        // Merge unique reports (remove duplicates by _id)
+        const mergeUnique = (arr1: Report[], arr2: Report[]) => {
+          const map = new Map();
+          [...arr1, ...arr2].forEach((r) => map.set(r._id, r));
+          return Array.from(map.values());
+        };
+
+        setApprovedReports(mergeUnique(approved, statedApproved));
+        setUnapprovedReports(mergeUnique(pendingData.data.reports, unapproved));
+        setDeniedReports(mergeUnique(denied, statedDenied));
       } catch (err) {
         console.error(err);
         setAlert({
