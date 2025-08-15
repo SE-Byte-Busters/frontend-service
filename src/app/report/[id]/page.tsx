@@ -8,7 +8,6 @@ import { useParams } from 'next/navigation';
 import { Alert, AlertProps } from '@/components/Alert';
 import {
   priorityTranslations,
-  priorityColors,
   approvalStatusTranslations,
   statusTranslations,
   reportOpennessTranslations,
@@ -509,12 +508,13 @@ export default function ReportPage() {
             <div className="space-y-6">
               {showCompletionAndPriority && (
                 <div className="flex items-center gap-2 justify-end">
-                  <span className="text-sm font-medium">اولویت:</span>
-                  <span
-                    className={`px-3 py-1 rounded-full text-white text-sm font-medium ${priorityColors[report.priority]}`}
-                  >
-                    {priorityTranslations[report.priority] || report.priority}
-                  </span>
+                  <Image
+                    src={`/images/icons/priority${report.priority}.png`}
+                    alt={priorityTranslations[report.priority]}
+                    width={128}
+                    height={128}
+                    className="object-contain transition-all"
+                  />
                 </div>
               )}
 

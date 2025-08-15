@@ -6,8 +6,6 @@ import Image from 'next/image';
 import { Report, ReportState } from './ReportTypes';
 import {
   priorityTranslations,
-  priorityColors,
-  statusTranslations,
   getReportState,
 } from './reportUtils';
 
