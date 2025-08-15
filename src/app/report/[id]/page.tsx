@@ -45,7 +45,7 @@ async function getReportData(id: string, token: string | null): Promise<Report> 
 
 async function getReportComments(id: string, token: string | null): Promise<Comment[]> {
   const res = await fetch(
-    `https://shahriar.thetechverse.ir:3000/api/v1/reports/${id}/comments`, {
+    `https://shahriar.thetechverse.ir:3000/api/v1/report/reports/${id}/comments`, {
       method: 'GET',
       headers: {
         'Authorization': `Bearer ${token}`,
@@ -63,7 +63,7 @@ async function getReportComments(id: string, token: string | null): Promise<Comm
 
 async function postComment(id: string, text: string, token: string | null): Promise<void> {
   const res = await fetch(
-    `https://shahriar.thetechverse.ir:3000/api/v1/reports/${id}/comments`, {
+    `https://shahriar.thetechverse.ir:3000/api/v1/report/reports/${id}/comments`, {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${token}`,
