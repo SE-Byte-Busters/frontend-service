@@ -8,7 +8,7 @@ export const priorityTranslations: Record<string, string> = {
 
 export const priorityColors: Record<string, string> = {
   High: 'bg-red-500',
-  Medium: 'bg-yellow-500',
+  Medium: 'bg-blue-500',
   Low: 'bg-green-500'
 };
 
