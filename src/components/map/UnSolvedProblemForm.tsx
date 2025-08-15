@@ -119,6 +119,7 @@ const UnSolvedProblemForm: React.FC<UnSolvedProblemFormProps> = ({
       );
       if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
       const data = await response.json();
+
       setReport(data.report);
       setComments(data.report.comments || []);
       setSolveRequests(data.report.usersReqSolve || []);
@@ -134,12 +135,14 @@ const UnSolvedProblemForm: React.FC<UnSolvedProblemFormProps> = ({
     try {
       const token = getAuthToken();
       const response = await fetch(
-        `https://shahriar.thetechverse.ir:3000/api/v1/report/reports/${id}/comments`,
+        `https://shahriar.thetechverse.ir:3000/api/v1/report/reports/${id}`,
         { headers: { 'Authorization': `Bearer ${token}` } }
       );
       if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
       const data = await response.json();
-      setComments(data.comments || []);
+      console.log(data);
+      console.log("___________________________000000000000")
+      setComments(data.report.comments || []);
     } catch (err) {
       console.error('Error fetching comments:', err);
     }

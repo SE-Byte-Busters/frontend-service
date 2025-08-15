@@ -2,7 +2,7 @@
 
 import { MapContainer, TileLayer, Marker, useMap, ZoomControl, Popup, useMapEvents } from 'react-leaflet';
 import { useReport } from '@/context/ReportContext';
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import Image from 'next/image';
@@ -209,16 +209,6 @@ const SolvedProblemFormWithLocation: React.FC<SolvedProblemFormWithLocationProps
   );
 };
 
-const FlyToPosition = ({ position }: { position: [number, number] }) => {
-  const map = useMap();
-  map.flyTo([position[0], position[1]], 16, { duration: 1.5 });
-  return null;
-};
-
-const MapClickHandler = ({ onClick }: { onClick: (e: L.LeafletMouseEvent) => void }) => {
-  useMap().on('click', onClick);
-  return null;
-};
 
 const MapBoundsHandler = ({ onBoundsChange }: { onBoundsChange: (bounds: L.LatLngBounds, zoom: number) => void }) => {
   const map = useMap();
@@ -260,8 +250,8 @@ const IranMap = () => {
   const [reportLocations, setReportLocations] = useState<Report[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  // const [currentBounds, setCurrentBounds] = useState<L.LatLngBounds | null>(null);
-  // const [currentZoom, setCurrentZoom] = useState<number>(11);
+  const [currentBounds, setCurrentBounds] = useState<L.LatLngBounds | null>(null);
+  const [currentZoom, setCurrentZoom] = useState<number>(11);
   const lastFetchRef = useRef<string>('');
   const abortControllerRef = useRef<AbortController | null>(null);
   const [selectedReportId, setSelectedReportId] = useState<string | null>(null);
@@ -280,26 +270,79 @@ const IranMap = () => {
   };
 
 
-  const fetchReports = useCallback(async (bounds: L.LatLngBounds, zoom: number, filter: string = 'all') => {
+
+  // --- OPTIMIZED FETCHING LOGIC ---
+  // Ref to store the LatLngBounds of successfully fetched areas
+  const fetchedBoundsRef = useRef<L.LatLngBounds[]>([]);
+  // Debounce utility function for optimizing API calls
+  function debounce<F extends (...args: any[]) => any>(func: F, waitFor: number) {
+    let timeout: ReturnType<typeof setTimeout> | null = null;
+    const debounced = (...args: Parameters<F>) => {
+      if (timeout !== null) {
+        clearTimeout(timeout);
+      }
+      timeout = setTimeout(() => func(...args), waitFor);
+    };
+    return debounced;
+  }
+
+
+  // --- OPTIMIZED COMPONENTS ---
+
+  const FlyToPosition = ({ position }: { position: [number, number] | null }) => {
+    const map = useMap();
+    useEffect(() => {
+      if (position) {
+        map.flyTo(position, 16, { animate: true, duration: 1.5 });
+      }
+    }, [position, map]);
+    return null;
+  };
+
+  // This component now directly calls the debounced fetcher
+  const MapEventsHandler = ({ onFetch }: { onFetch: (bounds: L.LatLngBounds, zoom: number) => void }) => {
+    const map = useMapEvents({
+      moveend: () => {
+        onFetch(map.getBounds(), map.getZoom());
+      },
+    });
+
+    // Fetch initial data on load
+    useEffect(() => {
+      onFetch(map.getBounds(), map.getZoom());
+    }, [map, onFetch]);
+
+    return null;
+  };
+
+
+  // 1. The core fetching logic, now with caching
+  const fetchReportsInternal = useCallback(async (bounds: L.LatLngBounds, zoom: number, filter: string) => {
     if (!bounds) return;
 
-    const ne = bounds.getNorthEast();
-    const sw = bounds.getSouthWest();
-
-    const requestKey = `${ne.lat}-${ne.lng}-${sw.lat}-${sw.lng}-${zoom}-${filter}`;
-    if (requestKey === lastFetchRef.current) return;
+    // --- CACHE CHECK ---
+    // If the new bounds are already inside an area we've fetched, skip the API call.
+    // This is what prevents re-fetching when you zoom in.
+    const isContained = fetchedBoundsRef.current.some(cachedBounds => cachedBounds.contains(bounds));
+    if (isContained) {
+      console.log("✅ Cache hit: Area already fetched. Skipping network request.");
+      return;
+    }
+    console.log("❌ Cache miss: Fetching new data.");
+    // --- END CACHE CHECK ---
 
     if (abortControllerRef.current) {
       abortControllerRef.current.abort();
     }
-
     abortControllerRef.current = new AbortController();
-    lastFetchRef.current = requestKey;
+    const signal = abortControllerRef.current.signal;
 
     setLoading(true);
     setError(null);
 
     try {
+      const ne = bounds.getNorthEast();
+      const sw = bounds.getSouthWest();
       const params = new URLSearchParams({
         neLat: ne.lat.toString(),
         neLng: ne.lng.toString(),
@@ -311,61 +354,90 @@ const IranMap = () => {
 
       const response = await fetch(
         `https://shahriar.thetechverse.ir:3000/api/v1/report/map-search?${params}`,
-        {
-          method: 'GET',
-          signal: abortControllerRef.current.signal,
-          headers: {
-            'Content-Type': 'application/json',
-          }
-        }
+        { method: 'GET', signal, headers: { 'Content-Type': 'application/json' } }
       );
 
-      if (!response.ok) {
-        // throw new Error(`HTTP error! status: ${response.status}`);
-      }
+      if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
 
       const data = await response.json();
-      console.log("_________________________________");
-      console.log(data.data);
-      if (requestKey === lastFetchRef.current) {
-        setReportLocations(data.data || []);
+
+      if (!signal.aborted) {
+        // Here, we should APPEND new data, not just replace it, for a better UX when panning
+        setReportLocations(prevLocations => {
+          const existingIds = new Set(prevLocations.map(loc => loc._id));
+          const newReports = (data.data || []).filter((report: Report) => !existingIds.has(report._id));
+          return [...prevLocations, ...newReports];
+        });
+
+        // --- UPDATE CACHE ---
+        // On success, add the new bounds to our cache.
+        fetchedBoundsRef.current.push(bounds);
       }
     } catch (err) {
       if (err instanceof Error && err.name === 'AbortError') {
         return;
       }
-
-      if (requestKey === lastFetchRef.current) {
+      if (!signal.aborted) {
         setError(err instanceof Error ? err.message : 'An error occurred');
-        setReportLocations([]);
       }
     } finally {
-      if (requestKey === lastFetchRef.current) {
+      if (!signal.aborted) {
         setLoading(false);
       }
     }
-  }, []);
+  }, []); // Empty dependency array because it's a stable function
 
-  const handleBoundsChange = useCallback(
-    (bounds: L.LatLngBounds, zoom: number) => {
-      // setCurrentBounds(bounds);
-      // setCurrentZoom(zoom);
 
-      let filter = 'all';
-      if (problemSolved && !problemUnSolved) {
-        filter = 'done';
-      } else if (problemUnSolved && !problemSolved) {
-        filter = 'notDone';
+  // 2. A memoized function to determine the current filter
+  const getFilter = useCallback(() => {
+    if (problemSolved && !problemUnSolved) return 'done';
+    if (problemUnSolved && !problemSolved) return 'notDone';
+    return 'all';
+  }, [problemSolved, problemUnSolved]);
+
+
+  // 3. The debounced fetcher that will be called by map events
+  const debouncedFetch = useMemo(
+    () => debounce((bounds: L.LatLngBounds, zoom: number) => {
+      const filter = getFilter();
+      // When filters change, we need to clear the cache to refetch data
+      // You might want more sophisticated logic here in the future
+      if (filter !== 'all') { // Simple example
+        // fetchedBoundsRef.current = [];
       }
-
-      const timeoutId = setTimeout(() => {
-        fetchReports(bounds, zoom, filter);
-      }, 3000);
-
-      return () => clearTimeout(timeoutId);
-    },
-    [fetchReports, problemSolved, problemUnSolved]
+      fetchReportsInternal(bounds, zoom, filter);
+    }, 500), // 500ms delay is usually good for maps
+    [fetchReportsInternal, getFilter]
   );
+
+  // Cleanup effect
+  useEffect(() => {
+    return () => {
+      if (abortControllerRef.current) {
+        abortControllerRef.current.abort();
+      }
+    };
+  }, [])
+  // const handleBoundsChange = useCallback(
+  //   (bounds: L.LatLngBounds, zoom: number) => {
+  //     setCurrentBounds(bounds);
+  //     setCurrentZoom(zoom);
+
+  //     let filter = 'all';
+  //     if (problemSolved && !problemUnSolved) {
+  //       filter = 'done';
+  //     } else if (problemUnSolved && !problemSolved) {
+  //       filter = 'notDone';
+  //     }
+
+  //     const timeoutId = setTimeout(() => {
+  //       fetchReports(bounds, zoom, filter);
+  //     }, 3000);
+
+  //     return () => clearTimeout(timeoutId);
+  //   },
+  //   [problemSolved, problemUnSolved]
+  // );
 
   // useEffect(() => {
   //   if (currentBounds) {
@@ -447,7 +519,8 @@ const IranMap = () => {
         <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
 
         {/* Map bounds handler for API calls */}
-        <MapBoundsHandler onBoundsChange={handleBoundsChange} />
+        {/* <MapBoundsHandler onBoundsChange={handleBoundsChange} /> */}
+        <MapEventsHandler onFetch={debouncedFetch} />
 
         {/* Render markers from API */}
         {reportLocations
