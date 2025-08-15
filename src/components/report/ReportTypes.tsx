@@ -43,3 +43,10 @@ export type ReportsResponse = {
     limit: number;
   };
 };
+
+export type Comment = {
+  _id: string;
+  user: User;
+  text: string;
+  date: string;
+}

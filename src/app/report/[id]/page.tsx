@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import Image from 'next/image';
 import dynamic from 'next/dynamic';
-import { Report } from '@/components/report/ReportTypes';
+import { Report, Comment } from '@/components/report/ReportTypes';
 import { useParams } from 'next/navigation';
 import { Alert, AlertProps } from '@/components/Alert';
 import {
@@ -13,7 +13,7 @@ import {
   statusTranslations,
   reportStatusTranslations,
   formatReportDate
-} from '@/components/report/reportTranslations'
+} from '@/components/report/reportTranslations';
 
 const ReportMap = dynamic(
   () => import('@/components/report/ReportMap'),
@@ -42,37 +42,111 @@ async function getReportData(id: string, token: string | null): Promise<Report> 
   return data.report;
 }
 
+async function getReportComments(id: string, token: string | null): Promise<Comment[]> {
+  const res = await fetch(
+    `https://shahriar.thetechverse.ir:3000/api/v1/reports/${id}/comments`, {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+      },
+    }
+  );
+
+  if (!res.ok) {
+    throw new Error('دریافت نظرات با خطا مواجه شد');
+  }
+
+  const data = await res.json();
+  return data.comments || [];
+}
+
+async function postComment(id: string, text: string, token: string | null): Promise<void> {
+  const res = await fetch(
+    `https://shahriar.thetechverse.ir:3000/api/v1/reports/${id}/comments`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ text }),
+    }
+  );
+
+  if (!res.ok) {
+    const errorData = await res.json();
+    throw new Error(errorData.message || 'ارسال نظر با خطا مواجه شد');
+  }
+}
+
 export default function ReportPage() {
   const params = useParams();
   const [report, setReport] = useState<Report | null>(null);
+  const [comments, setComments] = useState<Comment[]>([]);
+  const [newComment, setNewComment] = useState('');
   const [loading, setLoading] = useState(true);
+  const [commentLoading, setCommentLoading] = useState(false);
   const [alert, setAlert] = useState<AlertProps | null>(null);
+
+  const fetchData = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) throw new Error('نیاز به احراز هویت');
+
+      const reportData = await getReportData(params.id as string, token);
+      setReport(reportData);
+
+      const commentsData = await getReportComments(params.id as string, token);
+      setComments(commentsData);
+    } catch (err) {
+      setAlert({
+        type: 'error',
+        message: err instanceof Error ? err.message : 'خطای ناشناخته‌ای رخ داد',
+        duration: 3000,
+        onClose: () => setAlert(null)
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
-      const fetchData = async () => {
-        try {
-          const token = localStorage.getItem("token");
-          if (!token) {
-            throw new Error('نیاز به احراز هویت');
-          }
-          const data = await getReportData(params.id as string, token);
-          setReport(data);
-        } catch (err) {
-          setAlert({
-            type: 'error',
-            message: err instanceof Error ? err.message : 'خطای ناشناخته‌ای رخ داد',
-            duration: 3000,
-            onClose: () => setAlert(null)
-          });
-        } finally {
-          setLoading(false);
-        }
-      };
-
       fetchData();
     }
   }, [params.id]);
+
+  const handleSubmitComment = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newComment.trim()) return;
+
+    try {
+      setCommentLoading(true);
+      const token = localStorage.getItem("token");
+      if (!token) throw new Error('نیاز به احراز هویت');
+
+      await postComment(params.id as string, newComment, token);
+      setNewComment('');
+
+      const updatedComments = await getReportComments(params.id as string, token);
+      setComments(updatedComments);
+
+      setAlert({
+        type: 'success',
+        message: 'نظر شما با موفقیت ثبت شد',
+        duration: 3000,
+        onClose: () => setAlert(null)
+      });
+    } catch (err) {
+      setAlert({
+        type: 'error',
+        message: err instanceof Error ? err.message : 'خطا در ارسال نظر',
+        duration: 3000,
+        onClose: () => setAlert(null)
+      });
+    } finally {
+      setCommentLoading(false);
+    }
+  };
 
   if (loading) {
     return (
@@ -220,6 +294,67 @@ export default function ReportPage() {
                 )}
               </div>
             </div>
+          </div>
+        </div>
+
+        <div className="mt-12 bg-white rounded-lg shadow-md p-6">
+          <h2 className="text-2xl font-bold mb-6 text-right text-dark border-b pb-2">
+            نظرات ({comments.length})
+          </h2>
+
+          <form onSubmit={handleSubmitComment} className="mb-8">
+            <div className="flex flex-col gap-4">
+              <textarea
+                value={newComment}
+                onChange={(e) => setNewComment(e.target.value)}
+                placeholder="نظر خود را اینجا بنویسید..."
+                className="w-full p-4 border rounded-lg text-right min-h-[120px] text-dark"
+                disabled={commentLoading}
+              />
+              <div className="flex justify-end">
+                <button
+                  type="submit"
+                  disabled={commentLoading || !newComment.trim()}
+                  className={`px-6 py-2 rounded-lg text-white ${
+                    commentLoading || !newComment.trim()
+                      ? 'bg-gray-400 cursor-not-allowed'
+                      : 'bg-primary hover:bg-primary-dark'
+                  }`}
+                >
+                  {commentLoading ? 'در حال ارسال...' : 'ارسال نظر'}
+                </button>
+              </div>
+            </div>
+          </form>
+
+          <div className="space-y-6">
+            {comments.length === 0 ? (
+              <p className="text-center text-gray-500 py-4">
+                هیچ نظری ثبت نشده است. اولین نظر را شما ثبت کنید!
+              </p>
+            ) : (
+              comments.map(comment => (
+                <div
+                  key={comment._id}
+                  className="border-b pb-6 last:border-0 last:pb-0"
+                >
+                  <div className="flex justify-between items-start mb-2">
+                    <div className="flex items-center gap-3">
+                      <div className="bg-gray-200 border-2 border-dashed rounded-xl w-10 h-10" />
+                      <span className="font-bold text-dark">
+                        {comment.user.username}
+                      </span>
+                    </div>
+                    <span className="text-sm text-gray-500">
+                      {formatReportDate(comment.date)}
+                    </span>
+                  </div>
+                  <p className="text-right text-gray-700 mt-2">
+                    {comment.text}
+                  </p>
+                </div>
+              ))
+            )}
           </div>
         </div>
       </div>
