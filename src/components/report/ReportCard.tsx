@@ -7,7 +7,7 @@ import {
   priorityTranslations,
   priorityColors,
   statusTranslations,
-} from './reportTranslations';
+} from './reportUtils';
 
 type ReportCardProps = {
   report: Report;

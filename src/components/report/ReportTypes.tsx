@@ -50,3 +50,5 @@ export type Comment = {
   text: string;
   date: string;
 }
+
+export type ReportState = 'not-approved' | 'approved-unresolved' | 'approved-resolved' | 'denied' | 'unknown';

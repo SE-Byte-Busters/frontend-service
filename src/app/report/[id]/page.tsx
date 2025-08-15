@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import Image from 'next/image';
 import dynamic from 'next/dynamic';
-import { Report, Comment } from '@/components/report/ReportTypes';
+import { Report, Comment, ReportState } from '@/components/report/ReportTypes';
 import { useParams } from 'next/navigation';
 import { Alert, AlertProps } from '@/components/Alert';
 import {
@@ -11,9 +11,10 @@ import {
   priorityColors,
   approvalStatusTranslations,
   statusTranslations,
-  reportStatusTranslations,
-  formatReportDate
-} from '@/components/report/reportTranslations';
+  reportOpennessTranslations,
+  formatReportDate,
+  getReportState
+} from '@/components/report/reportUtils';
 
 const ReportMap = dynamic(
   () => import('@/components/report/ReportMap'),
@@ -86,6 +87,13 @@ export default function ReportPage() {
   const [loading, setLoading] = useState(true);
   const [commentLoading, setCommentLoading] = useState(false);
   const [alert, setAlert] = useState<AlertProps | null>(null);
+  const [reportState, setReportState] = useState<ReportState>('unknown');
+
+  useEffect(() => {
+    if (report) {
+      setReportState(getReportState(report));
+    }
+  }, [report]);
 
   const fetchData = async () => {
     try {
@@ -167,26 +175,74 @@ export default function ReportPage() {
   const formattedDate = formatReportDate(report.createdAt)
   const images = report.images || [];
 
+  const showCompletionAndPriority = reportState === 'approved-unresolved' || reportState === 'approved-resolved';
+
   return (
     <div className="min-h-screen p-6 pt-20 bg-light">
       {alert && <Alert {...alert} />}
 
       <div className="max-w-6xl mx-auto">
-        <h1 className="text-3xl font-bold mb-6 text-right text-dark">
-          {report.title || 'بدون عنوان'}
-        </h1>
+        <div className="flex justify-between items-start mb-6">
+          <h1 className="text-3xl font-bold text-right text-dark">
+            {report.title || 'بدون عنوان'}
+          </h1>
+
+          <div className="flex items-center gap-2">
+            {reportState === 'not-approved' && (
+              <Image
+                src="/images/icons/clock.png"
+                alt="در انتظار تایید"
+                width={32}
+                height={32}
+              />
+            )}
+            {reportState === 'approved-unresolved' && (
+              <Image
+                src="/images/icons/unSolved.png"
+                alt="گزارش باز"
+                width={32}
+                height={32}
+              />
+            )}
+            {reportState === 'approved-resolved' && (
+              <Image
+                src="/images/icons/solved.png"
+                alt="گزارش حل شده"
+                width={32}
+                height={32}
+              />
+            )}
+            {reportState === 'denied' && (
+              <Image
+                src="/images/icons/circle-x.png"
+                alt="گزارش رد شده"
+                width={32}
+                height={32}
+              />
+            )}
+            <span className={`px-3 py-1 rounded-full text-white text-sm font-medium ${
+              reportOpennessTranslations[reportState] === 'باز'
+                ? 'bg-green-500'
+                : 'bg-red-500'
+            }`}>
+              {reportOpennessTranslations[reportState]}
+            </span>
+          </div>
+        </div>
 
         <div className="flex flex-col lg:flex-row gap-6">
           <div className="w-full lg:w-1/2 bg-white rounded-lg shadow-md p-6 text-right text-dark">
             <div className="space-y-6">
-              <div className="flex items-center gap-2 justify-end">
-                <span className="text-sm font-medium">اولویت:</span>
-                <span
-                  className={`px-3 py-1 rounded-full text-white text-sm font-medium ${priorityColors[report.priority]}`}
-                >
-                  {priorityTranslations[report.priority] || report.priority}
-                </span>
-              </div>
+              {showCompletionAndPriority && (
+                <div className="flex items-center gap-2 justify-end">
+                  <span className="text-sm font-medium">اولویت:</span>
+                  <span
+                    className={`px-3 py-1 rounded-full text-white text-sm font-medium ${priorityColors[report.priority]}`}
+                  >
+                    {priorityTranslations[report.priority] || report.priority}
+                  </span>
+                </div>
+              )}
 
               <div>
                 <h2 className="text-xl font-semibold mb-2">توضیحات</h2>
@@ -224,28 +280,15 @@ export default function ReportPage() {
                   </div>
                 </div>
                 <div>
-                  <h3 className="font-semibold">وضعیت گزارش</h3>
-                  <p>{reportStatusTranslations[report.status] || 'نامشخص'}</p>
-                </div>
-                <div>
                   <h3 className="font-semibold">وضعیت تایید</h3>
                   <p>{approvalStatusTranslations[report.approvalStatus] || 'نامشخص'}</p>
                 </div>
-                <div>
-                  <h3 className="font-semibold">وضعیت پیشرفت</h3>
-                  <p>{statusTranslations[report.status] || 'نامشخص'}</p>
-                </div>
-                <div>
-                  <h3 className="font-semibold">امتیاز</h3>
-                  <p>{report.score || 0}</p>
-                </div>
-              </div>
-
-              <div className="flex items-center gap-2 text-right justify-end">
-                <span className="font-semibold">امتیاز جامعه:</span>
-                <span className="px-3 py-1 rounded-full font-medium bg-primary text-white">
-                  {report.voteScore || 0}
-                </span>
+                {showCompletionAndPriority && (
+                  <div>
+                    <h3 className="font-semibold">وضعیت پیشرفت</h3>
+                    <p>{statusTranslations[report.completionStatus] || 'نامشخص'}</p>
+                  </div>
+                )}
               </div>
             </div>
           </div>
