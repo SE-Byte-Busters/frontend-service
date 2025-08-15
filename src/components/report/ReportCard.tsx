@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { Report, ReportState } from './ReportTypes';
 import {
   priorityTranslations,
@@ -92,7 +93,8 @@ export const ReportCard = ({
     });
   };
 
-  const showPriority = reportState === 'approved-unresolved' || reportState === 'approved-resolved'
+  const showInPriority = reportState === 'not-approved';
+  const showPriority = reportState === 'approved-unresolved' || reportState === 'approved-resolved';
 
   return (
     <div className="relative w-full bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden flex flex-col hover:shadow-md transition-shadow duration-200">
@@ -203,17 +205,34 @@ export const ReportCard = ({
         </div>
 
         <div className="flex justify-between items-center mt-2">
-          {showPriority && (
-            <div className={`px-2 py-1 rounded-full text-xs font-medium text-white ${priorityColors[report.priority]}`}>
-              {priorityTranslations[report.priority]}
-            </div>
-          )}
+          <div className="flex items-center justify-center">
+            {showPriority && (
+              <Image
+                src={`/images/icons/priority${report.priority}.png`}
+                alt={priorityTranslations[report.priority]}
+                width={96}
+                height={96}
+                className="object-contain transition-all"
+              />
+            )}
+            {showInPriority && (
+              <Image
+                src={`/images/icons/inPriority.png`}
+                alt={priorityTranslations[report.priority]}
+                width={96}
+                height={96}
+                className="object-contain transition-all"
+              />
+            )}
+          </div>
 
           <div className={`flex flex-col items-center justify-center p-1.5 rounded-lg`}>
-            <img
+            <Image
               src={statusInfo.icon}
               alt={statusInfo.text}
-              className="w-10 h-10 object-contain"
+              width={36}
+              height={36}
+              className="object-contain"
             />
             <span className={`text-xs font-medium ${statusInfo.color} mt-1`}>
               {statusInfo.text}
