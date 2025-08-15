@@ -2,11 +2,12 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { Report } from './ReportTypes';
+import { Report, ReportState } from './ReportTypes';
 import {
   priorityTranslations,
   priorityColors,
   statusTranslations,
+  getReportState,
 } from './reportUtils';
 
 type ReportCardProps = {
@@ -16,6 +17,38 @@ type ReportCardProps = {
   onStatusChange?: (reportId: string, newStatus: number) => void;
 };
 
+const statusConfig: Record<ReportState, {
+  text: string;
+  icon: string;
+  color: string;
+}> = {
+  'not-approved': {
+    text: 'در حال بررسی',
+    icon: '/images/icons/clock.png',
+    color: 'text-amber-800',
+  },
+  'approved-unresolved': {
+    text: '',
+    icon: '/images/icons/unSolved.png',
+    color: 'text-green-500',
+  },
+  'approved-resolved': {
+    text: '',
+    icon: '/images/icons/solved.png',
+    color: 'text-green-500',
+  },
+  'denied': {
+    text: 'رد شده',
+    icon: '/images/icons/circle-x.png',
+    color: 'text-red-600',
+  },
+  'unknown': {
+    text: 'نامشخص',
+    icon: '/images/icons/help-circle.png',
+    color: 'text-gray-500',
+  }
+};
+
 export const ReportCard = ({
   report,
   loading = false,
@@ -23,6 +56,8 @@ export const ReportCard = ({
   onStatusChange,
 }: ReportCardProps) => {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const reportState = getReportState(report);
+  const statusInfo = statusConfig[reportState];
 
   const nextImage = () => {
     setCurrentImageIndex((prev) => (prev + 1) % (report.images?.length || 1));
@@ -57,8 +92,7 @@ export const ReportCard = ({
     });
   };
 
-  const showStatusRow = report.approvalStatus === 1;
-  const showPriority = showStatusRow && report.status !== 2;
+  const showPriority = reportState === 'approved-unresolved' || reportState === 'approved-resolved'
 
   return (
     <div className="relative w-full bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden flex flex-col hover:shadow-md transition-shadow duration-200">
@@ -121,9 +155,7 @@ export const ReportCard = ({
 
       {/* Card Content */}
       <Link href={`/report/${report._id}`} className="p-3 flex flex-col gap-2 text-right">
-        {/* Vote bar + Title/Date row */}
         <div className="flex justify-between gap-2">
-          {/* Title and Date */}
           <div className="flex-1">
             <h3 className="text-gray-900 text-sm font-bold line-clamp-1">
               {report.title}
@@ -170,26 +202,28 @@ export const ReportCard = ({
           </p>
         </div>
 
-        {/* Status & Priority Row */}
-        {showStatusRow && (
-          <div className="flex justify-between items-center mt-2">
-            {/* Resolved Status */}
-            <div className="text-xs font-medium text-gray-700">
-              وضعیت: {statusTranslations[report.status]}
+        <div className="flex justify-between items-center mt-2">
+          {showPriority && (
+            <div className={`px-2 py-1 rounded-full text-xs font-medium text-white ${priorityColors[report.priority]}`}>
+              {priorityTranslations[report.priority]}
             </div>
+          )}
 
-            {/* Priority Status */}
-            {showPriority && (
-              <div className={`px-2 py-0.5 rounded-full text-[10px] text-white ${priorityColors[report.priority]}`}>
-                {priorityTranslations[report.priority]}
-              </div>
-            )}
+          <div className={`flex flex-col items-center justify-center p-1.5 rounded-lg`}>
+            <img
+              src={statusInfo.icon}
+              alt={statusInfo.text}
+              className="w-10 h-10 object-contain"
+            />
+            <span className={`text-xs font-medium ${statusInfo.color} mt-1`}>
+              {statusInfo.text}
+            </span>
           </div>
-        )}
+        </div>
 
         {/* Admin Button & Category Icons */}
-        <div className="flex justify-between items-center mt-2">
-          {/* Category Icons
+        {/* <div className="flex justify-between items-center mt-2">
+           Category Icons
           <div className="flex flex-row-reverse gap-1">
             {report.category?.includes('road') && (
               <div className="bg-gray-100 rounded-full p-1">
@@ -220,8 +254,8 @@ export const ReportCard = ({
             >
               بررسی
             </button>
-          )} */}
-        </div>
+          )}
+        </div> */}
       </Link>
     </div>
   );

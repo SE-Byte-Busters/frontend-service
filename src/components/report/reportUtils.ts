@@ -19,9 +19,8 @@ export const approvalStatusTranslations: Record<number, string> = {
 };
 
 export const statusTranslations: Record<number, string> = {
-  0: 'شروع نشده',
-  1: 'در حال انجام',
-  2: 'کامل شده'
+  0: 'در صف رسیدگی',
+  1: 'رسیدگی‌شده',
 };
 
 export const reportOpennessTranslations: Record<ReportState, string> = {
