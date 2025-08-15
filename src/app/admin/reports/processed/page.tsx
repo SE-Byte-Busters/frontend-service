@@ -6,6 +6,79 @@ import { Alert, AlertProps } from "@/components/Alert";
 import { ReportsList } from "@/components/report/ReportList";
 import { Report } from "@/components/report/ReportTypes";
 
+// Helper: fetch all paginated reports
+const fetchAllReports = async (
+  baseUrl: string,
+  token: string,
+  sortBy: string = "createdAt"
+): Promise<Report[]> => {
+  let all: Report[] = [];
+  let page = 1;
+  let keepFetching = true;
+
+  while (keepFetching) {
+    const res = await fetch(`${baseUrl}?page=${page}&limit=50&sortBy=${sortBy}`, {
+      method: "GET",
+      headers: { Authorization: `Bearer ${token}` },
+    });
+
+    if (!res.ok) throw new Error("Failed to fetch paginated reports");
+
+    const data = await res.json();
+    const reports: Report[] = data.data.reports || [];
+
+    if (reports.length === 0) {
+      keepFetching = false;
+    } else {
+      all = [...all, ...reports];
+      page++;
+    }
+  }
+
+  return all;
+};
+
+// Helper: merge unique reports
+const mergeUnique = (arr1: Report[], arr2: Report[]) => {
+  const map = new Map();
+  [...arr1, ...arr2].forEach((r) => map.set(r._id, r));
+  return Array.from(map.values());
+};
+
+// Pagination component (Persian)
+function Pagination({
+  currentPage,
+  totalPages,
+  onPageChange,
+}: {
+  currentPage: number;
+  totalPages: number;
+  onPageChange: (page: number) => void;
+}) {
+  if (totalPages <= 1) return null;
+  return (
+    <div className="flex justify-center mt-4 gap-2">
+      <button
+        className="px-3 py-1 border rounded text-dark disabled:opacity-50"
+        onClick={() => onPageChange(currentPage - 1)}
+        disabled={currentPage === 1}
+      >
+        قبلی
+      </button>
+      <span className="px-3 py-1 text-dark">
+        صفحه {currentPage} از {totalPages}
+      </span>
+      <button
+        className="px-3 py-1 border rounded text-dark disabled:opacity-50"
+        onClick={() => onPageChange(currentPage + 1)}
+        disabled={currentPage === totalPages}
+      >
+        بعدی
+      </button>
+    </div>
+  );
+}
+
 export default function ProcessedReports() {
   const [approvedReports, setApprovedReports] = useState<Report[]>([]);
   const [unapprovedReports, setUnapprovedReports] = useState<Report[]>([]);
@@ -13,11 +86,10 @@ export default function ProcessedReports() {
   const [loading, setLoading] = useState<boolean>(true);
   const [alert, setAlert] = useState<AlertProps | null>(null);
 
-  // pagination states
+  // pagination state
   const [approvedPage, setApprovedPage] = useState(1);
   const [unapprovedPage, setUnapprovedPage] = useState(1);
   const [deniedPage, setDeniedPage] = useState(1);
-
   const pageSize = 5;
 
   useEffect(() => {
@@ -25,33 +97,27 @@ export default function ProcessedReports() {
 
     const fetchReports = async () => {
       try {
-        const [mainRes, pendingRes, statedRes] = await Promise.all([
+        const [mainData, pendingReports, statedReports] = await Promise.all([
           fetch("https://shahriar.thetechverse.ir:3000/api/v1/report/reports", {
             method: "GET",
             headers: { Authorization: `Bearer ${token}` },
+          }).then((res) => {
+            if (!res.ok) throw new Error("Failed to fetch reports");
+            return res.json();
           }),
-          fetch(
-            "https://shahriar.thetechverse.ir:3000/api/v1/admin/get-pending-reports?page=1&limit=10&sortBy=oldest",
-            {
-              method: "GET",
-              headers: { Authorization: `Bearer ${token}` },
-            }
+
+          fetchAllReports(
+            "https://shahriar.thetechverse.ir:3000/api/v1/admin/get-pending-reports",
+            token!,
+            "oldest"
           ),
-          fetch(
-            "https://shahriar.thetechverse.ir:3000/api/v1/admin/get-stated-reports?page=1&limit=10&sortBy=createdAt",
-            {
-              method: "GET",
-              headers: { Authorization: `Bearer ${token}` },
-            }
+
+          fetchAllReports(
+            "https://shahriar.thetechverse.ir:3000/api/v1/admin/get-stated-reports",
+            token!,
+            "createdAt"
           ),
         ]);
-
-        if (!mainRes.ok || !pendingRes.ok || !statedRes.ok)
-          throw new Error("Failed to fetch reports");
-
-        const mainData = await mainRes.json();
-        const pendingData = await pendingRes.json();
-        const statedData = await statedRes.json();
 
         // Filter main reports
         const approved = mainData.data.reports.filter(
@@ -65,22 +131,16 @@ export default function ProcessedReports() {
         );
 
         // Filter stated reports
-        const statedApproved = statedData.data.reports.filter(
+        const statedApproved = statedReports.filter(
           (r: Report) => r.approvalStatus === 1
         );
-        const statedDenied = statedData.data.reports.filter(
+        const statedDenied = statedReports.filter(
           (r: Report) => r.approvalStatus === 2
         );
 
-        // Merge unique reports (remove duplicates by _id)
-        const mergeUnique = (arr1: Report[], arr2: Report[]) => {
-          const map = new Map();
-          [...arr1, ...arr2].forEach((r) => map.set(r._id, r));
-          return Array.from(map.values());
-        };
-
+        // Merge unique
         setApprovedReports(mergeUnique(approved, statedApproved));
-        setUnapprovedReports(mergeUnique(pendingData.data.reports, unapproved));
+        setUnapprovedReports(mergeUnique(pendingReports, unapproved));
         setDeniedReports(mergeUnique(denied, statedDenied));
       } catch (err) {
         console.error(err);
@@ -98,49 +158,25 @@ export default function ProcessedReports() {
     fetchReports();
   }, []);
 
-  // Pagination helper
-  const paginate = (data: Report[], page: number) => {
-    const start = (page - 1) * pageSize;
-    const end = start + pageSize;
-    return data.slice(start, end);
-  };
-
-  const renderPagination = (
-    total: number,
-    page: number,
-    setPage: (p: number) => void
-  ) => {
-    const totalPages = Math.ceil(total / pageSize);
-    if (totalPages <= 1) return null;
-
-    return (
-      <div className="flex justify-center items-center gap-4 mt-4 text-dark" dir="rtl">
-        <button
-          onClick={() => setPage(Math.max(1, page - 1))}
-          disabled={page === 1}
-          className="px-3 py-1 rounded bg-gray-200 hover:bg-gray-300 disabled:opacity-50"
-        >
-          قبلی
-        </button>
-        <span>
-          صفحه {page} از {totalPages}
-        </span>
-        <button
-          onClick={() => setPage(Math.min(totalPages, page + 1))}
-          disabled={page === totalPages}
-          className="px-3 py-1 rounded bg-gray-200 hover:bg-gray-300 disabled:opacity-50"
-        >
-          بعدی
-        </button>
-      </div>
-    );
-  };
+  // Slice for frontend pagination
+  const approvedSlice = approvedReports.slice(
+    (approvedPage - 1) * pageSize,
+    approvedPage * pageSize
+  );
+  const unapprovedSlice = unapprovedReports.slice(
+    (unapprovedPage - 1) * pageSize,
+    unapprovedPage * pageSize
+  );
+  const deniedSlice = deniedReports.slice(
+    (deniedPage - 1) * pageSize,
+    deniedPage * pageSize
+  );
 
   return (
     <div className="bg-light min-h-screen flex flex-col items-center px-4 pt-20 pb-12 lg:pt-10 lg:pb-10">
       {alert && <Alert {...alert} />}
       <div className="flex flex-col items-center w-full max-w-6xl gap-12 mt-10">
-
+        
         {/* Approved Reports */}
         <div className="w-full">
           <h2
@@ -159,11 +195,15 @@ export default function ProcessedReports() {
           {approvedReports.length > 0 ? (
             <>
               <ReportsList
-                reports={paginate(approvedReports, approvedPage)}
+                reports={approvedSlice}
                 loading={loading}
                 adminView={true}
               />
-              {renderPagination(approvedReports.length, approvedPage, setApprovedPage)}
+              <Pagination
+                currentPage={approvedPage}
+                totalPages={Math.ceil(approvedReports.length / pageSize)}
+                onPageChange={setApprovedPage}
+              />
             </>
           ) : (
             !loading && (
@@ -192,11 +232,15 @@ export default function ProcessedReports() {
           {unapprovedReports.length > 0 ? (
             <>
               <ReportsList
-                reports={paginate(unapprovedReports, unapprovedPage)}
+                reports={unapprovedSlice}
                 loading={loading}
                 adminView={true}
               />
-              {renderPagination(unapprovedReports.length, unapprovedPage, setUnapprovedPage)}
+              <Pagination
+                currentPage={unapprovedPage}
+                totalPages={Math.ceil(unapprovedReports.length / pageSize)}
+                onPageChange={setUnapprovedPage}
+              />
             </>
           ) : (
             !loading && (
@@ -225,11 +269,15 @@ export default function ProcessedReports() {
           {deniedReports.length > 0 ? (
             <>
               <ReportsList
-                reports={paginate(deniedReports, deniedPage)}
+                reports={deniedSlice}
                 loading={loading}
                 adminView={true}
               />
-              {renderPagination(deniedReports.length, deniedPage, setDeniedPage)}
+              <Pagination
+                currentPage={deniedPage}
+                totalPages={Math.ceil(deniedReports.length / pageSize)}
+                onPageChange={setDeniedPage}
+              />
             </>
           ) : (
             !loading && (
