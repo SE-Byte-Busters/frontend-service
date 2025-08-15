@@ -18,7 +18,6 @@ export default function forgetPassword() {
           placeholder="نام کاربری یا شماره تلفن خود را وارد کنید"
         />
 
-
       </div>
 
       <div className="sm:w-[416px] sm:h-[62px] w-[230px] h-[50px] mt-[2px]">
