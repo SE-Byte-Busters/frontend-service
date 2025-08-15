@@ -1,6 +1,8 @@
 import { NextResponse, type NextRequest } from "next/server";
 
 export function middleware(request: NextRequest) {
+  return NextResponse.next();
+
   const token = request.cookies.get("token")?.value || "";
   const role = request.cookies.get("role")?.value?.toLowerCase() || "nonuser";
   let path = request.nextUrl.pathname;

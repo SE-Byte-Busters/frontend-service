@@ -16,7 +16,7 @@ export const approvalStatusTranslations: Record<number, string> = {
   2: 'رد شده'
 };
 
-export const completionStatusTranslations: Record<number, string> = {
+export const statusTranslations: Record<number, string> = {
   0: 'شروع نشده',
   1: 'در حال انجام',
   2: 'کامل شده'

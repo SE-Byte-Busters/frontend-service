@@ -10,7 +10,7 @@ import {
   priorityTranslations,
   priorityColors,
   approvalStatusTranslations,
-  completionStatusTranslations,
+  statusTranslations,
   reportStatusTranslations,
   formatReportDate
 } from '@/components/report/reportTranslations'
@@ -159,7 +159,7 @@ export default function ReportPage() {
                 </div>
                 <div>
                   <h3 className="font-semibold">وضعیت پیشرفت</h3>
-                  <p>{completionStatusTranslations[report.completionStatus] || 'نامشخص'}</p>
+                  <p>{statusTranslations[report.status] || 'نامشخص'}</p>
                 </div>
                 <div>
                   <h3 className="font-semibold">امتیاز</h3>
