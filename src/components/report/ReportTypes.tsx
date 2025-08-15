@@ -32,6 +32,7 @@ export type Report = {
   createdAt: string;
   priority: "High" | "Medium" | "Low";
   updatedAt: string;
+  comments?: Comment[];
 };
 
 export type ReportsResponse = {
@@ -46,7 +47,7 @@ export type ReportsResponse = {
 
 export type Comment = {
   _id: string;
-  user: User;
+  user: string;
   text: string;
   date: string;
 }

@@ -89,8 +89,57 @@ export default function ReportPage() {
   const [alert, setAlert] = useState<AlertProps | null>(null);
   const [reportState, setReportState] = useState<ReportState>('unknown');
 
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [editingPriority, setEditingPriority] = useState<"High" | "Medium" | "Low">("Medium");
+  const [editingScore, setEditingScore] = useState(report?.score || 0);
+  const [priorityLoading, setPriorityLoading] = useState(false);
+  const [approvalLoading, setApprovalLoading] = useState(false);
+  const [scoreLoading, setScoreLoading] = useState(false);
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const role = localStorage.getItem('role');
+      setIsAdmin(role === 'admin');
+    }
+  }, []);
+
+  const updateReportPriorityAndApproval = async (priority: string, approvalStatus: number) => {
+    const token = localStorage.getItem("token");
+    const res = await fetch(
+      `https://shahriar.thetechverse.ir:3000/api/v1/admin/reports/${params.id}`, {
+        method: 'PUT',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ priority, approvalStatus }),
+      }
+    );
+
+    if (!res.ok) throw new Error('بروزرسانی گزارش با خطا مواجه شد');
+    return await res.json();
+  };
+
+  const updateReportScore = async (score: number) => {
+    const token = localStorage.getItem("token");
+    const res = await fetch(
+      `https://shahriar.thetechverse.ir:3000/api/v1/admin/reports/${params.id}/score`, {
+        method: 'PUT',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ score }),
+      }
+    );
+
+    if (!res.ok) throw new Error('بروزرسانی امتیاز با خطا مواجه شد');
+    return await res.json();
+  };
+
   useEffect(() => {
     if (report) {
+      setEditingPriority(report.priority);
       setReportState(getReportState(report));
     }
   }, [report]);
@@ -103,8 +152,8 @@ export default function ReportPage() {
       const reportData = await getReportData(params.id as string, token);
       setReport(reportData);
 
-      const commentsData = await getReportComments(params.id as string, token);
-      setComments(commentsData);
+      // const commentsData = await getReportComments(params.id as string, token);
+      setComments(reportData.comments || []);
     } catch (err) {
       setAlert({
         type: 'error',
@@ -179,6 +228,231 @@ export default function ReportPage() {
 
   return (
     <div className="min-h-screen p-6 pt-20 bg-light">
+      {isAdmin && report && (
+        <div className="admin-controls bg-white rounded-lg shadow-md p-6 mb-6">
+          <h3 className="text-xl font-bold mb-4 text-right text-dark border-b pb-2">
+            مدیریت گزارش
+          </h3>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="control-group">
+              <label className="block mb-2 font-medium text-right text-dark">
+                اولویت
+              </label>
+              <div className="flex items-center gap-4">
+                <div className="flex flex-col md:flex-row gap-2">
+                  {['Low', 'Medium', 'High'].map((priority) => (
+                    <button
+                      key={priority}
+                      onClick={() => setEditingPriority(priority as "Low" | "Medium" | "High")}
+                      className={`p-1 rounded-full transition-all ${
+                        editingPriority === priority
+                          ? 'ring-2 ring-blue-500'
+                          : 'opacity-50 hover:opacity-75'
+                      }`}
+                    >
+                      <Image
+                        src={`/images/icons/priority${priority}.png`}
+                        alt={priority}
+                        width={128}
+                        height={128}
+                        className={`${
+                          editingPriority === priority
+                            ? ''
+                            : 'filter grayscale'
+                        }`}
+                      />
+                    </button>
+                  ))}
+                </div>
+                <button
+                  onClick={async () => {
+                    if (!report) return;
+                    setPriorityLoading(true);
+                    try {
+                      await updateReportPriorityAndApproval(
+                        editingPriority,
+                        report.approvalStatus
+                      );
+                      setReport({ ...report, priority: editingPriority });
+                      setAlert({
+                        type: 'success',
+                        message: 'اولویت با موفقیت بروزرسانی شد',
+                        duration: 3000,
+                        onClose: () => setAlert(null)
+                      });
+                    } catch (err) {
+                      setAlert({
+                        type: 'error',
+                        message: err instanceof Error ? err.message : 'خطا در بروزرسانی اولویت',
+                        duration: 3000,
+                        onClose: () => setAlert(null)
+                      });
+                    } finally {
+                      setPriorityLoading(false);
+                    }
+                  }}
+                  disabled={priorityLoading || report.priority === editingPriority}
+                  className={`px-4 py-2 rounded-lg text-white min-w-[80px] ${
+                    priorityLoading || report.priority === editingPriority
+                      ? 'bg-gray-400 cursor-not-allowed'
+                      : 'bg-blue-500 hover:bg-blue-600'
+                  }`}
+                >
+                  {priorityLoading ? '...' : 'ذخیره'}
+                </button>
+              </div>
+            </div>
+
+            <div className="control-group">
+              <label className="block mb-2 font-medium text-right text-dark">
+                وضعیت تایید
+              </label>
+              <div className="flex gap-2">
+                <button
+                  onClick={async () => {
+                    if (!report) return;
+                    setApprovalLoading(true);
+                    try {
+                      await updateReportPriorityAndApproval(
+                        report.priority,
+                        1 // Approved
+                      );
+                      const updatedReport = { ...report, approvalStatus: 1 };
+                      setReport(updatedReport);
+                      setReportState(getReportState(updatedReport));
+                      setAlert({
+                        type: 'success',
+                        message: 'گزارش با موفقیت تایید شد',
+                        duration: 3000,
+                        onClose: () => setAlert(null)
+                      });
+                    } catch (err) {
+                      setAlert({
+                        type: 'error',
+                        message: err instanceof Error ? err.message : 'خطا در تایید گزارش',
+                        duration: 3000,
+                        onClose: () => setAlert(null)
+                      });
+                    } finally {
+                      setApprovalLoading(false);
+                    }
+                  }}
+                  disabled={approvalLoading || report.approvalStatus === 1}
+                  className={`flex-1 py-2 rounded-lg text-white ${
+                    report.approvalStatus === 1
+                      ? 'bg-gray-400 cursor-not-allowed'
+                      : approvalLoading
+                        ? 'bg-gray-400'
+                        : 'bg-green-500 hover:bg-green-600'
+                  }`}
+                >
+                  تایید
+                </button>
+
+                <button
+                  onClick={async () => {
+                    if (!report) return;
+                    setApprovalLoading(true);
+                    try {
+                      await updateReportPriorityAndApproval(
+                        report.priority,
+                        2 // Denied
+                      );
+                      const updatedReport = { ...report, approvalStatus: 2 };
+                      setReport(updatedReport);
+                      setReportState(getReportState(updatedReport));
+                      setAlert({
+                        type: 'success',
+                        message: 'گزارش با موفقیت رد شد',
+                        duration: 3000,
+                        onClose: () => setAlert(null)
+                      });
+                    } catch (err) {
+                      setAlert({
+                        type: 'error',
+                        message: err instanceof Error ? err.message : 'خطا در رد گزارش',
+                        duration: 3000,
+                        onClose: () => setAlert(null)
+                      });
+                    } finally {
+                      setApprovalLoading(false);
+                    }
+                  }}
+                  disabled={approvalLoading || report.approvalStatus === 2}
+                  className={`flex-1 py-2 rounded-lg text-white ${
+                    report.approvalStatus === 2
+                      ? 'bg-gray-400 cursor-not-allowed'
+                      : approvalLoading
+                        ? 'bg-gray-400'
+                        : 'bg-red-500 hover:bg-red-600'
+                  }`}
+                >
+                  رد
+                </button>
+              </div>
+            </div>
+
+            <div className="control-group">
+              <label className="block mb-2 font-medium text-right text-dark">
+                امتیاز (0-100)
+              </label>
+              <div className="flex gap-2">
+                <input
+                  type="number"
+                  min="0"
+                  max="100"
+                  value={editingScore}
+                  onChange={(e) => setEditingScore(parseInt(e.target.value) || 0)}
+                  className="flex-grow p-2 border rounded-lg text-right text-dark"
+                  disabled={scoreLoading}
+                />
+                <button
+                  onClick={async () => {
+                    if (!report) return;
+                    if (editingScore < 0 || editingScore > 100) {
+                      setAlert({
+                        type: 'error',
+                        message: 'امتیاز باید بین ۰ تا ۱۰۰ باشد',
+                        duration: 3000,
+                        onClose: () => setAlert(null)
+                      });
+                      return;
+                    }
+
+                    setScoreLoading(true);
+                    try {
+                      const response = await updateReportScore(editingScore);
+                      setReport(response.report);
+                      setAlert({
+                        type: 'success',
+                        message: 'امتیاز با موفقیت بروزرسانی شد',
+                        duration: 3000,
+                        onClose: () => setAlert(null)
+                      });
+                    } catch (err) {
+                      setAlert({
+                        type: 'error',
+                        message: err instanceof Error ? err.message : 'خطا در بروزرسانی امتیاز',
+                        duration: 3000,
+                        onClose: () => setAlert(null)
+                      });
+                    } finally {
+                      setScoreLoading(false);
+                    }
+                  }}
+                  disabled={scoreLoading}
+                  className={`px-4 py-2 rounded-lg text-white ${
+                    scoreLoading ? 'bg-gray-400' : 'bg-blue-500 hover:bg-blue-600'
+                  }`}
+                >
+                  {scoreLoading ? 'در حال ذخیره...' : 'ذخیره'}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
       {alert && <Alert {...alert} />}
 
       <div className="max-w-6xl mx-auto">
@@ -289,6 +563,10 @@ export default function ReportPage() {
                     <p>{statusTranslations[report.completionStatus] || 'نامشخص'}</p>
                   </div>
                 )}
+                <div>
+                  <h3 className="font-semibold">امتیاز</h3>
+                  <p>{report.score}</p>
+                </div>
               </div>
             </div>
           </div>
@@ -385,7 +663,7 @@ export default function ReportPage() {
                     <div className="flex items-center gap-3">
                       <div className="bg-gray-200 border-2 border-dashed rounded-xl w-10 h-10" />
                       <span className="font-bold text-dark">
-                        {comment.user.username}
+                        {comment.user}
                       </span>
                     </div>
                     <span className="text-sm text-gray-500">
