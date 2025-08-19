@@ -53,9 +53,11 @@ export default function SignUp() {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = async () => {
-    try {
+  // Modify handleSubmit to accept the form event
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault(); // <-- ADD THIS LINE to prevent page reload
 
+    try {
       const response = await fetch('https://shahriar.thetechverse.ir:3000/api/v1/auth/signup', {
         method: "POST",
         headers: {
@@ -79,24 +81,22 @@ export default function SignUp() {
           duration: 3000,
           onClose: () => setAlert(null)
         });
-      } else if (response.status >= 400 || response.status < 500) {
+        // Move the redirect logic here directly
+        router.push(`/auth/otp?id=${data.data._id}&phonenumber=${data.data.otpSentTo}`);
+      } else if (response.status >= 400 && response.status < 500) {
         setAlert({
           type: 'error',
           message: '.شما قبلا ثبت نام کرده اید',
           duration: 3000,
           onClose: () => setAlert(null)
         });
-      } else if (response.status >= 500 || response.status < 600) {
+      } else { // Simplified error handling
         setAlert({
           type: 'error',
           message: 'خطای سرور. لطفاً بعداً تلاش کنید.',
           duration: 3000,
           onClose: () => setAlert(null)
         });
-      }
-
-      if (response.status >= 200 && response.status < 300) {
-        router.push(`/auth/otp?id=${data.data._id}&phonenumber=${data.data.otpSentTo}`);
       }
     } catch (error) {
       setAlert({
@@ -108,18 +108,11 @@ export default function SignUp() {
     }
   };
 
-  useEffect(() => {
-    console.log("Form State:", state); // اینو اضافه کن
-
-    if (state.success) {
-      handleSubmit();
-    }
-  }, [state.success]);
 
   return (
     <main>
       {alert && <Alert {...alert} />}
-      <form action={formAction}>
+      <form onSubmit={handleSubmit}>
 
         <section className="sm:w-[416px] w-[230px] mt-[24px]">
           <label className="block text-right text-[18px] font-semibold font-vazirmatn text-[#685752] uppercase mb-[8px]">
