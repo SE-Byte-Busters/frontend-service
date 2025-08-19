@@ -69,11 +69,10 @@ export const ReportCard = ({
   };
 
   const calculateVotePercentage = () => {
-    if (!report.voteScore || report.voteScore === 0) return { positive: 50, negative: 50 };
-
-    const positive = report.voteScore > 0 ? report.voteScore : 0;
-    const negative = report.voteScore < 0 ? -report.voteScore : 0;
-    const total = positive + negative !== 0 ? positive + negative : 1;
+    const total = report?.votes?.length || 0;
+    if (total === 0) return { positive: 50, negative: 50 };
+    const positive = report?.votes?.filter(v => v.direction === 'Up').length || 0;
+    const negative = report?.votes?.filter(v => v.direction === 'Down').length || 0;
 
     return {
       positive: Math.round((positive / total) * 100),

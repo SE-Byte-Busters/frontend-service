@@ -14,6 +14,12 @@ type User = {
   username: string;
 };
 
+type Vote = {
+  _id: string;
+  user: string;
+  direction: string;
+}
+
 export type Report = {
   _id: string;
   user: User;
@@ -28,6 +34,7 @@ export type Report = {
   approvalStatus: number;
   completionStatus: number;
   score: number;
+  votes: Vote[];
   voteScore: number;
   createdAt: string;
   priority: "High" | "Medium" | "Low";
