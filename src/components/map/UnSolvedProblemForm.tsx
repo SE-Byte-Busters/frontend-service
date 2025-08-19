@@ -1,8 +1,11 @@
+
+'use client';
+
 import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { useReport } from '@/context/ReportContext';
 
-// Types for API responses
+// --- TYPE DEFINITIONS (Unchanged) ---
 interface User {
   _id: string;
   username: string;
@@ -11,6 +14,7 @@ interface User {
 interface Comment {
   _id: string;
   user: User;
+  userName: string;
   text: string;
   date: string;
 }
@@ -44,7 +48,7 @@ interface Report {
   approvalStatus: number;
   status: number;
   voteScore: number;
-  votes: any[];
+  votes: Array<{ direction: 'Up' | 'Down' }>; // Specified direction for calculation
   comments: Comment[];
   createdAt: string;
   updatedAt: string;
@@ -52,7 +56,6 @@ interface Report {
   resolvedAt?: string;
   resolvedBy?: string;
 }
-
 
 interface UnSolvedProblemFormProps {
   reportId?: string;
@@ -65,31 +68,25 @@ const UnSolvedProblemForm: React.FC<UnSolvedProblemFormProps> = ({
   onSubmit,
   className
 }) => {
-  // State for report data
+  // --- STATE AND CONTEXT (Unchanged) ---
   const [report, setReport] = useState<Report | null>(null);
   const [comments, setComments] = useState<Comment[]>([]);
   const [solveRequests, setSolveRequests] = useState<SolveRequest[]>([]);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // Form states
   const [newComment, setNewComment] = useState('');
-  const [solveRequestText, setSolveRequestText] = useState('');
+  const [newRepReqSolve, setNewRepReqSolve] = useState('');
+
   const [isSubmittingComment, setIsSubmittingComment] = useState(false);
-  const [isSubmittingSolveRequest, setIsSubmittingSolveRequest] = useState(false);
+  const [isSolveRequest, setIsSolveRequest] = useState(false);
 
-  // Context
-  const {
-    isVisible,
-    setIsVisible,
-    position,
-    setPosition,
-    setAlert,
-    isReporting,
-    setIsReporting
-  } = useReport();
+  const [showSolveRequest, setShowSolveRequest] = useState(true);
 
-  // Get token from localStorage
+
+  const { setAlert } = useReport();
+
+  // --- API AND HELPER FUNCTIONS (Unchanged) ---
   const getAuthToken = () => {
     if (typeof window !== 'undefined') {
       return localStorage.getItem('token');
@@ -97,29 +94,32 @@ const UnSolvedProblemForm: React.FC<UnSolvedProblemFormProps> = ({
     return null;
   };
 
-  // API call to fetch report details
+  // This map object remains the same
+  const categoryIconMap: any = {
+    failure: { src: "/images/icons/category/tools.svg", alt: "tools" },
+    lightbulb: { src: "/images/icons/category/lightbulb.svg", alt: "lightbulb" },
+    unsafe: { src: "/images/icons/category/barrier.svg", alt: "barrier" },
+    trash: { src: "/images/icons/category/trash.svg", alt: "trash" },
+    smog: { src: "/images/icons/category/smog.svg", alt: "smog" },
+    leaf: { src: "/images/icons/category/leaf.svg", alt: "leaf" },
+  };
+
+
   const fetchReportDetails = async (id: string) => {
     setLoading(true);
     setError(null);
-
     try {
       const token = getAuthToken();
       const response = await fetch(
-        `https://shahriar.thetechverse.ir:3000/api/v1/reports/${id}/`,
+        `https://shahriar.thetechverse.ir:3000/api/v1/report/reports/${id}/`,
         {
           method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`,
-          },
+          headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
         }
       );
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-
+      if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
       const data = await response.json();
+
       setReport(data.report);
       setComments(data.report.comments || []);
       setSolveRequests(data.report.usersReqSolve || []);
@@ -131,218 +131,161 @@ const UnSolvedProblemForm: React.FC<UnSolvedProblemFormProps> = ({
     }
   };
 
-  // API call to fetch comments
   const fetchComments = async (id: string) => {
     try {
       const token = getAuthToken();
       const response = await fetch(
-        `https://shahriar.thetechverse.ir:3000/api/v1/reports/${id}/comments`,
-        {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`,
-          },
-        }
+        `https://shahriar.thetechverse.ir:3000/api/v1/report/reports/${id}`,
+        { headers: { 'Authorization': `Bearer ${token}` } }
       );
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-
+      if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
       const data = await response.json();
-      setComments(data.comments || []);
+      console.log(data);
+      console.log("___________________________000000000000")
+      setComments(data.report.comments || []);
     } catch (err) {
       console.error('Error fetching comments:', err);
     }
   };
+  const handleReportReqSolve = async () => {
 
-  // API call to fetch solve requests
-  const fetchSolveRequests = async (id: string) => {
+    if (!newRepReqSolve.trim() || !reportId) return;
     try {
+      setIsSolveRequest(true);
+      setShowSolveRequest(true);
+
       const token = getAuthToken();
       const response = await fetch(
-        `https://shahriar.thetechverse.ir:3000/api/v1/reports/${id}/reqsolved`,
+
+        `https://shahriar.thetechverse.ir:3000/api/v1/report/reports/${reportId}/reqsolved`,
         {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`,
-          },
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+          body: JSON.stringify({ text: newRepReqSolve }),
         }
+
       );
 
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
+      if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+      setNewRepReqSolve('');
 
-      const data = await response.json();
-      setSolveRequests(data.usersReqSovled || []);
+      setAlert({ type: 'success', message: 'گزارش حل مشکل با موفقیت ثبت شد' });
+      setTimeout(() => {
+        setAlert(null)
+      }, 3000)
+
     } catch (err) {
-      console.error('Error fetching solve requests:', err);
-    }
-  };
 
-  // Submit new comment
+      setAlert({ type: 'error', message: 'خطا در ثبت گزارش حل مشکل' });
+      setTimeout(() => {
+        setAlert(null)
+      }, 3000)
+
+      console.error('Error submitting comment:', err);
+
+    } finally {
+      setIsSolveRequest(false);
+    }
+
+  }
   const handleCommentSubmit = async () => {
     if (!newComment.trim() || !reportId) return;
-
     setIsSubmittingComment(true);
     try {
       const token = getAuthToken();
       const response = await fetch(
-        `https://shahriar.thetechverse.ir:3000/api/v1/reports/${reportId}/comments`,
+        `https://shahriar.thetechverse.ir:3000/api/v1/report/reports/${reportId}/comments`,
         {
           method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`,
-          },
-          body: JSON.stringify({
-            text: newComment
-          }),
+          headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+          body: JSON.stringify({ text: newComment }),
         }
       );
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-
+      if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
       setNewComment('');
       await fetchComments(reportId);
-      setAlert({
-        type: 'success',
-        message: 'نظر با موفقیت ثبت شد'
-      });
+      setAlert({ type: 'success', message: 'نظر با موفقیت ثبت شد' });
+      setTimeout(() => {
+        setAlert(null)
+      }, 3000)
     } catch (err) {
-      setAlert({
-        type: 'error',
-        message: 'خطا در ثبت نظر'
-      });
+      setAlert({ type: 'error', message: 'خطا در ثبت نظر' });
+      setTimeout(() => {
+        setAlert(null)
+      }, 3000)
       console.error('Error submitting comment:', err);
     } finally {
       setIsSubmittingComment(false);
     }
   };
 
-  // Submit solve request
-  const handleSolveRequestSubmit = async () => {
-    if (!solveRequestText.trim() || !reportId) return;
-
-    setIsSubmittingSolveRequest(true);
-    try {
-      const token = getAuthToken();
-      const response = await fetch(
-        `https://shahriar.thetechverse.ir:3000/api/v1/reports/${reportId}/reqsolved`,
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`,
-          },
-          body: JSON.stringify({
-            text: solveRequestText
-          }),
-        }
-      );
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-
-      setSolveRequestText('');
-      await fetchSolveRequests(reportId);
-      setAlert({
-        type: 'success',
-        message: 'درخواست حل مشکل با موفقیت ثبت شد'
-      });
-    } catch (err) {
-      setAlert({
-        type: 'error',
-        message: 'خطا در ثبت درخواست حل مشکل'
-      });
-      console.error('Error submitting solve request:', err);
-    } finally {
-      setIsSubmittingSolveRequest(false);
-    }
-  };
-
-  // Vote on report
   const handleVote = async (direction: 'Up' | 'Down') => {
     if (!reportId) return;
-
     try {
       const token = getAuthToken();
       const response = await fetch(
-        `https://shahriar.thetechverse.ir:3000/api/v1/reports/${reportId}/vote`,
+        `https://shahriar.thetechverse.ir:3000/api/v1/report/reports/${reportId}/vote`,
         {
           method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`,
-          },
-          body: JSON.stringify({
-            direction
-          }),
+          headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+          body: JSON.stringify({ direction }),
         }
       );
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-
-      const data = await response.json();
-
-      // Update report with new vote scores
-      if (report) {
-        setReport({
-          ...report,
-          voteScore: data.voteScore
-        });
-      }
-
-      setAlert({
-        type: 'success',
-        message: `رای ${direction === 'Up' ? 'مثبت' : 'منفی'} شما ثبت شد`
-      });
+      if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+      // Refetch report details to get the latest vote count and score
+      await fetchReportDetails(reportId);
+      setAlert({ type: 'success', message: `رای ${direction === 'Up' ? 'مثبت' : 'منفی'} شما ثبت شد` });
+      setTimeout(() => {
+        setAlert(null)
+      }, 3000)
     } catch (err) {
-      setAlert({
-        type: 'error',
-        message: 'خطا در ثبت رای'
-      });
+      setAlert({ type: 'error', message: 'خطا در ثبت رای' });
+      setTimeout(() => {
+        setAlert(null)
+      }, 3000)
       console.error('Error voting:', err);
     }
   };
 
-  // Format date
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('fa-IR', {
       year: 'numeric',
       month: 'long',
       day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
     });
   };
 
-  // Get status text
-  const getStatusText = (status: number) => {
-    switch (status) {
-      case 0: return 'جدید';
-      case 1: return 'در حال بررسی';
-      case 2: return 'حل شده';
-      case 3: return 'رد شده';
-      default: return 'نامشخص';
-    }
-  };
-
-  // Effect to fetch data when component mounts
+  // --- USE EFFECT (Unchanged) ---
   useEffect(() => {
     if (reportId) {
       fetchReportDetails(reportId);
     }
   }, [reportId]);
 
+  // --- UI STATE AND LOGIC ---
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const imageUrls = report?.images.map(img => img.url) || [];
+
+  const nextSlide = () => setCurrentIndex((prev) => (prev + 1) % (imageUrls.length || 1));
+  const prevSlide = () => setCurrentIndex((prev) => (prev - 1 + (imageUrls.length || 1)) % (imageUrls.length || 1));
+
+  // Vote calculation
+  const totalVotes = report?.votes?.length || 0;
+  const positiveVotes = report?.votes?.filter(v => v.direction === 'Up').length || 0;
+  const positivePercent = totalVotes > 0 ? (positiveVotes / totalVotes) * 100 : 0;
+  const negativePercent = 100 - positivePercent;
+
+  // Dynamic priority icon
+  const getPriorityIcon = (priority: string) => {
+    switch (priority?.toLowerCase()) {
+      case 'high': return "/images/icons/priorityHight.png";
+      case 'medium': return "/images/icons/priorityMiddle.png";
+      case 'low': return "/images/icons/priorityLow.png";
+      default: return "/images/icons/priorityMiddle.png";
+    }
+  }
+
+  // --- LOADING AND ERROR STATES ---
   if (loading) {
     return (
       <div className="flex justify-center items-center min-h-screen bg-[#fff9f5]">
@@ -357,15 +300,7 @@ const UnSolvedProblemForm: React.FC<UnSolvedProblemFormProps> = ({
   if (error) {
     return (
       <div className="flex justify-center items-center min-h-screen bg-[#fff9f5]">
-        <div className="text-center bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
-          <p>خطا: {error}</p>
-          <button
-            onClick={() => reportId && fetchReportDetails(reportId)}
-            className="mt-2 bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600"
-          >
-            تلاش مجدد
-          </button>
-        </div>
+        <p className="text-red-600">خطا: {error}</p>
       </div>
     );
   }
@@ -373,212 +308,200 @@ const UnSolvedProblemForm: React.FC<UnSolvedProblemFormProps> = ({
   if (!report) {
     return (
       <div className="flex justify-center items-center min-h-screen bg-[#fff9f5]">
-        <p className="text-[#685752]">گزارش یافت نشد</p>
+        <p className="text-[#685752]">گزارش یافت نشد.</p>
       </div>
     );
   }
 
+
+  // --- DYNAMIC UI RENDER ---
   return (
-    <div className={`${className} bg-[#fff9f5] min-h-screen`}>
-      <div className="grid grid-cols-12 gap-6 w-full p-6">
+    <div dir="rtl" className="grid grid-cols-12 gap-6 p-6 bg-[#fff5f3] rounded-xl shadow-sm min-h-screen">
+      {/* بخش اطلاعات و کامنت‌ها */}
+      <div className="col-span-12 md:col-span-7 flex flex-col items-center">
+        <div className="flex justify-between items-start">
+          <div>
+            <Image src={getPriorityIcon(report.priority)} alt={`Priority: ${report.priority}`} className="m-[10px]" width={200} height={200} />
+            <p className="text-center text-xl text-[#000000] font-vazirmatn max-w-[80%] mx-auto">
+              منتظر اقدام یکی از شهریارها هستیم
+              تو هم می‌تونی اولین گام رو برداری...
+            </p>
 
-        {/* Report Header */}
-        <div className="col-span-12">
-          <div className="bg-white rounded-lg p-6 shadow-md">
-            <div className="flex justify-between items-start mb-4">
-              <h1 className="text-2xl font-bold text-[#685752]">{report.title}</h1>
-              <span className={`px-3 py-1 rounded-full text-sm ${
-                report.status === 0 ? 'bg-blue-100 text-blue-800' :
-                report.status === 1 ? 'bg-yellow-100 text-yellow-800' :
-                report.status === 2 ? 'bg-green-100 text-green-800' :
-                'bg-red-100 text-red-800'
-              }`}>
-                {getStatusText(report.status)}
-              </span>
-            </div>
+          </div>
 
-            <p className="text-[#685752] mb-4">{report.description}</p>
+          <Image src="/images/icons/unSolved.png" alt="Unsolved" width={80} height={40} />
+        </div>
 
-            <div className="grid grid-cols-2 gap-4 mb-4">
-              <div>
-                <strong className="text-[#685752]">آدرس:</strong>
-                <p className="text-[#87878B]">{report.approximatePosition}</p>
-              </div>
-              <div>
-                <strong className="text-[#685752]">شهر:</strong>
-                <p className="text-[#87878B]">{report.city}</p>
-              </div>
-              <div>
-                <strong className="text-[#685752]">دسته‌بندی:</strong>
-                <p className="text-[#87878B]">{report.category.join(', ')}</p>
-              </div>
-              <div>
-                <strong className="text-[#685752]">اولویت:</strong>
-                <p className="text-[#87878B]">{report.priority}</p>
-              </div>
-            </div>
 
-            <div className="flex items-center gap-4 mb-4">
-              <div className="flex items-center gap-2">
-                <button
-                  onClick={() => handleVote('Up')}
-                  className="bg-green-500 text-white px-3 py-1 rounded hover:bg-green-600"
-                >
-                  👍
-                </button>
-                <span className="text-[#685752]">{report.voteScore}</span>
-                <button
-                  onClick={() => handleVote('Down')}
-                  className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600"
-                >
-                  👎
-                </button>
-              </div>
-              <div className="text-sm text-[#87878B]">
-                گزارش‌دهنده: {report.user.username} |
-                تاریخ: {formatDate(report.createdAt)}
-              </div>
-            </div>
+        <button
+          onClick={() => { setIsSolveRequest(true); setShowSolveRequest(false); }}
+          className={`w-[251px] h-[56px] bg-[#8EB486] rounded-[10px] mt-12 mb-12 active:brightness-90 ${!showSolveRequest ? 'hidden' : ''}`}>
+          <span className="font-bold text-[18px] text-[#fff] font-vazirmatn ">
+            گزارش حل مشکل
+          </span>
+        </button>
 
-            {/* Images */}
-            {report.images && report.images.length > 0 && (
-              <div className="mb-4">
-                <strong className="text-[#685752] block mb-2">تصاویر:</strong>
-                <div className="grid grid-cols-3 gap-4">
-                  {report.images.map((image, index) => (
-                    <img
-                      key={image._id}
-                      src={image.url}
-                      alt={`تصویر ${index + 1}`}
-                      className="w-full h-32 object-cover rounded"
-                    />
-                  ))}
-                </div>
+
+        <div className={`flex-grow ${!showSolveRequest ? 'mt-12' : ''}`}>
+          <label className="font-bold text-[24px] text-[#685752] font-vazirmatn m-[10px]">{isSolveRequest ? 'گزارش حل مشکل' : 'نظرات و پیشنهادات'}</label>
+          <textarea
+            className="w-[90%] border border-[#685752] p-3 m-2 rounded-[30px] text-[#685752]"
+            placeholder={isSolveRequest ? ' لطفا گزارش حل مشکل خود را بنویسید' : "مثلا: ترک عمیق به‌وجود آمده و ترس ریزش پل وجود دارد."}
+            rows={4}
+            value={isSolveRequest ? newRepReqSolve : newComment}
+            onChange={(e) => isSolveRequest ? setNewRepReqSolve(e.target.value) : setNewComment(e.target.value)}
+          />
+          <div className="flex justify-center">
+            <button
+              onClick={isSolveRequest ? handleReportReqSolve : handleCommentSubmit}
+              disabled={isSolveRequest ? (!isSolveRequest || !newRepReqSolve.trim()) : (isSubmittingComment || !newComment.trim())}
+              className="bg-[#f89b2f] text-white px-6 py-2 rounded-full m-2 hover:bg-[#e38821] transition disabled:opacity-50"
+            >
+              {isSolveRequest ? 'ثبت حل مشکل' : 'ثبت نظر'}
+            </button>
+            <button
+              onClick={() => {
+                setShowSolveRequest(true);
+                setIsSolveRequest(false);
+              }}
+              className={`bg-transparent ${showSolveRequest ? 'hidden' : ''}`}
+            >
+              <Image
+                src="/images/icons/X.png"
+                alt="Background Image"
+                width={64}
+                height={64}
+                className="w-10 h-10"
+              />
+            </button>
+          </div>
+
+          <div className='mt-4 w-[90%] mx-auto'>
+            {comments.length > 0 ? comments.map(comment => (
+              <div key={comment._id} className="flex border-b border-[#685752] pb-6 pt-4 m-2">
+                <span className="font-bold text-[20px] text-[#685752] font-vazirmatn ml-8 w-1/3">
+                  {comment.userName}
+                </span>
+                <span className="font-normal text-[20px] text-[#685752] font-vazirmatn w-2/3">
+                  {comment.text}
+                </span>
               </div>
+            )) : (
+              <p className='text-center text-[#685752] font-vazirmatn py-4'>هنوز نظری ثبت نشده است.</p>
             )}
           </div>
         </div>
+      </div>
 
-        {/* Comments Section */}
-        <div className="col-span-6">
-          <div className="bg-white rounded-lg p-6 shadow-md">
-            <h2 className="text-xl font-bold text-[#685752] mb-4">نظرات</h2>
+      {/* بخش تصویر و رأی‌دهی */}
+      <div className="col-span-12 md:col-span-5 space-y-3">
+        <div className="relative w-80 h-80 overflow-hidden rounded-xl mx-auto">
+          {imageUrls.length > 0 ? (
+            <>
+              <Image src={imageUrls[currentIndex]}
+                className="object-cover w-full h-full"
+                alt="report image" layout="fill" />
 
-            {/* Add Comment Form */}
-            <div className="mb-6">
-              <textarea
-                value={newComment}
-                onChange={(e) => setNewComment(e.target.value)}
-                placeholder="نظر خود را بنویسید..."
-                className="w-full border border-[#685752] p-3 rounded-lg text-[#685752] resize-none"
-                rows={3}
-              />
               <button
-                onClick={handleCommentSubmit}
-                disabled={isSubmittingComment || !newComment.trim()}
-                className="mt-2 bg-[#f89b2f] text-white px-4 py-2 rounded-lg hover:bg-[#e38821] transition disabled:opacity-50"
+                onClick={prevSlide}
+                className="absolute top-1/2 left-2 transform -translate-y-1/2 bg-white rounded-full shadow p-2"
               >
-                {isSubmittingComment ? 'در حال ثبت...' : 'ثبت نظر'}
+                <Image src="/images/icons/LeftArrow.png" alt="previous" width={30} height={30} />
               </button>
+              <button
+                onClick={nextSlide}
+                className="absolute top-1/2 right-2 transform -translate-y-1/2 bg-white rounded-full shadow p-2"
+              >
+                <Image src="/images/icons/RightArrow.png" alt="next" width={30} height={30} />
+              </button>
+              <div className="absolute bottom-2 left-1/2 transform -translate-x-1/2 flex gap-2">
+                {imageUrls.map((_, idx) => (
+                  <div key={idx} className={`w-2 h-2 rounded-full ${idx === currentIndex ? "bg-green-400" : "bg-gray-300"}`} />
+                ))}
+              </div>
+            </>
+          ) : (
+            <div className="w-full h-full bg-gray-200 flex items-center justify-center text-[#685752]">
+              بدون تصویر
+            </div>
+          )}
+        </div>
+        <div className="w-full space-y-2"> {/* Increased space-y for better spacing */}
+          {/* Removed fixed height (h-18) and overflow-hidden to let content define size */}
+          {/* Increased font size from text-sm to text-xl */}
+          <div className="flex items-center justify-center w-full text-xl font-bold mt-[30px]">
+
+            <button onClick={() => handleVote('Up')} className="pl-2 border-0 bg-transparent">
+              {/* Increased button image size for balance */}
+              <Image src="/images/icons/like.png" alt="like" width={110} height={130} />
+            </button>
+
+            {/* Increased bar height from h-25 (which was likely a typo) to a larger h-12 */}
+            <div className="flex w-full h-9 rounded-full border border-gray-200 shadow-sm overflow-hidden">
+              <div
+                className="bg-green-200 text-green-600 flex items-center justify-center"
+                style={{ width: `${positivePercent}%` }}
+              >
+                {/* The text inside now uses the parent's text-xl class */}
+                {Math.round(positivePercent) != 0 ? Math.round(positivePercent) + "%" : ""}
+              </div>
+              <div
+                className="bg-red-200 text-red-600 flex items-center justify-center"
+                style={{ width: `${negativePercent}%` }}
+              >
+                {Math.round(negativePercent) != 0 ? Math.round(negativePercent) + "%" : ""}
+              </div>
             </div>
 
-            {/* Comments List */}
-            <div className="space-y-4 max-h-96 overflow-y-auto">
-              {comments.length === 0 ? (
-                <p className="text-[#87878B] text-center">هنوز نظری ثبت نشده است</p>
-              ) : (
-                comments.map((comment) => (
-                  <div key={comment._id} className="border border-[#e5e5e5] rounded-lg p-4">
-                    <div className="flex justify-between items-start mb-2">
-                      <strong className="text-[#685752]">{comment.user.username}</strong>
-                      <span className="text-sm text-[#87878B]">
-                        {formatDate(comment.date)}
-                      </span>
-                    </div>
-                    <p className="text-[#685752]">{comment.text}</p>
-                  </div>
-                ))
-              )}
-            </div>
+            <button onClick={() => handleVote('Down')} className="pr-2 border-0 bg-transparent">
+              {/* Increased button image size for balance */}
+              <Image src="/images/icons/dislike.png" alt="dislike" width={110} height={130} />
+            </button>
           </div>
+          {/* Increased font size for better readability */}
+          <p className="text-center text-sm text-gray-700">{totalVotes} نفر رای داده‌اند</p>
         </div>
 
-        {/* Solve Requests Section */}
-        <div className="col-span-6">
-          <div className="bg-white rounded-lg p-6 shadow-md">
-            <h2 className="text-xl font-bold text-[#685752] mb-4">درخواست‌های حل مشکل</h2>
+        <section className="flex justify-between items-center gap-0 mt-10">
+          <Image src="/images/icons/profile.png" alt="profile" width={80} height={40} />
+          <section className='text-right'>
+            <h2 className="font-bold text-xl text-gray-800">{report.title}</h2>
+            <h2 className="font-bold text-lg text-gray-800">تاریخ ثبت: {formatDate(report.createdAt)}</h2>
+            <h4 className="font-bold text-sm text-gray-800">گزارشگر: {report.user?.username}</h4>
+          </section>
+        </section>
 
-            {/* Add Solve Request Form */}
-            <div className="mb-6">
-              <textarea
-                value={solveRequestText}
-                onChange={(e) => setSolveRequestText(e.target.value)}
-                placeholder="توضیح دهید که چگونه این مشکل را حل کرده‌اید..."
-                className="w-full border border-[#685752] p-3 rounded-lg text-[#685752] resize-none"
-                rows={3}
-              />
-              <button
-                onClick={handleSolveRequestSubmit}
-                disabled={isSubmittingSolveRequest || !solveRequestText.trim()}
-                className="mt-2 bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition disabled:opacity-50"
-              >
-                {isSubmittingSolveRequest ? 'در حال ثبت...' : 'ثبت درخواست حل'}
-              </button>
-            </div>
+        <p className="text-[#000000] m-4 text-right">
+          {report.description}
+        </p>
 
-            {/* Solve Requests List */}
-            <div className="space-y-4 max-h-96 overflow-y-auto">
-              {solveRequests.length === 0 ? (
-                <p className="text-[#87878B] text-center">هنوز درخواستی برای حل مشکل ثبت نشده است</p>
-              ) : (
-                solveRequests.map((request) => (
-                  <div key={request._id} className="border border-green-200 bg-green-50 rounded-lg p-4">
-                    <div className="flex justify-between items-start mb-2">
-                      <strong className="text-green-700">{request.user.username}</strong>
-                      <span className="text-sm text-green-600">
-                        {formatDate(request.date)}
-                      </span>
-                    </div>
-                    <p className="text-green-800">{request.text}</p>
-                  </div>
-                ))
-              )}
-            </div>
-          </div>
-        </div>
-
-        {/* Action Buttons */}
-        <div className="col-span-12 text-center flex justify-center gap-4">
-          <button
-            onClick={() => {
-              setIsReporting(false);
-              setPosition(null);
-              setIsVisible(true);
-            }}
-            className="bg-[#f89b2f] text-white px-6 py-2 rounded-full shadow-md hover:bg-[#e38821] transition"
-          >
-            بازگشت به نقشه
-          </button>
-
-          <button
-            onClick={() => {
-              setIsReporting(false);
-              setPosition(null);
-              setIsVisible(true);
-            }}
-            className="bg-transparent border-0 p-0"
-          >
-            <Image
-              src="/images/icons/X.png"
-              alt="بستن"
-              width={40}
-              height={40}
-              className="w-10 h-10"
-            />
-          </button>
+        <p className="text-[#000000] text-2xl font-bold m-4 text-right">{report.approximatePosition}</p>
+        <div className="flex items-center gap-2 absolute bottom-10">
+          {
+            // Make sure report and its category array exist before mapping
+            report?.category?.map(categoryName => {
+              if (typeof categoryName !== "string") {
+                return <></>;
+              }
+              const iconData = categoryIconMap[categoryName];
+              if (iconData) {
+                return (
+                  <Image
+                    key={categoryName}
+                    src={iconData.src}
+                    alt={iconData.alt}
+                    width={56}
+                    height={54}
+                  />
+                );
+              }
+              return null;
+            })
+              .filter(Boolean) // This is a clever way to remove nulls, but not needed if you map directly
+          }
         </div>
       </div>
-    </div>
+    </div >
   );
 };
 

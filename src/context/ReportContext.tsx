@@ -57,7 +57,6 @@ export const ReportProvider = ({ children }: { children: React.ReactNode }) => {
     );
 };
 
-// هوک برای استفاده راحت در کامپوننت‌ها
 export const useReport = () => {
     const context = useContext(ReportContext);
     if (!context) {

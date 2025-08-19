@@ -1,8 +1,8 @@
 'use client';
 
-import { MapContainer, TileLayer, Marker, useMap, ZoomControl, Popup } from 'react-leaflet';
+import { MapContainer, TileLayer, Marker, useMap, ZoomControl, Popup, useMapEvents } from 'react-leaflet';
 import { useReport } from '@/context/ReportContext';
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import Image from 'next/image';
@@ -14,6 +14,7 @@ import SolvedProblemForm from './SolvedProblemForm';
 import '@/app/globals.css';
 import Link from 'next/link';
 import { Report, ReportsResponse } from '@/components/report/ReportTypes'
+
 
 const customIconNeedle = new L.Icon({
   iconUrl: '/images/icons/needle.png',
@@ -202,22 +203,12 @@ const SolvedProblemFormWithLocation: React.FC<SolvedProblemFormWithLocationProps
       <div
         className={`w-[50%] fixed top-0 left-0 z-10 bg-white shadow-lg rounded-lg transition-all duration-500 ${!isVisible ? 'translate-x-0' : '-translate-x-full'}`}
       >
-        <UnSolvedProblemForm reportId={selectedReportId || undefined} />
+        <SolvedProblemForm reportId={selectedReportId || undefined} />
       </div>
     </div>
   );
 };
 
-const FlyToPosition = ({ position }: { position: [number, number] }) => {
-  const map = useMap();
-  map.flyTo([position[0] - 0.005, position[1] - 0.005], 16, { duration: 1.5 });
-  return null;
-};
-
-const MapClickHandler = ({ onClick }: { onClick: (e: L.LeafletMouseEvent) => void }) => {
-  useMap().on('click', onClick);
-  return null;
-};
 
 const MapBoundsHandler = ({ onBoundsChange }: { onBoundsChange: (bounds: L.LatLngBounds, zoom: number) => void }) => {
   const map = useMap();
@@ -265,26 +256,93 @@ const IranMap = () => {
   const abortControllerRef = useRef<AbortController | null>(null);
   const [selectedReportId, setSelectedReportId] = useState<string | null>(null);
 
-  const fetchReports = useCallback(async (bounds: L.LatLngBounds, zoom: number, filter: string = 'all') => {
+
+
+  const NewReportLocationHandler = ({ setUserPosition }: { setUserPosition: (pos: [number, number], msg: string) => void }) => {
+    useMapEvents({
+      click(e: L.LeafletMouseEvent) {
+        const coords: [number, number] = [e.latlng.lat, e.latlng.lng];
+        setUserPosition(coords, "chosed location");
+      },
+    });
+
+    return null;
+  };
+
+
+
+  // --- OPTIMIZED FETCHING LOGIC ---
+  // Ref to store the LatLngBounds of successfully fetched areas
+  const fetchedBoundsRef = useRef<L.LatLngBounds[]>([]);
+  // Debounce utility function for optimizing API calls
+  function debounce<F extends (...args: any[]) => any>(func: F, waitFor: number) {
+    let timeout: ReturnType<typeof setTimeout> | null = null;
+    const debounced = (...args: Parameters<F>) => {
+      if (timeout !== null) {
+        clearTimeout(timeout);
+      }
+      timeout = setTimeout(() => func(...args), waitFor);
+    };
+    return debounced;
+  }
+
+
+  // --- OPTIMIZED COMPONENTS ---
+
+  const FlyToPosition = ({ position }: { position: [number, number] | null }) => {
+    const map = useMap();
+    useEffect(() => {
+      if (position) {
+        map.flyTo(position, 16, { animate: true, duration: 1.5 });
+      }
+    }, [position, map]);
+    return null;
+  };
+
+  // This component now directly calls the debounced fetcher
+  const MapEventsHandler = ({ onFetch }: { onFetch: (bounds: L.LatLngBounds, zoom: number) => void }) => {
+    const map = useMapEvents({
+      moveend: () => {
+        onFetch(map.getBounds(), map.getZoom());
+      },
+    });
+
+    // Fetch initial data on load
+    useEffect(() => {
+      onFetch(map.getBounds(), map.getZoom());
+    }, [map, onFetch]);
+
+    return null;
+  };
+
+
+  // 1. The core fetching logic, now with caching
+  const fetchReportsInternal = useCallback(async (bounds: L.LatLngBounds, zoom: number, filter: string) => {
     if (!bounds) return;
 
-    const ne = bounds.getNorthEast();
-    const sw = bounds.getSouthWest();
-
-    const requestKey = `${ne.lat}-${ne.lng}-${sw.lat}-${sw.lng}-${zoom}-${filter}`;
-    if (requestKey === lastFetchRef.current) return;
+    // --- CACHE CHECK ---
+    // If the new bounds are already inside an area we've fetched, skip the API call.
+    // This is what prevents re-fetching when you zoom in.
+    const isContained = fetchedBoundsRef.current.some(cachedBounds => cachedBounds.contains(bounds));
+    if (isContained) {
+      console.log("✅ Cache hit: Area already fetched. Skipping network request.");
+      return;
+    }
+    console.log("❌ Cache miss: Fetching new data.");
+    // --- END CACHE CHECK ---
 
     if (abortControllerRef.current) {
       abortControllerRef.current.abort();
     }
-
     abortControllerRef.current = new AbortController();
-    lastFetchRef.current = requestKey;
+    const signal = abortControllerRef.current.signal;
 
     setLoading(true);
     setError(null);
 
     try {
+      const ne = bounds.getNorthEast();
+      const sw = bounds.getSouthWest();
       const params = new URLSearchParams({
         neLat: ne.lat.toString(),
         neLng: ne.lng.toString(),
@@ -294,82 +352,110 @@ const IranMap = () => {
         zoom: zoom.toString()
       });
 
-      const token = localStorage.getItem('token');
       const response = await fetch(
         `https://shahriar.thetechverse.ir:3000/api/v1/report/map-search?${params}`,
-        {
-          method: 'GET',
-          signal: abortControllerRef.current.signal,
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`,
-          }
-        }
+        { method: 'GET', signal, headers: { 'Content-Type': 'application/json' } }
       );
 
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
+      if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
 
-      const data: ReportsResponse = await response.json();
+      const data = await response.json();
 
-      if (requestKey === lastFetchRef.current) {
-        setReportLocations(data.reports || []);
+      if (!signal.aborted) {
+        // Here, we should APPEND new data, not just replace it, for a better UX when panning
+        setReportLocations(prevLocations => {
+          const existingIds = new Set(prevLocations.map(loc => loc._id));
+          const newReports = (data.data || []).filter((report: Report) => !existingIds.has(report._id));
+          return [...prevLocations, ...newReports];
+        });
+
+        // --- UPDATE CACHE ---
+        // On success, add the new bounds to our cache.
+        fetchedBoundsRef.current.push(bounds);
       }
     } catch (err) {
       if (err instanceof Error && err.name === 'AbortError') {
         return;
       }
-
-      if (requestKey === lastFetchRef.current) {
+      if (!signal.aborted) {
         setError(err instanceof Error ? err.message : 'An error occurred');
-        setReportLocations([]);
       }
     } finally {
-      if (requestKey === lastFetchRef.current) {
+      if (!signal.aborted) {
         setLoading(false);
       }
     }
-  }, []);
+  }, []); // Empty dependency array because it's a stable function
 
-  const handleBoundsChange = useCallback(
-    (bounds: L.LatLngBounds, zoom: number) => {
-      setCurrentBounds(bounds);
-      setCurrentZoom(zoom);
 
-      let filter = 'all';
-      if (problemSolved && !problemUnSolved) {
-        filter = 'done';
-      } else if (problemUnSolved && !problemSolved) {
-        filter = 'notDone';
+  // 2. A memoized function to determine the current filter
+  const getFilter = useCallback(() => {
+    if (problemSolved && !problemUnSolved) return 'done';
+    if (problemUnSolved && !problemSolved) return 'notDone';
+    return 'all';
+  }, [problemSolved, problemUnSolved]);
+
+
+  // 3. The debounced fetcher that will be called by map events
+  const debouncedFetch = useMemo(
+    () => debounce((bounds: L.LatLngBounds, zoom: number) => {
+      const filter = getFilter();
+      // When filters change, we need to clear the cache to refetch data
+      // You might want more sophisticated logic here in the future
+      if (filter !== 'all') { // Simple example
+        // fetchedBoundsRef.current = [];
       }
-
-      const timeoutId = setTimeout(() => {
-        fetchReports(bounds, zoom, filter);
-      }, 300);
-
-      return () => clearTimeout(timeoutId);
-    },
-    [fetchReports, problemSolved, problemUnSolved]
+      fetchReportsInternal(bounds, zoom, filter);
+    }, 500), // 500ms delay is usually good for maps
+    [fetchReportsInternal, getFilter]
   );
 
+  // Cleanup effect
   useEffect(() => {
-    if (currentBounds) {
-      let filter = 'all';
-      if (problemSolved && !problemUnSolved) {
-        filter = 'done';
-      } else if (problemUnSolved && !problemSolved) {
-        filter = 'notDone';
+    return () => {
+      if (abortControllerRef.current) {
+        abortControllerRef.current.abort();
       }
+    };
+  }, [])
+  // const handleBoundsChange = useCallback(
+  //   (bounds: L.LatLngBounds, zoom: number) => {
+  //     setCurrentBounds(bounds);
+  //     setCurrentZoom(zoom);
 
-      fetchReports(currentBounds, currentZoom, filter);
-    }
-  }, [problemSolved, problemUnSolved, currentBounds, currentZoom, fetchReports]);
+  //     let filter = 'all';
+  //     if (problemSolved && !problemUnSolved) {
+  //       filter = 'done';
+  //     } else if (problemUnSolved && !problemSolved) {
+  //       filter = 'notDone';
+  //     }
+
+  //     const timeoutId = setTimeout(() => {
+  //       fetchReports(bounds, zoom, filter);
+  //     }, 3000);
+
+  //     return () => clearTimeout(timeoutId);
+  //   },
+  //   [problemSolved, problemUnSolved]
+  // );
+
+  // useEffect(() => {
+  //   if (currentBounds) {
+  //     let filter = 'all';
+  //     if (problemSolved && !problemUnSolved) {
+  //       filter = 'done';
+  //     } else if (problemUnSolved && !problemSolved) {
+  //       filter = 'notDone';
+  //     }
+
+  //     fetchReports(currentBounds, currentZoom, filter);
+  //   }
+  // }, [problemSolved, problemUnSolved, currentBounds, currentZoom, fetchReports]);
 
   const getMarkerIcon = (report: Report) => {
-    if (report.status === 2) {
+    if (report.status === 1) {
       return customIconGreenNeedle;
-    } else if (report.status === 0 || report.status === 1) {
+    } else if (report.status === 0) {
       return customIconRedNeedle;
     }
     return customIconNeedle;
@@ -377,11 +463,14 @@ const IranMap = () => {
 
   const shouldShowReport = (report: Report) => {
     if (problemSolved && !problemUnSolved) {
-      return report.status === 2;
+      return report.status === 1;
     } else if (problemUnSolved && !problemSolved) {
-      return report.status === 0 || report.status === 1;
+      return report.status === 0;
+    } else if (!problemUnSolved && !problemSolved) {
+      return false;
+    } else {
+      return true;
     }
-    return true;
   };
 
   const setUserPosition = (pos: [number, number], text: string) => {
@@ -389,17 +478,18 @@ const IranMap = () => {
     setPopupText(text);
   };
 
+
+
+  // Corrected version
   const handleReportClick = (report: Report) => {
     setIsReporting(true);
-    setPosition([report.location.coordinates[1], report.location.coordinates[0]]);
+    setPosition([report.location.coordinates[0], report.location.coordinates[1]]);
     setSelectedReportId(report._id);
 
-    if (report.status === 2) {
+    if (report.status === 1) {
       setShowSolvedProblemForm(true);
-      setProblemSolved(true);
     } else {
       setShowUnSolvedProblemForm(true);
-      setProblemUnSolved(true);
     }
   };
 
@@ -413,8 +503,8 @@ const IranMap = () => {
       </div>
       {isLocatedNeedle && <ReportFormWithButton />}
 
-      {showUnSolvedProblemForm && <UnSolvedProblemFormWithLocation selectedReportId={selectedReportId}/>}
-      {showSolvedProblemForm && <SolvedProblemFormWithLocation selectedReportId={selectedReportId}/>}
+      {showUnSolvedProblemForm && <UnSolvedProblemFormWithLocation selectedReportId={selectedReportId} />}
+      {showSolvedProblemForm && <SolvedProblemFormWithLocation selectedReportId={selectedReportId} />}
 
       <MapContainer
         center={iranCenter}
@@ -429,7 +519,8 @@ const IranMap = () => {
         <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
 
         {/* Map bounds handler for API calls */}
-        <MapBoundsHandler onBoundsChange={handleBoundsChange} />
+        {/* <MapBoundsHandler onBoundsChange={handleBoundsChange} /> */}
+        <MapEventsHandler onFetch={debouncedFetch} />
 
         {/* Render markers from API */}
         {reportLocations
@@ -437,7 +528,7 @@ const IranMap = () => {
           .map((report) => (
             <Marker
               key={report._id}
-              position={[report.location.coordinates[1], report.location.coordinates[0]]}
+              position={[report.location.coordinates[0], report.location.coordinates[1]]}
               icon={getMarkerIcon(report)}
               eventHandlers={{
                 click: () => handleReportClick(report),
@@ -472,12 +563,8 @@ const IranMap = () => {
         )}
 
         <CustomZoomControls setUserPosition={setUserPosition} />
-        {isReporting && (
-          <MapClickHandler onClick={(e) => {
-            const coords: [number, number] = [e.latlng.lat, e.latlng.lng];
-            setUserPosition(coords, "موقعیت انتخاب شده توسط شما");
-          }} />
-        )}
+        {isReporting && <NewReportLocationHandler setUserPosition={setUserPosition} />}
+
         {isLocatedNeedle && position && <FlyToPosition position={position} />}
         {(showUnSolvedProblemForm || showSolvedProblemForm) && position && <FlyToPosition position={position} />}
       </MapContainer>
@@ -491,13 +578,13 @@ const IranMap = () => {
       {!isReporting && !isLocatedNeedle && (
         <section className="absolute bottom-5 sm:bottom-10 w-full flex justify-center items-center sm:gap-8 gap-3 z-10 flex-col sm:flex-row text-center">
           <button
-            onClick={() => setProblemSolved(!problemSolved)}
+            onClick={() => { setProblemSolved(!problemSolved); setShowNeedleOrange(false); }}
             className={`w-[200px] ${problemSolved ? 'bg-[#00E083]' : 'bg-gray-300'} text-sm px-4 py-2 rounded-3xl shadow hover:bg-gray-100 transition text-black`}
           >
             مشکلات حل شده
           </button>
           <button
-            onClick={() => setProblemUnSolved(!problemUnSolved)}
+            onClick={() => { setProblemUnSolved(!problemUnSolved); setShowNeedleOrange(false); }}
             className={`w-[200px] ${problemUnSolved ? 'bg-[#F45151]' : 'bg-gray-300'} text-sm px-4 py-2 rounded-3xl shadow hover:bg-gray-100 transition text-black`}
           >
             مشکلات حل نشده
@@ -522,11 +609,12 @@ const IranMap = () => {
       )}
 
       {/* Error indicator */}
-      {error && (
+      {/* {error && (
         <div className="absolute top-20 left-1/2 transform -translate-x-1/2 z-20 bg-red-100 border border-red-400 text-red-700 px-4 py-2 rounded-lg">
           <span className="text-sm text-black">خطا: {error}</span>
         </div>
-      )}
+        {}
+      )} */}
 
       {isReporting && position && (
         <div className="absolute bottom-10 w-full flex justify-center z-10 gap-4">
@@ -543,6 +631,7 @@ const IranMap = () => {
             onClick={() => {
               setIsReporting(false);
               setPosition(null);
+              setShowNeedleOrange(false);
               setPopupText('');
             }}
             className="bg-transparent border-0 p-0"
@@ -571,7 +660,6 @@ const IranMap = () => {
               setIsReporting(false);
               setPosition(null);
               setPopupText('');
-              setProblemSolved(!problemSolved);
               setShowSolvedProblemForm(false);
             }}
             className="bg-transparent border-0 p-0"
@@ -600,7 +688,6 @@ const IranMap = () => {
               setIsReporting(false);
               setPosition(null);
               setPopupText('');
-              setProblemUnSolved(!problemUnSolved);
               setShowUnSolvedProblemForm(false);
             }}
             className="bg-transparent border-0 p-0"

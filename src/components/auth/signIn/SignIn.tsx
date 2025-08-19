@@ -39,54 +39,53 @@ export default function SignIn() {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = async () => {
-    try {
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault(); // <-- IMPORTANT: Prevents the page from reloading
 
+    // Determine if the input is a number or a username
+    const isNumber = /^\d+$/.test(formData.userNameAndNumber);
+    const loginIdentifier = isNumber
+      ? "+98" + formData.userNameAndNumber.replace(/^0/, "")
+      : formData.userNameAndNumber;
+
+    try {
       const response = await fetch('https://shahriar.thetechverse.ir:3000/api/v1/auth/login', {
         method: "POST",
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          username: (state.type == "username") ? formData.userNameAndNumber : "+98" + formData.userNameAndNumber.replace(/^0/, ""),
+          username: loginIdentifier, // Use the identifier we just created
           password: formData.password,
         }),
       });
+
       const data = await response.json();
 
-      if (response.status >= 200 && response.status < 300) {
+      if (response.ok) { // A simpler way to check for success (200-299)
         setAlert({
           type: 'success',
-          message: "ورود با موفقیت بود",
+          message: "ورود با موفقیت انجام شد",
           duration: 3000,
           onClose: () => setAlert(null)
         });
-      } else if (response.status >= 400 || response.status < 500) {
-        setAlert({
-          type: 'error',
-          message: 'در ثبت تغییرات مشکلی پیش آمد. لطفاً دوباره تلاش کنید.',
-          duration: 3000,
-          onClose: () => setAlert(null)
-        });
-      } else if (response.status >= 500 || response.status < 600) {
-        setAlert({
-          type: 'error',
-          message: 'خطای سرور. لطفاً بعداً تلاش کنید.',
-          duration: 3000,
-          onClose: () => setAlert(null)
-        });
-      }
 
-      if (response.status >= 200 && response.status < 300) {
-        localStorage.setItem("token", data.data.token)
-        localStorage.setItem("role", data.data.role)
-        document.cookie = `token=${data.data.token}; path=/; max-age=${60 * 60 * 24 * 7}; secure; samesite=lax`
-        document.cookie = `role=${data.data.role}; path=/; max-age=${60 * 60 * 24 * 7}; secure; samesite=lax`      
+        localStorage.setItem("token", data.data.token);
+        localStorage.setItem("role", data.data.role);
+        document.cookie = `token=${data.data.token}; path=/; max-age=${60 * 60 * 24 * 7}; secure; samesite=lax`;
+        document.cookie = `role=${data.data.role}; path=/; max-age=${60 * 60 * 24 * 7}; secure; samesite=lax`;
+
         setTimeout(() => {
-          router.push("/"); // Navigate to main page after successful OTP verification
+          router.push("/");
         }, 1000);
-      }
 
+      } else {
+        // Handle all non-successful responses here
+        setAlert({
+          type: 'error',
+          message: data.message || 'نام کاربری یا رمز عبور اشتباه است.',
+          duration: 3000,
+          onClose: () => setAlert(null)
+        });
+      }
     } catch (error) {
       setAlert({
         type: 'error',
@@ -97,19 +96,12 @@ export default function SignIn() {
     }
   };
 
-  useEffect(() => {
-    console.log("Form State:", state); // اینو اضافه کن
-
-    if (state.success) {
-      handleSubmit();
-    }
-  }, [state.success]);
 
 
   return (
     <main>
       {alert && <Alert {...alert} />}
-      <form action={formAction}>
+      <form onSubmit={handleSubmit}>
 
         <section className="sm:w-[416px]  w-[230px]  mt-[62px]  ">
           {/* add font  */}

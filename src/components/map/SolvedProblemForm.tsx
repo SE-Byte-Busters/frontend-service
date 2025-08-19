@@ -12,6 +12,7 @@ interface User {
 interface Comment {
   _id: string;
   user: User;
+  userName: string;
   text: string;
   date: string;
 }
@@ -78,6 +79,9 @@ const SolvedProblemForm: React.FC<SolvedProblemFormProps> = ({
 
   // Image carousel state
   const [currentIndex, setCurrentIndex] = useState(0);
+  const imageUrls = report?.images.map(img => img.url) || [];
+
+
 
   // Context
   const {
@@ -89,6 +93,17 @@ const SolvedProblemForm: React.FC<SolvedProblemFormProps> = ({
     isReporting,
     setIsReporting
   } = useReport();
+
+  // This map object remains the same
+  const categoryIconMap: any = {
+    failure: { src: "/images/icons/category/tools.svg", alt: "tools" },
+    lightbulb: { src: "/images/icons/category/lightbulb.svg", alt: "lightbulb" },
+    unsafe: { src: "/images/icons/category/barrier.svg", alt: "barrier" },
+    trash: { src: "/images/icons/category/trash.svg", alt: "trash" },
+    smog: { src: "/images/icons/category/smog.svg", alt: "smog" },
+    leaf: { src: "/images/icons/category/leaf.svg", alt: "leaf" },
+  };
+
 
   // Get token from localStorage
   const getAuthToken = () => {
@@ -106,7 +121,7 @@ const SolvedProblemForm: React.FC<SolvedProblemFormProps> = ({
     try {
       const token = getAuthToken();
       const response = await fetch(
-        `https://shahriar.thetechverse.ir:3000/api/v1/reports/${id}/`,
+        `https://shahriar.thetechverse.ir:3000/api/v1/report/reports/${id}/`,
         {
           method: 'GET',
           headers: {
@@ -137,7 +152,7 @@ const SolvedProblemForm: React.FC<SolvedProblemFormProps> = ({
     try {
       const token = getAuthToken();
       const response = await fetch(
-        `https://shahriar.thetechverse.ir:3000/api/v1/reports/${id}/comments`,
+        `https://shahriar.thetechverse.ir:3000/api/v1/report/reports/${id}`,
         {
           method: 'GET',
           headers: {
@@ -152,7 +167,7 @@ const SolvedProblemForm: React.FC<SolvedProblemFormProps> = ({
       }
 
       const data = await response.json();
-      setComments(data.comments || []);
+      setComments(data.report.comments || []);
     } catch (err) {
       console.error('Error fetching comments:', err);
     }
@@ -166,7 +181,7 @@ const SolvedProblemForm: React.FC<SolvedProblemFormProps> = ({
     try {
       const token = getAuthToken();
       const response = await fetch(
-        `https://shahriar.thetechverse.ir:3000/api/v1/reports/${reportId}/comments`,
+        `https://shahriar.thetechverse.ir:3000/api/v1/report/reports/${reportId}/comments`,
         {
           method: 'POST',
           headers: {
@@ -207,7 +222,7 @@ const SolvedProblemForm: React.FC<SolvedProblemFormProps> = ({
     try {
       const token = getAuthToken();
       const response = await fetch(
-        `https://shahriar.thetechverse.ir:3000/api/v1/reports/${reportId}/vote`,
+        `https://shahriar.thetechverse.ir:3000/api/v1/report/reports/${reportId}/vote`,
         {
           method: 'POST',
           headers: {
@@ -372,11 +387,10 @@ const SolvedProblemForm: React.FC<SolvedProblemFormProps> = ({
 
             {/* Priority Display */}
             <div className="m-[10px]">
-              <span className={`px-4 py-2 rounded-full text-sm font-bold ${
-                report.priority === 'high' ? 'bg-red-100 text-red-800' :
+              <span className={`px-4 py-2 rounded-full text-sm font-bold ${report.priority === 'high' ? 'bg-red-100 text-red-800' :
                 report.priority === 'medium' ? 'bg-yellow-100 text-yellow-800' :
-                'bg-green-100 text-green-800'
-              }`}>
+                  'bg-green-100 text-green-800'
+                }`}>
                 اولویت: {getPriorityText(report.priority)}
               </span>
             </div>
@@ -410,7 +424,7 @@ const SolvedProblemForm: React.FC<SolvedProblemFormProps> = ({
                 comments.map((comment) => (
                   <h2 key={comment._id} className="flex border-b border-[#685752] pb-6 pt-4 m-2">
                     <span className="font-bold text-[20px] text-[#685752] font-vazirmatn ml-8">
-                      {comment.user.username}
+                      {comment.userName}
                     </span>
                     <span className="font-bold text-[20px] text-[#685752] font-vazirmatn">
                       {comment.text}
@@ -427,150 +441,110 @@ const SolvedProblemForm: React.FC<SolvedProblemFormProps> = ({
 
       {/* بخش تصویر و رأی‌دهی */}
       <div className="col-span-12 md:col-span-5 space-y-3">
-        {/* Image Carousel */}
         <div className="relative w-80 h-80 overflow-hidden rounded-xl mx-auto">
-          {report.images && report.images.length > 0 ? (
+          {imageUrls.length > 0 ? (
             <>
-              <Image
-                src={report.images[currentIndex]?.url || "/images/special/kharabi.png"}
-                className="object-cover"
-                alt="report"
-                width={350}
-                height={310}
-              />
+              <Image src={imageUrls[currentIndex]}
+                className="object-cover w-full h-full"
+                alt="report image" layout="fill" />
 
-              {report.images.length > 1 && (
-                <>
-                  <button
-                    onClick={prevSlide}
-                    className="absolute top-1/2 left-2 transform -translate-y-1/2 bg-white rounded-full shadow"
-                  >
-                    <Image src="/images/icons/LeftArrow.png"
-                      className="object-cover"
-                      alt="previous" width={50} height={50} />
-                  </button>
-                  <button
-                    onClick={nextSlide}
-                    className="absolute top-1/2 right-2 transform -translate-y-1/2 bg-white rounded-full shadow"
-                  >
-                    <Image src="/images/icons/RightArrow.png"
-                      className="object-cover"
-                      alt="next" width={50} height={50} />
-                  </button>
-                  <div className="absolute bottom-2 left-1/2 transform -translate-x-1/2 flex gap-2">
-                    {report.images.map((_, idx) => (
-                      <div
-                        key={idx}
-                        className={`w-2 h-2 rounded-full ${
-                          idx === currentIndex ? "bg-green-400" : "bg-gray-300"
-                        }`}
-                      />
-                    ))}
-                  </div>
-                </>
-              )}
+              <button
+                onClick={prevSlide}
+                className="absolute top-1/2 left-2 transform -translate-y-1/2 bg-white rounded-full shadow p-2"
+              >
+                <Image src="/images/icons/LeftArrow.png" alt="previous" width={30} height={30} />
+              </button>
+              <button
+                onClick={nextSlide}
+                className="absolute top-1/2 right-2 transform -translate-y-1/2 bg-white rounded-full shadow p-2"
+              >
+                <Image src="/images/icons/RightArrow.png" alt="next" width={30} height={30} />
+              </button>
+              <div className="absolute bottom-2 left-1/2 transform -translate-x-1/2 flex gap-2">
+                {imageUrls.map((_, idx) => (
+                  <div key={idx} className={`w-2 h-2 rounded-full ${idx === currentIndex ? "bg-green-400" : "bg-gray-300"}`} />
+                ))}
+              </div>
             </>
           ) : (
-            <Image
-              src="/images/special/kharabi.png"
-              className="object-cover"
-              alt="report"
-              width={350}
-              height={310}
-            />
+            <div className="w-full h-full bg-gray-200 flex items-center justify-center text-[#685752]">
+              بدون تصویر
+            </div>
           )}
         </div>
+        <div className="w-full space-y-2"> {/* Increased space-y for better spacing */}
+          {/* Removed fixed height (h-18) and overflow-hidden to let content define size */}
+          {/* Increased font size from text-sm to text-xl */}
+          <div className="flex items-center justify-center w-full text-xl font-bold mt-[30px]">
 
-        {/* Vote Bar */}
-        <div className="w-full space-y-1">
-          <div className="flex w-full h-8 overflow-hidden rounded-full border border-gray-200 shadow-sm text-sm font-bold mt-[10px]">
-            <button onClick={() => handleVote('Down')} className="text-green-600 font-semibold rounded-full">
-              <Image src="/images/icons/dislike.png" alt="dislike" width={56} height={64} />
+            <button onClick={() => handleVote('Up')} className="pl-2 border-0 bg-transparent">
+              {/* Increased button image size for balance */}
+              <Image src="/images/icons/like.png" alt="like" width={110} height={130} />
             </button>
 
-            <div
-              className="bg-red-200 text-red-600 flex items-center justify-center"
-              style={{
-                width: `${negativePercent}%`,
-                borderTopLeftRadius: '9999px',
-                borderBottomLeftRadius: '9999px',
-                borderTopRightRadius: 0,
-                borderBottomRightRadius: 0,
-              }}
-            >
-              {Math.round(negativePercent)}٪
+            {/* Increased bar height from h-25 (which was likely a typo) to a larger h-12 */}
+            <div className="flex w-full h-9 rounded-full border border-gray-200 shadow-sm overflow-hidden">
+              <div
+                className="bg-green-200 text-green-600 flex items-center justify-center"
+                style={{ width: `${positivePercent}%` }}
+              >
+                {/* The text inside now uses the parent's text-xl class */}
+                {Math.round(positivePercent) != 0 ? Math.round(positivePercent) + "%" : ""}
+              </div>
+              <div
+                className="bg-red-200 text-red-600 flex items-center justify-center"
+                style={{ width: `${negativePercent}%` }}
+              >
+                {Math.round(negativePercent) != 0 ? Math.round(negativePercent) + "%" : ""}
+              </div>
             </div>
 
-            <div
-              className="bg-green-200 text-green-600 flex items-center justify-center"
-              style={{
-                width: `${positivePercent}%`,
-                borderTopRightRadius: '9999px',
-                borderBottomRightRadius: '9999px',
-                borderTopLeftRadius: 0,
-                borderBottomLeftRadius: 0,
-              }}
-            >
-              {Math.round(positivePercent)}٪
-            </div>
-
-            <button onClick={() => handleVote('Up')} className="text-red-500 font-semibold rounded-full">
-              <Image src="/images/icons/like.png" alt="like" width={56} height={64} />
+            <button onClick={() => handleVote('Down')} className="pr-2 border-0 bg-transparent">
+              {/* Increased button image size for balance */}
+              <Image src="/images/icons/dislike.png" alt="dislike" width={110} height={130} />
             </button>
           </div>
-
-          <p className="text-center text-xs text-gray-700">{totalVotes} نفر رای داده‌اند</p>
-
-          {/* Report Info */}
-          <section className="flex justify-between items-center gap-0 mt-10">
-            <Image src="/images/icons/profile.png" alt="profile" width={80} height={40} />
-            <section>
-              <h2 className="font-bold text-xl text-gray-800 mr-0 mt-4">{report.title}</h2>
-              <h2 className="font-bold text-lg text-gray-800 mr-0">
-                تاریخ ثبت گزارش: {formatDate(report.createdAt)}
-              </h2>
-              <h4 className="font-bold text-sm text-gray-800">{report.user.username}</h4>
-            </section>
-          </section>
-
-          <p className="text-[#000000] m-4">
-            {report.description}
-          </p>
-
-          <p className="text-[#000000] text-2xl font-bold m-4">
-            {report.city}, {report.approximatePosition}
-          </p>
+          {/* Increased font size for better readability */}
+          <p className="text-center text-sm text-gray-700">{totalVotes} نفر رای داده‌اند</p>
         </div>
 
-        {/* Action Buttons */}
-        <div className="col-span-12 text-center flex justify-center gap-4 mt-6">
-          <button
-            onClick={() => {
-              setIsReporting(false);
-              setPosition(null);
-              setIsVisible(true);
-            }}
-            className="bg-[#f89b2f] text-white px-6 py-2 rounded-full shadow-md hover:bg-[#e38821] transition"
-          >
-            بازگشت به نقشه
-          </button>
+        <section className="flex justify-between items-center gap-0 mt-10">
+          <Image src="/images/icons/profile.png" alt="profile" width={80} height={40} />
+          <section className='text-right'>
+            <h2 className="font-bold text-xl text-gray-800">{report.title}</h2>
+            <h2 className="font-bold text-lg text-gray-800">تاریخ ثبت: {formatDate(report.createdAt)}</h2>
+            <h4 className="font-bold text-sm text-gray-800">گزارشگر: {report.user?.username}</h4>
+          </section>
+        </section>
 
-          <button
-            onClick={() => {
-              setIsReporting(false);
-              setPosition(null);
-              setIsVisible(true);
-            }}
-            className="bg-transparent border-0 p-0"
-          >
-            <Image
-              src="/images/icons/X.png"
-              alt="بستن"
-              width={40}
-              height={40}
-              className="w-10 h-10"
-            />
-          </button>
+        <p className="text-[#000000] m-4 text-right">
+          {report.description}
+        </p>
+
+        <p className="text-[#000000] text-2xl font-bold m-4 text-right">{report.approximatePosition}</p>
+        <div className="flex items-center gap-2 absolute bottom-10">
+          {
+            // Make sure report and its category array exist before mapping
+            report?.category?.map(categoryName => {
+              if (typeof categoryName !== "string") {
+                return <></>;
+              }
+              const iconData = categoryIconMap[categoryName];
+              if (iconData) {
+                return (
+                  <Image
+                    key={categoryName}
+                    src={iconData.src}
+                    alt={iconData.alt}
+                    width={56}
+                    height={54}
+                  />
+                );
+              }
+              return null;
+            })
+              .filter(Boolean) // This is a clever way to remove nulls, but not needed if you map directly
+          }
         </div>
       </div>
     </div>

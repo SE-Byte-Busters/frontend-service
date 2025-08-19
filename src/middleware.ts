@@ -11,12 +11,13 @@ export function middleware(request: NextRequest) {
   }
 
   // Define routes
-
   const publicRoutes = [
     "/",
     "/map",
     "/auth/sign-up",
     "/auth/sign-in",
+    "/auth/otp",
+    "/auth/forget-password",
     "/leaderboard",
     "/report/reports",
   ];
