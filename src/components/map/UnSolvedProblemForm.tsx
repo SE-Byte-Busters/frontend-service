@@ -278,10 +278,10 @@ const UnSolvedProblemForm: React.FC<UnSolvedProblemFormProps> = ({
   // Dynamic priority icon
   const getPriorityIcon = (priority: string) => {
     switch (priority?.toLowerCase()) {
-      case 'high': return "/images/icons/priorityHight.png";
-      case 'medium': return "/images/icons/priorityMiddle.png";
+      case 'high': return "/images/icons/priorityHigh.png";
+      case 'medium': return "/images/icons/priorityMedium.png";
       case 'low': return "/images/icons/priorityLow.png";
-      default: return "/images/icons/priorityMiddle.png";
+      default: return "/images/icons/priorityMedium.png";
     }
   }
 
