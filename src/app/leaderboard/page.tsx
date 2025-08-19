@@ -1,165 +1,89 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 import Image from "next/image";
-import { ReportsList } from "@/components/report/ReportList";
-import { Report } from "@/components/report/ReportTypes";
+import LoadingSpinner from "@/components/LoadingSpinner";
 
-export default function ProcessedReports() {
-  const router = useRouter();
-  const [approvedReports, setApprovedReports] = useState<Report[]>([]);
-  const [lastTenReports, setLastTenReports] = useState<Report[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
-  const [showAuthAlert, setShowAuthAlert] = useState<boolean>(false);
+interface User {
+  _id: string;
+  firstName?: string;
+  lastName?: string;
+  username?: string;
+  profileUrl?: string;
+  totalScore: number;
+}
+
+export default function Leaderboard() {
+  const [users, setUsers] = useState<User[]>([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const token = localStorage.getItem("token");
-
-    /*     if (!token) {
-          setShowAuthAlert(true);
-          const timer = setTimeout(() => {
-            router.push("/auth/sign-up");
-          }, 3000);
-          return () => clearTimeout(timer);
-        } */
-
-    const fetchReports = async () => {
-      try {
-        // First verify token validity
-        const verifyRes = await fetch(
-          "https://shahriar.thetechverse.ir:3000/api/v1/user-profile/score-and-rank",
-          {
-            method: "GET",
-            headers: { Authorization: `Bearer ${token}` },
-          }
-        );
-
-        if (!verifyRes.ok) throw new Error("Invalid token");
-
-        // Then fetch reports
-        const res = await fetch(
-          "https://shahriar.thetechverse.ir:3000/api/v1/admin/get-stated-reports?page=1&limit=10&sortBy=createdAt",
-          {
-            method: "GET",
-            headers: { Authorization: `Bearer ${token}` },
-          }
-        );
-
-        if (!res.ok) throw new Error("Failed to fetch reports");
-
-        const data = await res.json();
-
-        // Filter for approvalStatus = 1
-        const approved = data.data.reports.filter((r: Report) => r.approvalStatus === 1);
-
-        // Sort by priority (High > Low) and then by voteScore (High > Low) for top reports
-        const prioritySorted = [...approved].sort((a: Report, b: Report) => {
-          const priorityOrder = ["High", "Medium", "Low"];
-          const aPriorityIndex = priorityOrder.indexOf(a.priority);
-          const bPriorityIndex = priorityOrder.indexOf(b.priority);
-
-          if (aPriorityIndex !== bPriorityIndex) {
-            return aPriorityIndex - bPriorityIndex;
-          }
-          return b.voteScore - a.voteScore;
-        });
-
-        // Get top 3 prioritized reports
-        setApprovedReports(prioritySorted.slice(0, 3));
-
-        // Get last 10 approved reports (newest first)
-        const lastTen = [...approved]
-          .sort((a: Report, b: Report) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
-          .slice(0, 10);
-
-        setLastTenReports(lastTen);
-
-      } catch (err: any) {
-        console.error("Error:", err);
-        if (err.message === "Invalid token") {
-          localStorage.removeItem("token");
-          setShowAuthAlert(true);
-          /* setTimeout(() => router.push("/auth/sign-up"), 3000); */
-        }
-      } finally {
+    fetch(
+      "https://shahriar.thetechverse.ir:3000/api/v1/user-profile/top?limit=10"
+    )
+      .then((res) => res.json())
+      .then((data) => {
+        setUsers(data);
         setLoading(false);
-      }
-    };
+      })
+      .catch(() => setLoading(false));
+  }, []);
 
-    fetchReports();
-  }, [router]);
-
-  if (showAuthAlert) {
+  if (loading) {
     return (
-      <div className="bg-light min-h-screen flex items-center justify-center">
-        <div className="bg-yellow-50 border-l-4 border-yellow-500 p-4 rounded-md shadow-lg max-w-md">
-          <div className="flex items-center gap-2 text-yellow-700" dir="rtl">
-            <span>⚠️</span>
-            <span>ابتدا وارد اکانت کاربری خود شوید</span>
-          </div>
-        </div>
+      <div className="flex justify-center items-center h-screen bg-white">
+        <LoadingSpinner />
       </div>
     );
   }
 
   return (
-    <div className="bg-light min-h-screen flex flex-col items-center px-4 pb-12 lg:pt-24 lg:pb-10">
-      <div className="flex flex-col items-center w-full max-w-6xl gap-12 mt-10">
-        {/* Top spacer */}
-        <div className="w-full h-16" />
+    <div dir="rtl" className="min-h-screen bg-gradient-to-b from-blue-50 to-white py-32 px-4">
+      <div className="max-w-4xl mx-auto bg-white rounded-2xl shadow-2xl p-8">
+        {/* Header */}
+        <h1 className="text-3xl md:text-5xl font-extrabold text-center mb-12 text-gradient-to-r text-primary">
+          🏆 ستارگان شهر
+        </h1>
 
-        {/* Top 3 Approved Reports */}
-        <div className="w-full">
-          <h2 className="text-xl font-semibold text-gray-900 mb-1 pb-2 flex items-center gap-2" dir="rtl">
-            <Image
-              src="/images/icons/worldcrown.jpg"
-              alt="Top reports icon"
-              width={24}
-              height={24}
-              className="shrink-0"
-            />
-            صدر لیست گزارشات محبوب
-          </h2>
-          <p className="text-m text-primary mb-4">
-            این گزارش‌ها بیشترین میزان پسند و مشارکت کاربران را داشته‌اند و در صدر توجه قرار گرفته‌اند.
-          </p>
-          {loading ? (
-            <div className="bg-gray-100 p-4 rounded-lg text-center text-gray-700">در حال بارگذاری...</div>
-          ) : approvedReports.length > 0 ? (
-            <ReportsList reports={approvedReports} loading={loading} adminView={true} />
-          ) : (
-            <div className="bg-green-50 p-4 rounded-lg text-center text-green-700">
-              هیچ گزارشی تایید نشده است
-            </div>
-          )}
-        </div>
+        {/* Users List */}
+        <ul className="divide-y divide-gray-200">
+          {users.map((user, index) => (
+            <li
+              key={user._id}
+              className="flex items-center justify-between py-4 px-6 hover:bg-light rounded-xl transition"
+            >
+              {/* Rank */}
+              <div className="w-10 text-center font-bold text-lg text-gray-700">
+                {index + 1}
+              </div>
 
-        {/* Last 10 Approved Reports */}
-        <div className="w-full">
-          <h2 className="text-xl font-semibold text-gray-900 mb-1 pb-2 flex items-center gap-2" dir="rtl">
-            <Image
-              src="/images/icons/handguy.jpg"
-              alt="Recent reports icon"
-              width={24}
-              height={24}
-              className="shrink-0"
-            />
-            آخرین گزارش‌های ثبت‌شده
-          </h2>
-          <p className="text-m text-primary mb-4">
-            گزارش‌هایی که همین حالا ارسال شدن—شاید مشکلی باشه که تو هم بتونی براش کاری بکنی!
-          </p>
-          {loading ? (
-            <div className="bg-gray-100 p-4 rounded-lg text-center text-gray-700">در حال بارگذاری...</div>
-          ) : lastTenReports.length > 0 ? (
-            <ReportsList reports={lastTenReports} loading={loading} adminView={true} />
-          ) : (
-            <div className="bg-blue-50 p-4 rounded-lg text-center text-blue-700">
-              هیچ گزارشی تایید نشده است
-            </div>
-          )}
-        </div>
+              {/* Profile & Name */}
+              <div className="flex items-center gap-4 flex-1">
+                <div className="relative w-12 h-12 rounded-full overflow-hidden bg-gray-200">
+                  {user.profileUrl ? (
+                    <Image
+                      src={user.profileUrl}
+                      alt={user.firstName || user.username || "کاربر"}
+                      fill
+                      className="object-cover"
+                    />
+                  ) : (
+                    <div className="flex items-center justify-center w-full h-full text-gray-500">
+                      👤
+                    </div>
+                  )}
+                </div>
+                <span className="font-semibold text-gray-800">
+                  {user.firstName || ""} {user.lastName || ""}
+                  {!user.firstName && !user.lastName && user.username}
+                </span>
+              </div>
+
+              {/* Score */}
+              <div className="font-bold text-accent text-lg">{user.totalScore} امتیاز</div>
+            </li>
+          ))}
+        </ul>
       </div>
     </div>
   );

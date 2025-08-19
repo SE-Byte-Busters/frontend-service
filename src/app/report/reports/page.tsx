@@ -1,132 +1,94 @@
 "use client";
 
-import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
-import Image from 'next/image';
-import Link from 'next/link';
-import { Alert, AlertProps } from '@/components/Alert';
-import { ReportsList } from '@/components/report/ReportList';
-import { Report } from '@/components/report/ReportTypes';
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import Image from "next/image";
+import { ReportsList } from "@/components/report/ReportList";
+import { Report } from "@/components/report/ReportTypes";
 
-type UserData = {
-  _id: string;
-  score: number;
-  rank: number;
-  username: string;
-  profileUrl?: string | null; // added for profile image URL
-};
-
-export default function NewReport() {
+export default function ProcessedReports() {
   const router = useRouter();
-  const [userData, setUserData] = useState<UserData | null>(null);
-  const [reports, setReports] = useState<Report[]>([]);
+  const [approvedReports, setApprovedReports] = useState<Report[]>([]);
+  const [lastTenReports, setLastTenReports] = useState<Report[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
-  const [alert, setAlert] = useState<AlertProps | null>(null);
   const [showAuthAlert, setShowAuthAlert] = useState<boolean>(false);
 
   useEffect(() => {
-    const fetchData = async () => {
-      const token = localStorage.getItem('token');
-      if (!token) {
-        setShowAuthAlert(true);
-        setLoading(false);
-        return;
-      }
+    const token = localStorage.getItem("token");
+    
+/*     if (!token) {
+      setShowAuthAlert(true);
+      const timer = setTimeout(() => {
+        router.push("/auth/sign-up");
+      }, 3000);
+      return () => clearTimeout(timer);
+    } */
 
+    const fetchReports = async () => {
       try {
-        // Fetch score and rank
-        const userRes = await fetch(
-          'https://shahriar.thetechverse.ir:3000/api/v1/user-profile/score-and-rank', {
-          method: 'GET',
-          headers: {
-            'Authorization': `Bearer ${token}`,
-          },
-        }
+        // First verify token validity
+        const verifyRes = await fetch(
+          "https://shahriar.thetechverse.ir:3000/api/v1/user-profile/score-and-rank",
+          {
+            method: "GET",
+            headers: { Authorization: `Bearer ${token}` },
+          }
         );
 
-        if (!userRes.ok) throw new Error('Invalid token');
-        const userDataResponse = await userRes.json();
+        if (!verifyRes.ok) throw new Error("Invalid token");
 
-        // Fetch user profile to get profile image
-        const profileRes = await fetch(
-          'https://shahriar.thetechverse.ir:3000/api/v1/user-profile/', {
-          method: 'GET',
-          headers: {
-            'Authorization': `Bearer ${token}`,
-          },
-        }
+        // Then fetch reports
+        const res = await fetch(
+          "https://shahriar.thetechverse.ir:3000/api/v1/admin/get-stated-reports?page=1&limit=10&sortBy=createdAt",
+          {
+            method: "GET",
+            headers: { Authorization: `Bearer ${token}` },
+          }
         );
 
-        if (!profileRes.ok) throw new Error('Failed to fetch profile image');
-        const profileData = await profileRes.json();
-        const profileImageUrl = profileData.data?.profileUrl || null;
+        if (!res.ok) throw new Error("Failed to fetch reports");
 
-        // Combine all user data into one object
-        setUserData({
-          ...userDataResponse.data,
-          profileUrl: profileImageUrl,
+        const data = await res.json();
+
+        // Filter for approvalStatus = 1
+        const approved = data.data.reports.filter((r: Report) => r.approvalStatus === 1);
+
+        // Sort by priority (High > Low) and then by voteScore (High > Low) for top reports
+        const prioritySorted = [...approved].sort((a: Report, b: Report) => {
+          const priorityOrder = ["High", "Medium", "Low"];
+          const aPriorityIndex = priorityOrder.indexOf(a.priority);
+          const bPriorityIndex = priorityOrder.indexOf(b.priority);
+
+          if (aPriorityIndex !== bPriorityIndex) {
+            return aPriorityIndex - bPriorityIndex;
+          }
+          return b.voteScore - a.voteScore;
         });
 
-        // Fetch reports as before
-        const reportsRes = await fetch(
-          'https://shahriar.thetechverse.ir:3000/api/v1/report/reports', {
-          method: 'GET',
-          headers: {
-            'Authorization': `Bearer ${token}`,
-          },
-        }
-        );
+        // Get top 3 prioritized reports
+        setApprovedReports(prioritySorted.slice(0, 3));
 
-        if (!reportsRes.ok) throw new Error('Failed to fetch reports');
-        const reportsData = await reportsRes.json();
-        setReports(reportsData.data.reports);
-      } catch (err: any) {
-        if (err.message === 'Invalid token') {
-          localStorage.removeItem('token');
+        // Get last 10 approved reports (newest first)
+        const lastTen = [...approved]
+          .sort((a: Report, b: Report) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+          .slice(0, 10);
+
+        setLastTenReports(lastTen);
+
+      } catch (err) {
+        console.error("Error:", err);
+        if (err.message === "Invalid token") {
+          localStorage.removeItem("token");
           setShowAuthAlert(true);
-        } else {
-          setAlert({
-            type: 'error',
-            message: 'خطا در دریافت اطلاعات. لطفاً دوباره تلاش کنید.',
-            duration: 3000,
-            onClose: () => setAlert(null)
-          });
+          /* setTimeout(() => router.push("/auth/sign-up"), 3000); */
         }
-        console.error(err);
       } finally {
         setLoading(false);
       }
     };
 
-    fetchData();
-  }, []);
-
-  const placeholderReports: Report[] = Array(3).fill(null).map((_, index) => ({
-    _id: `placeholder-${index}`,
-    user: '',
-    title: 'در حال بارگذاری...',
-    description: 'توضیحات گزارش در حال بارگذاری می‌باشد',
-    approximatePosition: 'موقعیت نامشخص',
-    location: { type: '', coordinates: [0, 0] },
-    city: 'شهر نامشخص',
-    category: [],
-    images: [],
-    status: 0,
-    approvalStatus: 0,
-    voteScore: 0,
-    createdAt: new Date().toISOString(),
-    priority: "Low",
-    updatedAt: new Date().toISOString(),
-  }));
-
-  const displayReports = loading ? placeholderReports : reports;
-  const displayUserData = loading ? {
-    _id: 'placeholder',
-    score: 0,
-    rank: 0,
-    username: 'کاربر',
-    profileUrl: null,
-  } : userData;
+    fetchReports();
+  }, [router]);
 
   if (showAuthAlert) {
     return (
@@ -134,7 +96,7 @@ export default function NewReport() {
         <div className="bg-yellow-50 border-l-4 border-yellow-500 p-4 rounded-md shadow-lg max-w-md">
           <div className="flex items-center gap-2 text-yellow-700" dir="rtl">
             <span>⚠️</span>
-            <span>برای مشاهده گزارش‌های خود ابتدا وارد حساب کاربری شوید</span>
+            <span>ابتدا وارد اکانت کاربری خود شوید</span>
           </div>
         </div>
       </div>
@@ -142,77 +104,62 @@ export default function NewReport() {
   }
 
   return (
-    <div className="bg-light min-h-screen flex flex-col items-center px-4 pt-20 pb-12 lg:pt-10 lg:pb-10">
-      {alert && <Alert {...alert} />}
+    <div className="bg-light min-h-screen flex flex-col items-center px-4 pb-12 lg:pt-24 lg:pb-10">
       <div className="flex flex-col items-center w-full max-w-6xl gap-12 mt-10">
-        {/* Profile Info & Stats */}
-        <div className="w-full flex flex-col-reverse lg:flex-row-reverse items-center lg:items-center lg:justify-center gap-6">
-          {/* Stats Section */}
-          <div className="flex flex-col items-center gap-2 w-full max-w-md">
-            <div className="w-full flex justify-between px-6 text-lg text-gray-900">
-              <span className="text-right w-1/3">رتبه</span>
-              <span className="text-center w-1/3">نشان دریافتی</span>
-              <span className="text-left w-1/3">امتیاز کل</span>
-            </div>
-            <div className="bg-accent rounded-full px-6 py-3 flex justify-between items-center w-full text-sm md:text-base text-gray-900">
-              <span className="text-right w-1/3">{displayUserData?.rank ?? '--'}</span>
-              <span className="text-center w-1/3">
-                {displayUserData?.rank === 1 ? 'قهرمان محیط زیست و فعال ترین گزارش دهنده' : '--'}
-              </span>
-              <span className="text-left w-1/3">{displayUserData?.score ?? '--'}</span>
-            </div>
-          </div>
+        {/* Top spacer */}
+        <div className="w-full h-16" />
 
-          {/* Profile Image + Name */}
-          <div className="flex flex-col items-center">
-            <Image
-              src={displayUserData?.profileUrl || "/images/avatars/default-profile.png"}
-              alt="Profile"
-              width={120}
-              height={120}
-              className="rounded-full"
+        {/* Top 3 Approved Reports */}
+        <div className="w-full">
+          <h2 className="text-xl font-semibold text-gray-900 mb-1 pb-2 flex items-center gap-2" dir="rtl">
+            <Image 
+              src="/images/icons/worldcrown.jpg" 
+              alt="Top reports icon" 
+              width={24} 
+              height={24} 
+              className="shrink-0" 
             />
-            <p className="font-bold text-md text-gray-900 mt-2">{displayUserData?.username ?? 'کاربر'}</p>
-          </div>
+            صدر لیست گزارشات محبوب
+          </h2>
+          <p className="text-m text-primary mb-4">
+            این گزارش‌ها بیشترین میزان پسند و مشارکت کاربران را داشته‌اند و در صدر توجه قرار گرفته‌اند.
+          </p>
+          {loading ? (
+            <div className="bg-gray-100 p-4 rounded-lg text-center text-gray-700">در حال بارگذاری...</div>
+          ) : approvedReports.length > 0 ? (
+            <ReportsList reports={approvedReports} loading={loading} adminView={true} />
+          ) : (
+            <div className="bg-green-50 p-4 rounded-lg text-center text-green-700">
+              هیچ گزارشی تایید نشده است
+            </div>
+          )}
         </div>
 
-        {/* Reports Section */}
-        {displayReports.length > 0 ? (
-          <ReportsList reports={displayReports} loading={loading} />
-        ) : (
-          !loading && (
-            <div className="w-full px-4 sm:px-6 lg:px-8 py-12 sm:py-16">
-              <div className="flex flex-col items-center gap-8 sm:gap-12 lg:gap-16 sm:flex-row sm:items-center">
-                <Image
-                  src="/images/special/no-report.png"
-                  width={373}
-                  height={276}
-                  alt="no report image"
-                  className="w-48 sm:w-56 md:w-64 lg:w-72 h-auto"
-                />
-
-                <div className="flex flex-col items-center text-center gap-4 sm:gap-6">
-                  <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-dark">
-                    تو هم می‌تونی اثر بذاری!
-                  </h1>
-
-                  <p className="text-base text-justify sm:text-lg md:text-xl text-dark max-w-md leading-relaxed">
-                    منتظرت بودیم! الان بهترین زمانه که صدات رو به گوش برسونی و کمک کنی شهری پاک‌تر و سالم‌تر داشته باشیم.
-                  </p>
-
-                  <Link
-                    href="/map"
-                    className="bg-accent text-white text-lg sm:text-xl md:text-2xl rounded-lg px-4 py-2 sm:px-6 sm:py-3
-                    transition duration-300 hover:text-black w-auto"
-                    aria-label="ثبت گزارش جدید"
-                  >
-                    ثبت گزارش جدید
-                  </Link>
-                </div>
-              </div>
+        {/* Last 10 Approved Reports */}
+        <div className="w-full">
+          <h2 className="text-xl font-semibold text-gray-900 mb-1 pb-2 flex items-center gap-2" dir="rtl">
+            <Image 
+              src="/images/icons/handguy.jpg" 
+              alt="Recent reports icon" 
+              width={24} 
+              height={24} 
+              className="shrink-0" 
+            />
+            آخرین گزارش‌های ثبت‌شده
+          </h2>
+          <p className="text-m text-primary mb-4">
+            گزارش‌هایی که همین حالا ارسال شدن—شاید مشکلی باشه که تو هم بتونی براش کاری بکنی!
+          </p>
+          {loading ? (
+            <div className="bg-gray-100 p-4 rounded-lg text-center text-gray-700">در حال بارگذاری...</div>
+          ) : lastTenReports.length > 0 ? (
+            <ReportsList reports={lastTenReports} loading={loading} adminView={true} />
+          ) : (
+            <div className="bg-blue-50 p-4 rounded-lg text-center text-blue-700">
+              هیچ گزارشی تایید نشده است
             </div>
-          )
-        )}
+          )}
+        </div>
       </div>
     </div>
   );
