@@ -1,8 +1,6 @@
 import { NextResponse, type NextRequest } from "next/server";
 
 export function middleware(request: NextRequest) {
-  return NextResponse.next();
-
   const token = request.cookies.get("token")?.value || "";
   const role = request.cookies.get("role")?.value?.toLowerCase() || "nonuser";
   let path = request.nextUrl.pathname;
@@ -27,9 +25,10 @@ export function middleware(request: NextRequest) {
     "/admin",
     "/admin/reports/processed",
     "/admin/profile/edit",
+    "/report/[id]",
   ];
   const userRoutes = [
-    "/report",
+    "/report/[id]",
     "/report/reports",
     "/user/profile/edit",
     "/user/leave-a-review",
@@ -43,10 +42,13 @@ export function middleware(request: NextRequest) {
     (route) => path === route || path.startsWith(`${route}/`)
   );
   const isAdminRoute = adminRoutes.some(
-    (route) => path.startsWith(route) // Changed to startsWith to catch all admin subroutes
+    (route) => path.startsWith(route) ||
+      (route === "/report/[id]" && /^\/report\/[^/]+$/.test(path))
   );
   const isUserRoute = userRoutes.some(
-    (route) => path.startsWith(route) // Changed to startsWith to catch all user subroutes
+    (route) =>
+      path.startsWith(route) ||
+      (route === "/report/[id]" && /^\/report\/[^/]+$/.test(path))
   );
 
   // Always allow 404 page
