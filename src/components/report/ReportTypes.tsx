@@ -1,6 +1,7 @@
 type ReportImage = {
   key: string;
   url: string;
+  _id: string;
 };
 
 type Location = {
@@ -8,9 +9,20 @@ type Location = {
   coordinates: [number, number];
 };
 
-export type Report = {
+type User = {
+  _id: string;
+  username: string;
+};
+
+type Vote = {
   _id: string;
   user: string;
+  direction: string;
+}
+
+export type Report = {
+  _id: string;
+  user: User;
   title: string;
   description: string;
   approximatePosition: string;
@@ -20,10 +32,14 @@ export type Report = {
   images: ReportImage[];
   status: number;
   approvalStatus: number;
+  completionStatus: number;
+  score: number;
+  votes: Vote[];
   voteScore: number;
   createdAt: string;
   priority: "High" | "Medium" | "Low";
   updatedAt: string;
+  comments?: Comment[];
 };
 
 export type ReportsResponse = {
@@ -35,3 +51,12 @@ export type ReportsResponse = {
     limit: number;
   };
 };
+
+export type Comment = {
+  _id: string;
+  user: string;
+  text: string;
+  date: string;
+}
+
+export type ReportState = 'not-approved' | 'approved-unresolved' | 'approved-resolved' | 'denied' | 'unknown';

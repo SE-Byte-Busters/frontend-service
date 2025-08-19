@@ -49,7 +49,7 @@ export default function Header() {
   }, []);
 
   return (
-    <header className="bg-white/60 shadow-md fixed top-0 left-0 w-full z-20 backdrop-blur">
+    <header className="bg-white/60 shadow-md fixed top-0 left-0 w-full z-[1500] backdrop-blur">
       <div className="flex flex-col sm:flex-row justify-between items-center container mx-auto px-4 sm:px-6 gap-2 sm:gap-0">
         {/* Desktop view */}
         <div className="hidden sm:block w-full">

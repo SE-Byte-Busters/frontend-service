@@ -35,7 +35,7 @@ export const ReportsList = ({ reports, loading = false, adminView = false, onSta
   }
 
   return (
-    <div className="w-full flex flex-row-reverse flex-wrap justify-end gap-6">
+    <div className="w-full flex flex-wrap justify-end gap-6 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
       {reports.map((report) => (
         <ReportCard
           key={report._id}
