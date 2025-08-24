@@ -1,4 +1,4 @@
-"use client"; // Ensure this is a client-side component
+"use client";
 
 import Link from "next/link";
 import Image from "next/image";
@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation";
 import { useState, useEffect } from "react";
 
 import { LucideIconName, Icon } from "@/components/Icon";
+import { NotificationIcon } from '@/components/NotificationIcon';
 
 export default function MobileHeader({
   navItems,
@@ -19,9 +20,8 @@ export default function MobileHeader({
   const pathname = usePathname();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [username, setUsername] = useState<string | null>(null);
-  const [loading, setLoading] = useState(true); // 🔥
+  const [loading, setLoading] = useState(true);
 
-  // Fetch username from API using the token stored in localStorage
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (token) {
@@ -34,17 +34,17 @@ export default function MobileHeader({
         .then((response) => response.json())
         .then((data) => {
           if (data?.data?.username) {
-            setUsername(data.data.username); // Set the username from the API response
+            setUsername(data.data.username);
           }
         })
         .catch((error) => {
           console.error("Error fetching user data:", error);
         })
         .finally(() => {
-          setLoading(false); // 🔥
+          setLoading(false);
         });
     } else {
-      setLoading(false); // 🔥
+      setLoading(false);
     }
   }, []);
 
@@ -54,18 +54,20 @@ export default function MobileHeader({
 
   return (
     <>
-      {/* Mobile header */}
       <div className="flex items-center justify-between w-full py-1">
         {/* Auth or username display */}
         {loading ? (
           <div className="p-2 bg-accent rounded-lg w-24 h-10 animate-pulse" />
         ) : username ? (
-          <Link
-            href="/admin/profile/edit" // ⬅️ Navigate to profile edit when username exists
-            className="p-2 bg-accent rounded-lg hover:text-black transition-colors"
-          >
-            {username}
-          </Link>
+          <div className="flex items-center gap-2">
+            <Link
+              href="/admin/profile/edit"
+              className="p-2 bg-accent rounded-lg hover:text-black transition-colors"
+            >
+              {username}
+            </Link>
+            <NotificationIcon />
+          </div>
         ) : (
           <Link
             href="/auth/sign-up"
