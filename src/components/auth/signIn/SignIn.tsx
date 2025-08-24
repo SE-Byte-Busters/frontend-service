@@ -70,6 +70,7 @@ export default function SignIn() {
 
         localStorage.setItem("token", data.data.token);
         localStorage.setItem("role", data.data.role);
+        window.dispatchEvent(new Event('login'));
         document.cookie = `token=${data.data.token}; path=/; max-age=${60 * 60 * 24 * 7}; secure; samesite=lax`;
         document.cookie = `role=${data.data.role}; path=/; max-age=${60 * 60 * 24 * 7}; secure; samesite=lax`;
 

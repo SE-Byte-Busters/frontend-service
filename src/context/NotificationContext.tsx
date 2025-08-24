@@ -47,7 +47,19 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
   const [token, setToken] = useState<string | null>(null);
 
   useEffect(() => {
-    setToken(localStorage.getItem('token'));
+    const handleStorageChange = () => {
+      const newToken = localStorage.getItem('token');
+      setToken(newToken);
+    };
+
+    window.addEventListener('storage', handleStorageChange);
+
+    window.addEventListener('login', handleStorageChange);
+
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+      window.removeEventListener('login', handleStorageChange);
+    };
   }, []);
 
   useEffect(() => {
