@@ -766,6 +766,77 @@ export default function ReportPage() {
                   <p>{report.score}</p>
                 </div>
               </div>
+
+              <div className="p-2">
+                <h2 className="text-xl font-semibold mb-4 text-dark">دسته‌بندی‌ها</h2>
+                <div className="flex items-center gap-2 justify-end">
+                  {report.category?.map(categoryName => {
+                    const iconData = categoryIconMap[categoryName];
+                    if (!iconData) return null;
+                    return (
+                      <div key={categoryName} className="relative">
+                        <div
+                          onMouseEnter={() => setActiveCategory(categoryName)}
+                          onMouseLeave={() => setActiveCategory(null)}
+                          onClick={() => setActiveCategory(activeCategory === categoryName ? null : categoryName)}
+                          className="cursor-pointer"
+                        >
+                          <Image
+                            src={iconData.src}
+                            alt={iconData.alt}
+                            width={56}
+                            height={54}
+                          />
+                        </div>
+                        {activeCategory === categoryName && (
+                          <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-2 py-1 bg-gray-800 text-white text-sm rounded whitespace-nowrap">
+                            {iconData.fa}
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+
+              <div className="p-2">
+                <h2 className="text-xl font-semibold mb-4 text-dark">
+                  رأی‌ها
+                </h2>
+                <div className="flex items-center justify-center w-full text-xl font-bold mt-[30px]">
+                  <button
+                    onClick={() => handleVote('Up')}
+                    className="pl-2 border-0 bg-transparent"
+                    disabled={isSubmittingVote}
+                  >
+                    <Image src="/images/icons/like.png" alt="like" width={110} height={130} />
+                  </button>
+
+                  <div className="flex w-full h-9 rounded-full border border-gray-200 shadow-sm overflow-hidden">
+                    <div
+                      className="bg-green-200 text-green-600 flex items-center justify-center"
+                      style={{ width: `${positivePercent}%` }}
+                    >
+                      {Math.round(positivePercent) != 0 ? Math.round(positivePercent) + "%" : ""}
+                    </div>
+                    <div
+                      className="bg-red-200 text-red-600 flex items-center justify-center"
+                      style={{ width: `${negativePercent}%` }}
+                    >
+                      {Math.round(negativePercent) != 0 ? Math.round(negativePercent) + "%" : ""}
+                    </div>
+                  </div>
+
+                  <button
+                    onClick={() => handleVote('Down')}
+                    className="pr-2 border-0 bg-transparent"
+                    disabled={isSubmittingVote}
+                  >
+                    <Image src="/images/icons/dislike.png" alt="dislike" width={110} height={130} />
+                  </button>
+                </div>
+                <p className="text-center text-sm text-gray-700 mt-2">{totalVotes} نفر رای داده‌اند</p>
+              </div>
             </div>
           </div>
 
@@ -807,77 +878,6 @@ export default function ReportPage() {
                   <p>تصویری برای این گزارش موجود نیست</p>
                 </div>
               )}
-            </div>
-
-            <div className="bg-white rounded-lg shadow-md p-4 text-right">
-              <h2 className="text-xl font-semibold mb-4 text-dark">
-                رأی‌ها
-              </h2>
-              <div className="flex items-center justify-center w-full text-xl font-bold mt-[30px]">
-                <button
-                  onClick={() => handleVote('Up')}
-                  className="pl-2 border-0 bg-transparent"
-                  disabled={isSubmittingVote}
-                >
-                  <Image src="/images/icons/like.png" alt="like" width={110} height={130} />
-                </button>
-
-                <div className="flex w-full h-9 rounded-full border border-gray-200 shadow-sm overflow-hidden">
-                  <div
-                    className="bg-green-200 text-green-600 flex items-center justify-center"
-                    style={{ width: `${positivePercent}%` }}
-                  >
-                    {Math.round(positivePercent) != 0 ? Math.round(positivePercent) + "%" : ""}
-                  </div>
-                  <div
-                    className="bg-red-200 text-red-600 flex items-center justify-center"
-                    style={{ width: `${negativePercent}%` }}
-                  >
-                    {Math.round(negativePercent) != 0 ? Math.round(negativePercent) + "%" : ""}
-                  </div>
-                </div>
-
-                <button
-                  onClick={() => handleVote('Down')}
-                  className="pr-2 border-0 bg-transparent"
-                  disabled={isSubmittingVote}
-                >
-                  <Image src="/images/icons/dislike.png" alt="dislike" width={110} height={130} />
-                </button>
-              </div>
-              <p className="text-center text-sm text-gray-700 mt-2">{totalVotes} نفر رای داده‌اند</p>
-            </div>
-
-            <div className="bg-white rounded-lg shadow-md p-4 text-right">
-              <h2 className="text-xl font-semibold mb-4 text-dark">دسته‌بندی‌ها</h2>
-              <div className="flex items-center gap-2 justify-end">
-                {report.category?.map(categoryName => {
-                  const iconData = categoryIconMap[categoryName];
-                  if (!iconData) return null;
-                  return (
-                    <div key={categoryName} className="relative">
-                      <div
-                        onMouseEnter={() => setActiveCategory(categoryName)}
-                        onMouseLeave={() => setActiveCategory(null)}
-                        onClick={() => setActiveCategory(activeCategory === categoryName ? null : categoryName)}
-                        className="cursor-pointer"
-                      >
-                        <Image
-                          src={iconData.src}
-                          alt={iconData.alt}
-                          width={56}
-                          height={54}
-                        />
-                      </div>
-                      {activeCategory === categoryName && (
-                        <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-2 py-1 bg-gray-800 text-white text-sm rounded whitespace-nowrap">
-                          {iconData.fa}
-                        </div>
-                      )}
-                    </div>
-                  );
-                })}
-              </div>
             </div>
 
             <div className="bg-white rounded-lg shadow-md p-4 h-96 text-right flex flex-col overflow-hidden">
