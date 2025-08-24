@@ -19,7 +19,7 @@ interface Ticket {
   admin?: Admin;
   createdAt: string;
   respondedAt?: string;
-  report: Report;
+  report: Report | null;
 }
 
 const UserTicketPage = () => {
@@ -154,7 +154,7 @@ const UserTicketPage = () => {
                   {/* Status and Report Title */}
                   <div className="flex items-center justify-between mb-3">
                     <h3 className="font-medium text-gray-900">
-                      {ticket.report?.title || "بدون عنوان"}
+                      {ticket.report?.title || "گزارش حذف شده"}
                     </h3>
                     <span
                       className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
@@ -196,10 +196,15 @@ const UserTicketPage = () => {
                   {/* View Report Button and Dates */}
                   <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between pt-2 border-t border-gray-100">
                     <Link
-                      href={`/report/${ticket.report._id}`}
-                      className="mb-2 sm:mb-0 inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors"
+                      href={ticket.report ? `/report/${ticket.report._id}` : '#'}
+                      className={`mb-2 sm:mb-0 inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded-md shadow-sm text-white transition-colors ${
+                        ticket.report
+                          ? "bg-blue-600 hover:bg-blue-700 focus:ring-blue-500"
+                          : "bg-gray-400 cursor-not-allowed"
+                      }`}
+                      onClick={e => !ticket.report && e.preventDefault()}
                     >
-                      مشاهده گزارش
+                      {ticket.report ? "مشاهده گزارش" : "گزارش حذف شده"}
                     </Link>
 
                     <div className="flex flex-col text-xs text-gray-500">

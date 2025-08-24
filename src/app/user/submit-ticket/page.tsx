@@ -1,13 +1,26 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
+import { RefreshCw } from "lucide-react";
 
-const SubmitTicketPage = () => {
+function LoadingComponent() {
+  return (
+    <div className="bg-white min-h-screen px-6 py-10">
+      <div className="max-w-7xl mx-auto">
+        <div className="flex items-center justify-center h-64">
+          <RefreshCw className="animate-spin h-8 w-8 text-blue-600" />
+          <span className="mr-2 text-gray-600">در حال بارگذاری...</span>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function SubmitTicketContent() {
   const searchParams = useSearchParams();
   const reportIdFromUrl = searchParams.get("reportId");
 
-  // State for ticket submission
   const [reportId, setReportId] = useState(reportIdFromUrl || "");
   const [userMessage, setUserMessage] = useState("");
   const [submitLoading, setSubmitLoading] = useState(false);
@@ -329,6 +342,12 @@ const SubmitTicketPage = () => {
       </div>
     </div>
   );
-};
+}
 
-export default SubmitTicketPage;
+export default function SubmitTicketPage() {
+  return (
+    <Suspense fallback={<LoadingComponent />}>
+      <SubmitTicketContent />
+    </Suspense>
+  );
+}
