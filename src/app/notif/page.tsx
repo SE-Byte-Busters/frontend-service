@@ -3,47 +3,49 @@
 import { connectSocket } from '@/lib/socket';
 import { useEffect, useState } from 'react';
 
-const NotificationsPage = () => {
+export default function NotificationsPage() {
+  const [socketConnected, setSocketConnected] = useState(false);
+  const [notifications, setNotifications] = useState<string[]>([]);
+  const [token, setToken] = useState<string | null>(null);
 
-    const [socketConnected, setSocketConnected] = useState(false);
-    const [notifications, setNotifications] = useState<string[]>([]);
+  useEffect(() => {
+    setToken(localStorage.getItem('token'));
+  }, []);
 
-    const token = localStorage.getItem('token');
+  useEffect(() => {
+    if (!token) return;
 
-    useEffect(() => {
-        const socket = connectSocket(token);
+    const socket = connectSocket(token);
 
-        socket.on('connect', () => {
-            console.log('✅ Socket connected:', socket.id);
-            setSocketConnected(true);
-        });
+    socket.on('connect', () => {
+      console.log('✅ Socket connected:', socket.id);
+      setSocketConnected(true);
+    });
 
-        socket.on('disconnect', () => {
-            console.log('❌ Socket disconnected');
-            setSocketConnected(false);
-        });
+    socket.on('disconnect', () => {
+      console.log('❌ Socket disconnected');
+      setSocketConnected(false);
+    });
 
-        socket.on('notification', (data: any) => {
-            console.log('📩 Notification received:', data);
-            setNotifications((prev) => [...prev, JSON.stringify(data)]);
-        });
+    socket.on('notification', (data: any) => {
+      console.log('📩 Notification received:', data);
+      setNotifications((prev) => [...prev, JSON.stringify(data)]);
+    });
 
-        return () => {
-            socket.disconnect();
-        };
-    }, []);
+    return () => {
+      socket.disconnect();
+    };
+  }, [token]);
 
-    return (
-        <div style={{ padding: 20 }}>
-            <h1>📨 Real-time Notifications</h1>
-            <p>Status: {socketConnected ? '🟢 Connected' : '🔴 Disconnected'}</p>
-            <ul>
-                {notifications.map((n, i) => (
-                    <li key={i}>{n}</li>
-                ))}
-            </ul>
-        </div>
-    );
-};
-
-export default NotificationsPage;
+  return (
+    <div style={{ padding: 20 }}>
+      <h1>📨 Real-time Notifications</h1>
+      <p>Status: {socketConnected ? '🟢 Connected' : '🔴 Disconnected'}</p>
+      <ul>
+        {notifications.map((n, i) => (
+          <li key={i}>{n}</li>
+        ))}
+      </ul>
+    </div>
+  );
+}

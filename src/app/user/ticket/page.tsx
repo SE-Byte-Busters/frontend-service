@@ -3,24 +3,40 @@
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
 
+interface Admin {
+  username: string;
+}
+
+interface Report {
+  _id: string;
+  title?: string;
+}
+
+interface Ticket {
+  _id: string;
+  userMessage: string;
+  adminDecisionNote?: string;
+  admin?: Admin;
+  createdAt: string;
+  respondedAt?: string;
+  report: Report | null;
+}
+
 const UserTicketPage = () => {
-  // State for tickets list
-  const [tickets, setTickets] = useState([]);
-  const [ticketsLoading, setTicketsLoading] = useState(true);
-  const [ticketsError, setTicketsError] = useState("");
+  const [tickets, setTickets] = useState<Ticket[]>([]);
+  const [ticketsLoading, setTicketsLoading] = useState<boolean>(true);
+  const [ticketsError, setTicketsError] = useState<string>("");
 
   const API_BASE_URL = "https://shahriar.thetechverse.ir:3000/api/v1";
 
-  // Get auth token
-  const getAuthToken = () => {
+  const getAuthToken = (): string | null => {
     if (typeof window !== "undefined") {
       return localStorage.getItem("token");
     }
     return null;
   };
 
-  // Format date to Persian
-  const formatPersianDate = (dateString) => {
+  const formatPersianDate = (dateString: string | undefined): string => {
     if (!dateString) return "تاریخ مشخص نشده";
 
     const date = new Date(dateString);
@@ -33,8 +49,7 @@ const UserTicketPage = () => {
     });
   };
 
-  // Fetch user tickets
-  const fetchUserTickets = async () => {
+  const fetchUserTickets = async (): Promise<void> => {
     setTicketsLoading(true);
     setTicketsError("");
 
@@ -58,17 +73,15 @@ const UserTicketPage = () => {
         throw new Error(data.message || "خطا در دریافت تیکت‌ها");
       }
 
-      console.log("✅ پاسخ کامل سرور:", JSON.stringify(data, null, 2));
       setTickets(data.tickets || []);
     } catch (error) {
       console.error("Error fetching tickets:", error);
-      setTicketsError(error.message);
+      setTicketsError(error instanceof Error ? error.message : "خطای ناشناخته");
     } finally {
       setTicketsLoading(false);
     }
   };
 
-  // Load tickets on component mount
   useEffect(() => {
     fetchUserTickets();
   }, []);
@@ -141,7 +154,7 @@ const UserTicketPage = () => {
                   {/* Status and Report Title */}
                   <div className="flex items-center justify-between mb-3">
                     <h3 className="font-medium text-gray-900">
-                      {ticket.report?.title || "بدون عنوان"}
+                      {ticket.report?.title || "گزارش حذف شده"}
                     </h3>
                     <span
                       className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
@@ -183,10 +196,15 @@ const UserTicketPage = () => {
                   {/* View Report Button and Dates */}
                   <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between pt-2 border-t border-gray-100">
                     <Link
-                      href={`/report/${ticket.report._id}`}
-                      className="mb-2 sm:mb-0 inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors"
+                      href={ticket.report ? `/report/${ticket.report._id}` : '#'}
+                      className={`mb-2 sm:mb-0 inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded-md shadow-sm text-white transition-colors ${
+                        ticket.report
+                          ? "bg-blue-600 hover:bg-blue-700 focus:ring-blue-500"
+                          : "bg-gray-400 cursor-not-allowed"
+                      }`}
+                      onClick={e => !ticket.report && e.preventDefault()}
                     >
-                      مشاهده گزارش
+                      {ticket.report ? "مشاهده گزارش" : "گزارش حذف شده"}
                     </Link>
 
                     <div className="flex flex-col text-xs text-gray-500">

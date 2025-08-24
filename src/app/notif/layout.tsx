@@ -1,13 +1,11 @@
-
-
 export default function RootLayout({
-    children,
+  children,
 }: Readonly<{
-    children: React.ReactNode;
+  children: React.ReactNode;
 }>) {
-    return (
-        <main>
-            <section>{children}</section>
-        </main>
-    );
+  return (
+    <main>
+      <section>{children}</section>
+    </main>
+  );
 }

@@ -1,5 +1,3 @@
-// part01 for this file
-
 "use client";
 
 import { useEffect, useState } from "react";
@@ -16,24 +14,55 @@ import {
   ExternalLink,
 } from "lucide-react";
 
+interface User {
+  _id?: string;
+  username?: string;
+  phoneNumber?: string;
+}
+
+interface Report {
+  _id?: string;
+  title?: string;
+  city?: string;
+  isResolved?: boolean;
+}
+
+interface Ticket {
+  _id: string;
+  user?: User;
+  userMessage: string;
+  adminDecisionNote?: string;
+  status: string;
+  priority: string;
+  createdAt: string;
+  respondedAt?: string;
+  report?: Report;
+  reportId?: string;
+}
+
+interface Stats {
+  total: number;
+  pending: number;
+  resolved: number;
+}
+
 export default function AdminTicketsPage() {
   const router = useRouter();
-  const [tickets, setTickets] = useState([]);
-  const [filteredTickets, setFilteredTickets] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [searchTerm, setSearchTerm] = useState("");
-  const [statusFilter, setStatusFilter] = useState("all");
-  const [selectedTicket, setSelectedTicket] = useState(null);
-  const [showModal, setShowModal] = useState(false);
-  const [adminResponse, setAdminResponse] = useState("");
-  const [updating, setUpdating] = useState(false);
-  const [stats, setStats] = useState({
+  const [tickets, setTickets] = useState<Ticket[]>([]);
+  const [filteredTickets, setFilteredTickets] = useState<Ticket[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [searchTerm, setSearchTerm] = useState<string>("");
+  const [statusFilter, setStatusFilter] = useState<string>("all");
+  const [selectedTicket, setSelectedTicket] = useState<Ticket | null>(null);
+  const [showModal, setShowModal] = useState<boolean>(false);
+  const [adminResponse, setAdminResponse] = useState<string>("");
+  const [updating, setUpdating] = useState<boolean>(false);
+  const [stats, setStats] = useState<Stats>({
     total: 0,
     pending: 0,
     resolved: 0,
   });
 
-  // Fetch tickets from API
   useEffect(() => {
     fetchTickets();
   }, []);
@@ -68,10 +97,9 @@ export default function AdminTicketsPage() {
       setTickets(ticketsData);
       setFilteredTickets(ticketsData);
 
-      // Calculate stats
       const total = ticketsData.length;
       const resolved = ticketsData.filter(
-        (ticket) =>
+        (ticket: Ticket) =>
           ticket.report?.isResolved === true ||
           ticket.status === "Resolved" ||
           ticket.status === "resolved" ||
@@ -87,23 +115,20 @@ export default function AdminTicketsPage() {
     }
   };
 
-  // Filter and search functionality
   useEffect(() => {
     let filtered = tickets;
 
-    // Apply status filter
     if (statusFilter !== "all") {
-      filtered = filtered.filter((ticket) =>
+      filtered = filtered.filter((ticket: Ticket) =>
         statusFilter === "pending"
           ? ticket.status === "Pending"
           : ticket.status === "Resolved" || ticket.status === "resolved"
       );
     }
 
-    // Apply search filter
     if (searchTerm) {
       filtered = filtered.filter(
-        (ticket) =>
+        (ticket: Ticket) =>
           ticket.report?.title
             ?.toLowerCase()
             .includes(searchTerm.toLowerCase()) ||
@@ -120,20 +145,20 @@ export default function AdminTicketsPage() {
     setFilteredTickets(filtered);
   }, [tickets, statusFilter, searchTerm]);
 
-  const handleTicketClick = (ticket) => {
+  const handleTicketClick = (ticket: Ticket): void => {
     setSelectedTicket(ticket);
     setAdminResponse(ticket.adminDecisionNote || "");
     setShowModal(true);
   };
 
-  const handleViewReport = (reportId, e) => {
-    e.stopPropagation(); // جلوگیری از باز شدن مودال تیکت
+  const handleViewReport = (reportId: string | undefined, e: React.MouseEvent): void => {
+    e.stopPropagation();
     if (reportId) {
       router.push(`/report/${reportId}`);
     }
   };
 
-  const handleUpdateTicket = async () => {
+  const handleUpdateTicket = async (): Promise<void> => {
     if (!selectedTicket || !adminResponse.trim()) {
       alert("لطفاً پاسخ خود را وارد کنید");
       return;
@@ -147,12 +172,10 @@ export default function AdminTicketsPage() {
         return;
       }
 
-      // ✅ از responseNote استفاده کنید
       const requestBody = {
         responseNote: adminResponse,
       };
 
-      // دیباگ کامل
       console.log("Ticket ID:", selectedTicket._id);
       console.log("Request Body:", requestBody);
       console.log(
@@ -172,7 +195,6 @@ export default function AdminTicketsPage() {
         }
       );
 
-      // دیباگ response
       console.log("Response Status:", response.status);
       console.log(
         "Response Headers:",
@@ -200,11 +222,9 @@ export default function AdminTicketsPage() {
       }
 
       console.log("Response Data:", responseData);
-      // ✅ از داده‌های بازگشتی از سرور استفاده کنید
       const updatedTicket = responseData.ticket;
 
-      // آپدیت لیست تیکت‌ها
-      const updatedTickets = tickets.map((ticket) =>
+      const updatedTickets = tickets.map((ticket: Ticket) =>
         ticket._id === selectedTicket._id ? updatedTicket : ticket
       );
 
@@ -212,9 +232,8 @@ export default function AdminTicketsPage() {
       setShowModal(false);
       setAdminResponse("");
 
-      // آپدیت آمار
       const resolved = updatedTickets.filter(
-        (ticket) =>
+        (ticket: Ticket) =>
           ticket.report?.isResolved === true ||
           ticket.status === "Resolved" ||
           ticket.respondedAt
@@ -225,13 +244,13 @@ export default function AdminTicketsPage() {
       alert("پاسخ با موفقیت ارسال شد");
     } catch (error) {
       console.error("Error updating ticket:", error);
-      alert(`خطا در ارسال پاسخ: ${error.message}`);
+      alert('خطا در ارسال پاسخ');
     } finally {
       setUpdating(false);
     }
   };
 
-  const getPriorityColor = (priority) => {
+  const getPriorityColor = (priority: string): string => {
     switch (priority) {
       case "high":
         return "bg-red-100 text-red-800 border-red-200";
@@ -244,7 +263,7 @@ export default function AdminTicketsPage() {
     }
   };
 
-  const getPriorityText = (priority) => {
+  const getPriorityText = (priority: string): string => {
     switch (priority) {
       case "high":
         return "اولویت بالا";
@@ -351,7 +370,7 @@ export default function AdminTicketsPage() {
                 placeholder="جستجو بر اساس عنوان، نام کاربر یا پیام..."
                 className="w-full pr-10 pl-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white text-gray-900 placeholder-gray-500"
                 value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearchTerm(e.target.value)}
               />
             </div>
 
@@ -359,7 +378,7 @@ export default function AdminTicketsPage() {
               <select
                 className="px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white text-gray-900"
                 value={statusFilter}
-                onChange={(e) => setStatusFilter(e.target.value)}
+                onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setStatusFilter(e.target.value)}
               >
                 <option value="all">همه وضعیت‌ها</option>
                 <option value="pending">در انتظار پاسخ</option>
@@ -380,7 +399,7 @@ export default function AdminTicketsPage() {
           </div>
         ) : (
           <div className="space-y-4">
-            {filteredTickets.map((ticket) => (
+            {filteredTickets.map((ticket: Ticket) => (
               <div
                 key={ticket._id}
                 className="bg-white rounded-xl shadow-sm border hover:shadow-md transition-all duration-200 cursor-pointer"
@@ -432,16 +451,15 @@ export default function AdminTicketsPage() {
                     </div>
 
                     <div className="flex items-center gap-3">
-                      {/* دکمه مشاهده گزارش */}
                       {(ticket.report?._id ||
                         ticket.reportId ||
                         ticket.report) && (
                         <button
-                          onClick={(e) =>
+                          onClick={(e: React.MouseEvent) =>
                             handleViewReport(
                               ticket.report?._id ||
                                 ticket.reportId ||
-                                ticket.report,
+                                (ticket.report as any)?._id,
                               e
                             )
                           }
@@ -453,16 +471,15 @@ export default function AdminTicketsPage() {
                         </button>
                       )}
 
-                      {/* دکمه موقت برای تست - نمایش همیشگی */}
                       <button
-                        onClick={(e) => {
+                        onClick={(e: React.MouseEvent) => {
                           e.stopPropagation();
                           console.log("Ticket data:", ticket);
                           alert(
                             `Report ID: ${
                               ticket.report?._id ||
                               ticket.reportId ||
-                              ticket.report ||
+                              (ticket.report as any)?._id ||
                               "یافت نشد"
                             }`
                           );
@@ -479,8 +496,8 @@ export default function AdminTicketsPage() {
                           ticket.report?.isResolved === true ||
                           ticket.status === "Resolved" ||
                           ticket.respondedAt
-                            ? "bg-green-100 text-green-800" // پاسخ داده شده - سبز
-                            : "bg-orange-100 text-orange-800" // در انتظار پاسخ - نارنجی
+                            ? "bg-green-100 text-green-800"
+                            : "bg-orange-100 text-orange-800"
                         }`}
                       >
                         {ticket.report?.isResolved === true ||
@@ -638,7 +655,7 @@ export default function AdminTicketsPage() {
                   style={{ color: "#111827" }}
                   placeholder="پاسخ خود را اینجا بنویسید..."
                   value={adminResponse}
-                  onChange={(e) => setAdminResponse(e.target.value)}
+                  onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setAdminResponse(e.target.value)}
                 />
                 {!adminResponse.trim() && (
                   <p className="text-sm text-red-500 mt-1">
@@ -650,7 +667,6 @@ export default function AdminTicketsPage() {
 
             <div className="p-6 border-t bg-gray-50 flex justify-between gap-3">
               <div>
-                {/* دکمه مشاهده گزارش در مودال */}
                 {(selectedTicket.report?._id ||
                   selectedTicket.reportId ||
                   selectedTicket.report) && (
@@ -661,7 +677,7 @@ export default function AdminTicketsPage() {
                         `/report/${
                           selectedTicket.report?._id ||
                           selectedTicket.reportId ||
-                          selectedTicket.report
+                          (selectedTicket.report as any)?._id
                         }`
                       );
                     }}
@@ -672,7 +688,6 @@ export default function AdminTicketsPage() {
                   </button>
                 )}
 
-                {/* دکمه تست موقت */}
                 <button
                   onClick={() => {
                     console.log("Selected ticket:", selectedTicket);
@@ -682,6 +697,7 @@ export default function AdminTicketsPage() {
                       )}\nReport ID: ${
                         selectedTicket.report?._id ||
                         selectedTicket.reportId ||
+                        (selectedTicket.report as any)?._id ||
                         "یافت نشد"
                       }`
                     );

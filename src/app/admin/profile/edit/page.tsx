@@ -15,7 +15,7 @@ type UserProfile = {
   firstName: string;
   lastName: string;
   isVerified: boolean;
-  profileUrl?: string | null; 
+  profileUrl?: string | null;
 };
 
 export default function EditAdminProfile() {
@@ -115,12 +115,7 @@ export default function EditAdminProfile() {
             profileUrl: userProfile.profileUrl ?? null, // Pass profileUrl here
           }}
         />
-        <PasswordSection
-          userData={{
-            email: userProfile.email,
-            isVerified: userProfile.isVerified,
-          }}
-        />
+        <PasswordSection />
       </div>
     </div>
   );
