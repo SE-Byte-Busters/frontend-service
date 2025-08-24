@@ -96,7 +96,7 @@ export default function EditProfile() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-20 items-start mt-40">
         {userProfile && (
           <>
-            <InfoSection 
+            <InfoSection
               userData={{
                 username: userProfile.username,
                 email: userProfile.email,
@@ -104,14 +104,9 @@ export default function EditProfile() {
                 firstName: userProfile.firstName,
                 lastName: userProfile.lastName,
                 profileUrl: userProfile.profileUrl || "", // pass profileUrl here
-              }} 
+              }}
             />
-            <PasswordSection 
-              userData={{
-                email: userProfile.email,
-                isVerified: userProfile.isVerified
-              }} 
-            />
+            <PasswordSection />
           </>
         )}
       </div>
