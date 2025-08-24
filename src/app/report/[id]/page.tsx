@@ -106,6 +106,104 @@ export default function ReportPage() {
   const [scoreLoading, setScoreLoading] = useState(false);
   const [solveRequests, setSolveRequests] = useState<SolveRequest[]>([]);
   const [solveRequestsLoading, setSolveRequestsLoading] = useState(false);
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [isSubmittingVote, setIsSubmittingVote] = useState(false);
+  const [activeCategory, setActiveCategory] = useState<string | null>(null);
+
+  const categoryIconMap: any = {
+    failure: { src: "/images/icons/category/tools.svg", alt: "tools", fa: "خرابی" },
+    lightbulb: { src: "/images/icons/category/lightbulb.svg", alt: "lightbulb", fa: "روشنایی" },
+    unsafe: { src: "/images/icons/category/barrier.svg", alt: "barrier", fa: "ناامنی" },
+    trash: { src: "/images/icons/category/trash.svg", alt: "trash", fa: "زباله" },
+    smog: { src: "/images/icons/category/smog.svg", alt: "smog", fa: "آلودگی" },
+    leaf: { src: "/images/icons/category/leaf.svg", alt: "leaf", fa: "طبیعت" },
+  };
+
+  const getAuthToken = () => {
+    if (typeof window !== 'undefined') {
+      return localStorage.getItem('token');
+    }
+    return null;
+  };
+
+  const handleVote = async (direction: 'Up' | 'Down') => {
+    if (!report) return;
+    setIsSubmittingVote(true);
+
+    try {
+      const token = getAuthToken();
+      const response = await fetch(
+        `https://shahriar.thetechverse.ir:3000/api/v1/report/reports/${report._id}/vote`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            direction
+          }),
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const data = await response.json();
+
+      if (report) {
+        setReport({
+          ...report,
+          voteScore: data.voteScore
+        });
+      }
+
+      setAlert({
+        type: 'success',
+        message: `رای ${direction === 'Up' ? 'مثبت' : 'منفی'} شما ثبت شد`,
+        duration: 3000,
+        onClose: () => setAlert(null)
+      });
+    } catch (err) {
+      setAlert({
+        type: 'error',
+        message: 'خطا در ثبت رای',
+        duration: 3000,
+        onClose: () => setAlert(null)
+      });
+      console.error('Error voting:', err);
+    } finally {
+      setIsSubmittingVote(false);
+    }
+  };
+
+  const calculateVotePercentages = () => {
+    if (!report || !report.votes || report.votes.length === 0) {
+      return { positivePercent: 50, negativePercent: 50, totalVotes: 0 };
+    }
+
+    const totalVotes = report.votes.length;
+    const positiveVotes = report.votes.filter((vote: any) => vote.direction === 'Up').length;
+    const negativeVotes = totalVotes - positiveVotes;
+
+    const positivePercent = totalVotes > 0 ? (positiveVotes / totalVotes) * 100 : 50;
+    const negativePercent = totalVotes > 0 ? (negativeVotes / totalVotes) * 100 : 50;
+
+    return { positivePercent, negativePercent, totalVotes };
+  };
+
+  const nextSlide = () => {
+    if (report && report.images && report.images.length > 0) {
+      setCurrentIndex((prev) => (prev + 1) % report.images.length);
+    }
+  };
+
+  const prevSlide = () => {
+    if (report && report.images && report.images.length > 0) {
+      setCurrentIndex((prev) => (prev - 1 + report.images.length) % report.images.length);
+    }
+  };
 
   const fetchSolveRequests = async () => {
     try {
@@ -232,7 +330,6 @@ export default function ReportPage() {
       const reportData = await getReportData(params.id as string, token);
       setReport(reportData);
 
-      // const commentsData = await getReportComments(params.id as string, token);
       setComments(reportData.comments || []);
     } catch (err) {
       setAlert({
@@ -299,9 +396,9 @@ export default function ReportPage() {
     );
   }
 
+  const { positivePercent, negativePercent, totalVotes } = calculateVotePercentages();
   const formattedDate = formatReportDate(report.createdAt)
   const images = report.images || [];
-
   const showCompletionAndPriority = reportState === 'approved-unresolved' || reportState === 'approved-resolved';
 
   return (
@@ -655,19 +752,6 @@ export default function ReportPage() {
                   <p>{report.approximatePosition || 'نامشخص'}</p>
                 </div>
                 <div>
-                  <h3 className="font-semibold">دسته‌بندی‌ها</h3>
-                  <div className="flex flex-wrap gap-2 mt-1 justify-end">
-                    {(report.category || []).map((cat, index) => (
-                      <span
-                        key={index}
-                        className="px-2 py-1 rounded-md text-sm bg-accent text-white"
-                      >
-                        {cat}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-                <div>
                   <h3 className="font-semibold">وضعیت تایید</h3>
                   <p>{approvalStatusTranslations[report.approvalStatus] || 'نامشخص'}</p>
                 </div>
@@ -692,18 +776,31 @@ export default function ReportPage() {
               </h2>
 
               {images.length > 0 ? (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {images.map((image) => (
-                    <div key={image._id} className="relative aspect-square rounded-md overflow-hidden">
-                      <Image
-                        src={image.url}
-                        alt="عکس گزارش"
-                        fill
-                        className="object-cover"
-                        sizes="(max-width: 768px) 100vw, 50vw"
-                      />
-                    </div>
-                  ))}
+                <div className="relative w-full h-80 overflow-hidden rounded-xl mx-auto">
+                  <Image
+                    src={images[currentIndex].url}
+                    className="object-cover w-full h-full"
+                    alt="report image"
+                    layout="fill"
+                  />
+
+                  <button
+                    onClick={prevSlide}
+                    className="absolute top-1/2 left-2 transform -translate-y-1/2 bg-white rounded-full shadow p-2"
+                  >
+                    <Image src="/images/icons/LeftArrow.png" alt="previous" width={30} height={30} />
+                  </button>
+                  <button
+                    onClick={nextSlide}
+                    className="absolute top-1/2 right-2 transform -translate-y-1/2 bg-white rounded-full shadow p-2"
+                  >
+                    <Image src="/images/icons/RightArrow.png" alt="next" width={30} height={30} />
+                  </button>
+                  <div className="absolute bottom-2 left-1/2 transform -translate-x-1/2 flex gap-2">
+                    {images.map((_, idx) => (
+                      <div key={idx} className={`w-2 h-2 rounded-full ${idx === currentIndex ? "bg-green-400" : "bg-gray-300"}`} />
+                    ))}
+                  </div>
                 </div>
               ) : (
                 <div className="text-center py-8 text-gray-500">
@@ -712,7 +809,78 @@ export default function ReportPage() {
               )}
             </div>
 
-              <div className="bg-white rounded-lg shadow-md p-4 h-96 text-right flex flex-col overflow-hidden">
+            <div className="bg-white rounded-lg shadow-md p-4 text-right">
+              <h2 className="text-xl font-semibold mb-4 text-dark">
+                رأی‌ها
+              </h2>
+              <div className="flex items-center justify-center w-full text-xl font-bold mt-[30px]">
+                <button
+                  onClick={() => handleVote('Up')}
+                  className="pl-2 border-0 bg-transparent"
+                  disabled={isSubmittingVote}
+                >
+                  <Image src="/images/icons/like.png" alt="like" width={110} height={130} />
+                </button>
+
+                <div className="flex w-full h-9 rounded-full border border-gray-200 shadow-sm overflow-hidden">
+                  <div
+                    className="bg-green-200 text-green-600 flex items-center justify-center"
+                    style={{ width: `${positivePercent}%` }}
+                  >
+                    {Math.round(positivePercent) != 0 ? Math.round(positivePercent) + "%" : ""}
+                  </div>
+                  <div
+                    className="bg-red-200 text-red-600 flex items-center justify-center"
+                    style={{ width: `${negativePercent}%` }}
+                  >
+                    {Math.round(negativePercent) != 0 ? Math.round(negativePercent) + "%" : ""}
+                  </div>
+                </div>
+
+                <button
+                  onClick={() => handleVote('Down')}
+                  className="pr-2 border-0 bg-transparent"
+                  disabled={isSubmittingVote}
+                >
+                  <Image src="/images/icons/dislike.png" alt="dislike" width={110} height={130} />
+                </button>
+              </div>
+              <p className="text-center text-sm text-gray-700 mt-2">{totalVotes} نفر رای داده‌اند</p>
+            </div>
+
+            <div className="bg-white rounded-lg shadow-md p-4 text-right">
+              <h2 className="text-xl font-semibold mb-4 text-dark">دسته‌بندی‌ها</h2>
+              <div className="flex items-center gap-2 justify-end">
+                {report.category?.map(categoryName => {
+                  const iconData = categoryIconMap[categoryName];
+                  if (!iconData) return null;
+                  return (
+                    <div key={categoryName} className="relative">
+                      <div
+                        onMouseEnter={() => setActiveCategory(categoryName)}
+                        onMouseLeave={() => setActiveCategory(null)}
+                        onClick={() => setActiveCategory(activeCategory === categoryName ? null : categoryName)}
+                        className="cursor-pointer"
+                      >
+                        <Image
+                          src={iconData.src}
+                          alt={iconData.alt}
+                          width={56}
+                          height={54}
+                        />
+                      </div>
+                      {activeCategory === categoryName && (
+                        <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-2 py-1 bg-gray-800 text-white text-sm rounded whitespace-nowrap">
+                          {iconData.fa}
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+
+            <div className="bg-white rounded-lg shadow-md p-4 h-96 text-right flex flex-col overflow-hidden">
               <h2 className="text-xl font-semibold mb-4 text-dark">
                 موقعیت
               </h2>
