@@ -3,11 +3,13 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
+import { useRouter } from 'next/navigation';
 import { Report, ReportState } from './ReportTypes';
 import {
   priorityTranslations,
   getReportState,
 } from './reportUtils';
+import { Icon } from '@/components/Icon';
 
 type ReportCardProps = {
   report: Report;
@@ -57,6 +59,7 @@ export const ReportCard = ({
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const reportState = getReportState(report);
   const statusInfo = statusConfig[reportState];
+  const router = useRouter();
 
   const nextImage = () => {
     setCurrentImageIndex((prev) => (prev + 1) % (report.images?.length || 1));
@@ -94,7 +97,7 @@ export const ReportCard = ({
   const showPriority = reportState === 'approved-unresolved' || reportState === 'approved-resolved';
 
   return (
-    <div className="relative w-full bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden flex flex-col hover:shadow-md transition-shadow duration-200">
+    <div className="relative h-full w-full bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden flex flex-col hover:shadow-md transition-shadow duration-200">
       {/* Image Carousel */}
       <div className="relative w-full aspect-square bg-gray-100">
         {loading ? (
@@ -153,89 +156,96 @@ export const ReportCard = ({
       </div>
 
       {/* Card Content */}
-      <Link href={`/report/${report._id}`} className="p-3 flex flex-col gap-2 text-right">
-        <div className="flex justify-between gap-2">
-          <div className="flex-1">
-            <h3 className="text-gray-900 text-sm font-bold line-clamp-1">
-              {report.title}
-            </h3>
-            <p className="text-xs text-gray-500 mt-0.5">
-              {formatDate(report.createdAt)}
+      <div className="p-3 flex flex-col gap-2 text-right">
+        <Link href={`/report/${report._id}`}>
+          <div className="flex justify-between gap-2">
+            <div className="flex-1">
+              <h3 className="text-gray-900 text-sm font-bold line-clamp-1">
+                {report.title}
+              </h3>
+              <p className="text-xs text-gray-500 mt-0.5">
+                {formatDate(report.createdAt)}
+              </p>
+            </div>
+
+            {/* Vote visualization bar */}
+            <div className="flex flex-col items-center w-1/4 min-w-[70px]">
+              <div className="w-full flex h-3 rounded-full overflow-hidden border border-gray-300">
+                <div
+                  className="bg-green-500"
+                  style={{ width: `${votePercentages.positive}%` }}
+                ></div>
+                <div
+                  className="bg-red-500"
+                  style={{ width: `${votePercentages.negative}%` }}
+                ></div>
+              </div>
+              <div className="flex justify-between w-full text-[10px] mt-1 text-gray-500">
+                <span>{votePercentages.positive}%</span>
+                <span>{votePercentages.negative}%</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Description */}
+          <div className="mt-1">
+            <p className="text-xs text-gray-700 leading-relaxed line-clamp-3">
+              {report.description}
             </p>
           </div>
 
-          {/* Vote visualization bar */}
-          <div className="flex flex-col items-center w-1/4 min-w-[70px]">
-            <div className="w-full flex h-3 rounded-full overflow-hidden border border-gray-300">
-              <div
-                className="bg-green-500"
-                style={{ width: `${votePercentages.positive}%` }}
-              ></div>
-              <div
-                className="bg-red-500"
-                style={{ width: `${votePercentages.negative}%` }}
-              ></div>
+          {/* Approximate Location */}
+          <div className="mt-1">
+            <p className="text-xs font-medium text-gray-800 flex items-center gap-1">
+              <Icon name="MapPin" className='w-3 h-3' />
+              {report.city}, {report.approximatePosition}
+            </p>
+          </div>
+
+          <div className="flex justify-between items-center mt-2">
+            <div className="flex items-center justify-center">
+              {showPriority && (
+                <Image
+                  src={`/images/icons/priority${report.priority}.png`}
+                  alt={priorityTranslations[report.priority]}
+                  width={96}
+                  height={96}
+                  className="object-contain transition-all"
+                />
+              )}
+              {showInPriority && (
+                <Image
+                  src={`/images/icons/inPriority.png`}
+                  alt={priorityTranslations[report.priority]}
+                  width={96}
+                  height={96}
+                  className="object-contain transition-all"
+                />
+              )}
             </div>
-            <div className="flex justify-between w-full text-[10px] mt-1 text-gray-500">
-              <span>{votePercentages.positive}%</span>
-              <span>{votePercentages.negative}%</span>
+
+            <div className={`flex flex-col items-center justify-center p-1.5 rounded-lg`}>
+              <Image
+                src={statusInfo.icon}
+                alt={statusInfo.text}
+                width={36}
+                height={36}
+                className="object-contain"
+              />
+              <span className={`text-xs font-medium ${statusInfo.color} mt-1`}>
+                {statusInfo.text}
+              </span>
             </div>
           </div>
-        </div>
+        </Link>
 
-        {/* Description */}
-        <div className="mt-1">
-          <p className="text-xs text-gray-700 leading-relaxed line-clamp-3">
-            {report.description}
-          </p>
-        </div>
-
-        {/* Approximate Location */}
-        <div className="mt-1">
-          <p className="text-xs font-medium text-gray-800 flex items-center gap-1">
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-            </svg>
-            {report.city}, {report.approximatePosition}
-          </p>
-        </div>
-
-        <div className="flex justify-between items-center mt-2">
-          <div className="flex items-center justify-center">
-            {showPriority && (
-              <Image
-                src={`/images/icons/priority${report.priority}.png`}
-                alt={priorityTranslations[report.priority]}
-                width={96}
-                height={96}
-                className="object-contain transition-all"
-              />
-            )}
-            {showInPriority && (
-              <Image
-                src={`/images/icons/inPriority.png`}
-                alt={priorityTranslations[report.priority]}
-                width={96}
-                height={96}
-                className="object-contain transition-all"
-              />
-            )}
-          </div>
-
-          <div className={`flex flex-col items-center justify-center p-1.5 rounded-lg`}>
-            <Image
-              src={statusInfo.icon}
-              alt={statusInfo.text}
-              width={36}
-              height={36}
-              className="object-contain"
-            />
-            <span className={`text-xs font-medium ${statusInfo.color} mt-1`}>
-              {statusInfo.text}
-            </span>
-          </div>
-        </div>
+        <button
+          onClick={() => router.push(`/submit-ticket?reportId=${report._id}`)}
+          className="flex items-center justify-center gap-1 px-3 py-2 bg-primary text-white rounded-lg hover:bg-dark transition-colors"
+        >
+          <Icon name="Ticket" className="w-5 h-5" />
+          <span>ثبت تیکت</span>
+        </button>
 
         {/* Admin Button & Category Icons */}
         {/* <div className="flex justify-between items-center mt-2">
@@ -272,7 +282,7 @@ export const ReportCard = ({
             </button>
           )}
         </div> */}
-      </Link>
+      </div>
     </div>
   );
 };
