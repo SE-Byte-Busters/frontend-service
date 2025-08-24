@@ -3,24 +3,40 @@
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
 
+interface Admin {
+  username: string;
+}
+
+interface Report {
+  _id: string;
+  title?: string;
+}
+
+interface Ticket {
+  _id: string;
+  userMessage: string;
+  adminDecisionNote?: string;
+  admin?: Admin;
+  createdAt: string;
+  respondedAt?: string;
+  report: Report;
+}
+
 const UserTicketPage = () => {
-  // State for tickets list
-  const [tickets, setTickets] = useState([]);
-  const [ticketsLoading, setTicketsLoading] = useState(true);
-  const [ticketsError, setTicketsError] = useState("");
+  const [tickets, setTickets] = useState<Ticket[]>([]);
+  const [ticketsLoading, setTicketsLoading] = useState<boolean>(true);
+  const [ticketsError, setTicketsError] = useState<string>("");
 
   const API_BASE_URL = "https://shahriar.thetechverse.ir:3000/api/v1";
 
-  // Get auth token
-  const getAuthToken = () => {
+  const getAuthToken = (): string | null => {
     if (typeof window !== "undefined") {
       return localStorage.getItem("token");
     }
     return null;
   };
 
-  // Format date to Persian
-  const formatPersianDate = (dateString) => {
+  const formatPersianDate = (dateString: string | undefined): string => {
     if (!dateString) return "تاریخ مشخص نشده";
 
     const date = new Date(dateString);
@@ -33,8 +49,7 @@ const UserTicketPage = () => {
     });
   };
 
-  // Fetch user tickets
-  const fetchUserTickets = async () => {
+  const fetchUserTickets = async (): Promise<void> => {
     setTicketsLoading(true);
     setTicketsError("");
 
@@ -58,17 +73,15 @@ const UserTicketPage = () => {
         throw new Error(data.message || "خطا در دریافت تیکت‌ها");
       }
 
-      console.log("✅ پاسخ کامل سرور:", JSON.stringify(data, null, 2));
       setTickets(data.tickets || []);
     } catch (error) {
       console.error("Error fetching tickets:", error);
-      setTicketsError(error.message);
+      setTicketsError(error instanceof Error ? error.message : "خطای ناشناخته");
     } finally {
       setTicketsLoading(false);
     }
   };
 
-  // Load tickets on component mount
   useEffect(() => {
     fetchUserTickets();
   }, []);
