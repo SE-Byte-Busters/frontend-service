@@ -173,7 +173,7 @@ export default function AdminTicketsPage() {
       }
 
       const requestBody = {
-        responseNote: adminResponse,
+        adminDecisionNote: adminResponse,
       };
 
       console.log("Ticket ID:", selectedTicket._id);
