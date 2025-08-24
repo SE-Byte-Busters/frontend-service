@@ -1,6 +1,9 @@
+// part01 for this file
+
 "use client";
 
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import {
   Search,
   Eye,
@@ -10,9 +13,11 @@ import {
   XCircle,
   RefreshCw,
   Settings,
+  ExternalLink,
 } from "lucide-react";
 
 export default function AdminTicketsPage() {
+  const router = useRouter();
   const [tickets, setTickets] = useState([]);
   const [filteredTickets, setFilteredTickets] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -65,15 +70,15 @@ export default function AdminTicketsPage() {
 
       // Calculate stats
       const total = ticketsData.length;
-      const pending = ticketsData.filter(
-        (t) => t.status === "Pending" && !t.adminDecisionNote
-      ).length;
       const resolved = ticketsData.filter(
-        (t) =>
-          t.status === "Resolved" ||
-          t.status === "resolved" ||
-          t.adminDecisionNote
+        (ticket) =>
+          ticket.report?.isResolved === true ||
+          ticket.status === "Resolved" ||
+          ticket.status === "resolved" ||
+          ticket.respondedAt
       ).length;
+      const pending = total - resolved;
+
       setStats({ total, pending, resolved });
     } catch (error) {
       console.error("Error fetching tickets:", error);
@@ -90,10 +95,8 @@ export default function AdminTicketsPage() {
     if (statusFilter !== "all") {
       filtered = filtered.filter((ticket) =>
         statusFilter === "pending"
-          ? ticket.status === "Pending" && !ticket.adminDecisionNote
-          : ticket.status === "Resolved" ||
-            ticket.status === "resolved" ||
-            ticket.adminDecisionNote
+          ? ticket.status === "Pending"
+          : ticket.status === "Resolved" || ticket.status === "resolved"
       );
     }
 
@@ -123,6 +126,13 @@ export default function AdminTicketsPage() {
     setShowModal(true);
   };
 
+  const handleViewReport = (reportId, e) => {
+    e.stopPropagation(); // جلوگیری از باز شدن مودال تیکت
+    if (reportId) {
+      router.push(`/report/${reportId}`);
+    }
+  };
+
   const handleUpdateTicket = async () => {
     if (!selectedTicket || !adminResponse.trim()) {
       alert("لطفاً پاسخ خود را وارد کنید");
@@ -131,28 +141,24 @@ export default function AdminTicketsPage() {
 
     setUpdating(true);
     try {
-      const token =
-        typeof window !== "undefined" ? localStorage.getItem("token") : null;
+      const token = localStorage.getItem("token");
       if (!token) {
         alert("توکن احراز هویت یافت نشد");
         return;
       }
 
-      // Try different possible field names that the API might expect
+      // ✅ از responseNote استفاده کنید
       const requestBody = {
-        decisionNote: adminResponse,
         responseNote: adminResponse,
-        adminResponse: adminResponse,
-        note: adminResponse,
-        message: adminResponse,
-        response: adminResponse,
       };
 
+      // دیباگ کامل
+      console.log("Ticket ID:", selectedTicket._id);
+      console.log("Request Body:", requestBody);
       console.log(
-        "Sending request to:",
+        "Full URL:",
         `https://shahriar.thetechverse.ir:3000/api/v1/ticket/${selectedTicket._id}/admin/responseticket`
       );
-      console.log("Request body:", requestBody);
 
       const response = await fetch(
         `https://shahriar.thetechverse.ir:3000/api/v1/ticket/${selectedTicket._id}/admin/responseticket`,
@@ -166,76 +172,60 @@ export default function AdminTicketsPage() {
         }
       );
 
-      console.log("Response status:", response.status);
+      // دیباگ response
+      console.log("Response Status:", response.status);
+      console.log(
+        "Response Headers:",
+        Object.fromEntries([...response.headers])
+      );
+
+      const responseText = await response.text();
+      console.log("Response Text:", responseText);
 
       if (!response.ok) {
         let errorData;
         try {
-          errorData = await response.json();
-          console.log("Error response:", errorData);
-        } catch (parseError) {
-          console.log("Could not parse error response");
-          errorData = {
-            message: `HTTP ${response.status}: ${response.statusText}`,
-          };
+          errorData = JSON.parse(responseText);
+        } catch (e) {
+          errorData = { message: responseText };
         }
-        throw new Error(
-          errorData.message || `Failed to update ticket (${response.status})`
-        );
+        throw new Error(errorData.message || `خطا: ${response.status}`);
       }
 
-      const responseData = await response.json();
-      console.log("Update response:", responseData);
+      let responseData;
+      try {
+        responseData = JSON.parse(responseText);
+      } catch (e) {
+        throw new Error("پاسخ سرور معتبر نیست");
+      }
 
-      // Update the tickets state with the new response
+      console.log("Response Data:", responseData);
+      // ✅ از داده‌های بازگشتی از سرور استفاده کنید
+      const updatedTicket = responseData.ticket;
+
+      // آپدیت لیست تیکت‌ها
       const updatedTickets = tickets.map((ticket) =>
-        ticket._id === selectedTicket._id
-          ? {
-              ...ticket,
-              adminDecisionNote: adminResponse,
-              status: "Resolved",
-              respondedAt: new Date().toISOString(),
-            }
-          : ticket
+        ticket._id === selectedTicket._id ? updatedTicket : ticket
       );
 
       setTickets(updatedTickets);
       setShowModal(false);
       setAdminResponse("");
 
-      // Update stats
-      const pending = updatedTickets.filter(
-        (t) => t.status === "Pending" && !t.adminDecisionNote
-      ).length;
+      // آپدیت آمار
       const resolved = updatedTickets.filter(
-        (t) =>
-          t.status === "Resolved" ||
-          t.status === "resolved" ||
-          t.adminDecisionNote
+        (ticket) =>
+          ticket.report?.isResolved === true ||
+          ticket.status === "Resolved" ||
+          ticket.respondedAt
       ).length;
-      setStats((prev) => ({ ...prev, pending, resolved }));
+      const pending = updatedTickets.length - resolved;
+      setStats({ total: updatedTickets.length, pending, resolved });
 
-      // Show success message
       alert("پاسخ با موفقیت ارسال شد");
     } catch (error) {
       console.error("Error updating ticket:", error);
-
-      // Provide more helpful error messages
-      let errorMessage = "خطا در ارسال پاسخ: ";
-      if (error.message.includes("Response note is required")) {
-        errorMessage +=
-          "فیلد پاسخ الزامی است. لطفاً مطمئن شوید که پاسخ خود را وارد کرده‌اید.";
-      } else if (error.message.includes("403")) {
-        errorMessage += "شما مجوز لازم برای انجام این عمل را ندارید.";
-      } else if (error.message.includes("401")) {
-        errorMessage += "لطفاً دوباره وارد شوید.";
-      } else if (error.message.includes("404")) {
-        errorMessage += "تیکت مورد نظر یافت نشد.";
-      } else {
-        errorMessage += error.message;
-      }
-
-      alert(errorMessage);
+      alert(`خطا در ارسال پاسخ: ${error.message}`);
     } finally {
       setUpdating(false);
     }
@@ -442,24 +432,68 @@ export default function AdminTicketsPage() {
                     </div>
 
                     <div className="flex items-center gap-3">
+                      {/* دکمه مشاهده گزارش */}
+                      {(ticket.report?._id ||
+                        ticket.reportId ||
+                        ticket.report) && (
+                        <button
+                          onClick={(e) =>
+                            handleViewReport(
+                              ticket.report?._id ||
+                                ticket.reportId ||
+                                ticket.report,
+                              e
+                            )
+                          }
+                          className="flex items-center gap-1 px-3 py-1 text-sm bg-purple-100 text-purple-700 rounded-lg hover:bg-purple-200 transition-colors"
+                          title="مشاهده گزارش"
+                        >
+                          <ExternalLink className="h-4 w-4" />
+                          مشاهده گزارش
+                        </button>
+                      )}
+
+                      {/* دکمه موقت برای تست - نمایش همیشگی */}
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          console.log("Ticket data:", ticket);
+                          alert(
+                            `Report ID: ${
+                              ticket.report?._id ||
+                              ticket.reportId ||
+                              ticket.report ||
+                              "یافت نشد"
+                            }`
+                          );
+                        }}
+                        className="flex items-center gap-1 px-3 py-1 text-sm bg-red-100 text-red-700 rounded-lg hover:bg-red-200 transition-colors"
+                        title="تست - نمایش اطلاعات گزارش"
+                      >
+                        <ExternalLink className="h-4 w-4" />
+                        تست گزارش
+                      </button>
+
                       <span
                         className={`px-3 py-1 text-sm rounded-full font-medium flex items-center gap-1 ${
-                          ticket.status === "Pending" &&
-                          !ticket.adminDecisionNote
-                            ? "bg-orange-100 text-orange-800"
-                            : "bg-green-100 text-green-800"
+                          ticket.report?.isResolved === true ||
+                          ticket.status === "Resolved" ||
+                          ticket.respondedAt
+                            ? "bg-green-100 text-green-800" // پاسخ داده شده - سبز
+                            : "bg-orange-100 text-orange-800" // در انتظار پاسخ - نارنجی
                         }`}
                       >
-                        {ticket.status === "Pending" &&
-                        !ticket.adminDecisionNote ? (
-                          <>
-                            <Clock className="h-4 w-4" />
-                            در انتظار بررسی
-                          </>
-                        ) : (
+                        {ticket.report?.isResolved === true ||
+                        ticket.status === "Resolved" ||
+                        ticket.respondedAt ? (
                           <>
                             <CheckCircle className="h-4 w-4" />
                             پاسخ داده شده
+                          </>
+                        ) : (
+                          <>
+                            <Clock className="h-4 w-4" />
+                            در انتظار پاسخ
                           </>
                         )}
                       </span>
@@ -614,27 +648,73 @@ export default function AdminTicketsPage() {
               </div>
             </div>
 
-            <div className="p-6 border-t bg-gray-50 flex justify-end gap-3">
-              <button
-                onClick={() => setShowModal(false)}
-                className="px-4 py-2 text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-100 transition"
-              >
-                انصراف
-              </button>
-              <button
-                onClick={handleUpdateTicket}
-                disabled={updating || !adminResponse.trim()}
-                className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition flex items-center gap-2"
-              >
-                {updating ? (
-                  <>
-                    <RefreshCw className="h-4 w-4 animate-spin" />
-                    در حال ارسال...
-                  </>
-                ) : (
-                  "ارسال پاسخ"
+            <div className="p-6 border-t bg-gray-50 flex justify-between gap-3">
+              <div>
+                {/* دکمه مشاهده گزارش در مودال */}
+                {(selectedTicket.report?._id ||
+                  selectedTicket.reportId ||
+                  selectedTicket.report) && (
+                  <button
+                    onClick={() => {
+                      setShowModal(false);
+                      router.push(
+                        `/report/${
+                          selectedTicket.report?._id ||
+                          selectedTicket.reportId ||
+                          selectedTicket.report
+                        }`
+                      );
+                    }}
+                    className="flex items-center gap-2 px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition"
+                  >
+                    <ExternalLink className="h-4 w-4" />
+                    مشاهده گزارش
+                  </button>
                 )}
-              </button>
+
+                {/* دکمه تست موقت */}
+                <button
+                  onClick={() => {
+                    console.log("Selected ticket:", selectedTicket);
+                    alert(
+                      `Report data: ${JSON.stringify(
+                        selectedTicket.report || "null"
+                      )}\nReport ID: ${
+                        selectedTicket.report?._id ||
+                        selectedTicket.reportId ||
+                        "یافت نشد"
+                      }`
+                    );
+                  }}
+                  className="flex items-center gap-2 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition ml-2"
+                >
+                  <ExternalLink className="h-4 w-4" />
+                  تست داده‌های گزارش
+                </button>
+              </div>
+
+              <div className="flex gap-3">
+                <button
+                  onClick={() => setShowModal(false)}
+                  className="px-4 py-2 text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-100 transition"
+                >
+                  انصراف
+                </button>
+                <button
+                  onClick={handleUpdateTicket}
+                  disabled={updating || !adminResponse.trim()}
+                  className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition flex items-center gap-2"
+                >
+                  {updating ? (
+                    <>
+                      <RefreshCw className="h-4 w-4 animate-spin" />
+                      در حال ارسال...
+                    </>
+                  ) : (
+                    "ارسال پاسخ"
+                  )}
+                </button>
+              </div>
             </div>
           </div>
         </div>

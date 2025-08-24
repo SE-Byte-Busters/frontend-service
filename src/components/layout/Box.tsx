@@ -56,6 +56,14 @@ export const Box = () => {
             <Icon name="FileText" className="w-4 h-4" />
           </button>
 
+          <button
+            onClick={() => router.push("/user/ticket")}
+            className="flex items-center justify-start gap-2 w-full rounded-md px-3 py-2 text-sm text-orange-600 hover:text-orange-800 hover:bg-orange-50 transition-colors duration-200"
+          >
+            <span>تیکت های من</span>
+            <Icon name="MessageCircle" className="w-4 h-4" />
+          </button>
+
           {/* به سایت نظر بده button */}
           <button
             onClick={() => router.push("/user/leave-a-review")}
@@ -69,6 +77,14 @@ export const Box = () => {
 
       {role === "admin" && (
         <>
+          <button
+            onClick={() => router.push("/admin/ticket")}
+            className="flex items-center justify-start gap-2 w-full rounded-md px-3 py-2 text-sm text-orange-600 hover:text-orange-800 hover:bg-orange-50 transition-colors duration-200"
+          >
+            <span>تیکت ها</span>
+            <Icon name="MessageCircle" className="w-4 h-4" />
+          </button>
+
           {/* آمار button */}
           <button
             onClick={() => router.push("/admin/statistic")}

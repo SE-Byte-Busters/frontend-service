@@ -35,11 +35,15 @@ const SubmitTicketPage = () => {
   const handleSubmitTicket = async (e) => {
     e.preventDefault();
 
-    if (!reportId.trim() || !userMessage.trim()) {
+    if (!userMessage.trim()) {
       setSubmitError("لطفاً همه فیلدها را پر کنید");
       return;
     }
 
+    if (!reportId || !reportId.trim()) {
+      setSubmitError("شناسه گزارش موجود نیست");
+      return;
+    }
     setSubmitLoading(true);
     setSubmitError("");
     setSubmitSuccess("");
@@ -112,7 +116,7 @@ const SubmitTicketPage = () => {
           <div className="bg-white rounded-xl shadow-lg border border-gray-200 p-8">
             <form onSubmit={handleSubmitTicket} className="space-y-6">
               {/* Report ID */}
-              <div>
+              {/* <div>
                 <label
                   htmlFor="reportId"
                   className="block text-sm font-semibold text-gray-700 mb-3"
@@ -153,7 +157,7 @@ const SubmitTicketPage = () => {
                     شناسه گزارش از طریق لینک دریافت شد
                   </p>
                 )}
-              </div>
+              </div> */}
 
               {/* User Message */}
               <div>
@@ -233,7 +237,6 @@ const SubmitTicketPage = () => {
                   type="submit"
                   disabled={
                     submitLoading ||
-                    !reportId.trim() ||
                     !userMessage.trim() ||
                     userMessage.length < 10
                   }
