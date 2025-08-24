@@ -103,7 +103,7 @@ export default function NewReport() {
 
   const placeholderReports: Report[] = Array(3).fill(null).map((_, index) => ({
     _id: `placeholder-${index}`,
-    user: '',
+    user: { _id: '', username: '' },
     title: 'در حال بارگذاری...',
     description: 'توضیحات گزارش در حال بارگذاری می‌باشد',
     approximatePosition: 'موقعیت نامشخص',
@@ -116,6 +116,10 @@ export default function NewReport() {
     voteScore: 0,
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
+    completionStatus: 0,
+    score: 0,
+    votes: [],
+    priority: 'Low',
   }));
 
   const displayReports = loading ? placeholderReports : reports;

@@ -32,7 +32,7 @@ const SubmitTicketPage = () => {
   }, [reportIdFromUrl]);
 
   // Submit new ticket
-  const handleSubmitTicket = async (e) => {
+  const handleSubmitTicket = async (e: React.FormEvent) => {
     e.preventDefault();
 
     if (!userMessage.trim()) {
@@ -77,7 +77,7 @@ const SubmitTicketPage = () => {
       setUserMessage("");
     } catch (error) {
       console.error("Error submitting ticket:", error);
-      setSubmitError(error.message);
+      setSubmitError(error instanceof Error ? error.message : "خطا در حال ارسال تیکت! مجدد تلاش کنید.");
     } finally {
       setSubmitLoading(false);
     }
