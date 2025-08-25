@@ -38,7 +38,7 @@ export default function Leaderboard() {
   }
 
   return (
-    <div dir="rtl" className="min-h-screen bg-gradient-to-b from-blue-50 to-white py-32 px-4">
+    <div className="min-h-screen bg-light py-32 px-4">
       <div className="max-w-4xl mx-auto bg-white rounded-2xl shadow-2xl p-8">
         {/* Header */}
         <h1 className="text-3xl md:text-5xl font-extrabold text-center mb-12 text-gradient-to-r text-primary">
