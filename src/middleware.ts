@@ -20,6 +20,7 @@ export function middleware(request: NextRequest) {
     "/auth/forget-password",
     "/leaderboard",
     "/report/reports",
+    "/resources/aboutus",
   ];
   const adminRoutes = [
     "/admin",
@@ -42,7 +43,8 @@ export function middleware(request: NextRequest) {
     (route) => path === route || path.startsWith(`${route}/`)
   );
   const isAdminRoute = adminRoutes.some(
-    (route) => path.startsWith(route) ||
+    (route) =>
+      path.startsWith(route) ||
       (route === "/report/[id]" && /^\/report\/[^/]+$/.test(path))
   );
   const isUserRoute = userRoutes.some(
