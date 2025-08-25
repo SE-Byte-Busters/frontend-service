@@ -35,9 +35,18 @@ export default function AdminStatisticsPage() {
     setLoading(true);
     setError(null);
 
-    const base = "https://shahriar.thetechverse.ir:3000/api/v1/statistic";
+    const token = localStorage.getItem('token');
+    if (!token) {
+      setError('No authorization token found');
+      setLoading(false);
+      return;
+    }
 
-    // calculate startDate param
+    const base = "https://shahriar.thetechverse.ir:3000/api/v1/statistic";
+    const headers = {
+      'Authorization': `Bearer ${token}`
+    };
+
     let reportsByDateUrl = `${base}/reports-by-date`;
     if (rangeDays) {
       const startDate = new Date();
@@ -47,9 +56,9 @@ export default function AdminStatisticsPage() {
     }
 
     const endpoints = [
-      fetch(reportsByDateUrl).then((r) => r.json()).catch((e) => ({ __err: e })),
-      fetch(`${base}/reports-approval-status`).then((r) => r.json()).catch((e) => ({ __err: e })),
-      fetch(`${base}/reports-resolved-unresolved`).then((r) => r.json()).catch((e) => ({ __err: e })),
+      fetch(reportsByDateUrl, { headers }).then((r) => r.json()).catch((e) => ({ __err: e })),
+      fetch(`${base}/reports-approval-status`, { headers }).then((r) => r.json()).catch((e) => ({ __err: e })),
+      fetch(`${base}/reports-resolved-unresolved`, { headers }).then((r) => r.json()).catch((e) => ({ __err: e })),
     ];
 
     Promise.all(endpoints)
@@ -243,7 +252,7 @@ export default function AdminStatisticsPage() {
           <div className="bg-white rounded-xl shadow p-5">
             <h2 className="font-semibold text-lg mb-3 text-dark">نمودار تعداد گزارش‌ها بر اساس تاریخ</h2>
             <p className="text-sm text-dark mb-4">از آخرین ۳۰ روز (یا بازهٔ تاریخی مشخص)</p>
-            
+
             {/* 👇 Filter buttons */}
             <div className="flex gap-2 mb-4">
               {[30, 90, 120].map((d) => (

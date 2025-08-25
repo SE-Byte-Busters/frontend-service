@@ -29,7 +29,7 @@ export function ReviewsList({ reviewsPerPage = 4 }: { reviewsPerPage?: number })
       try {
         setIsLoading(true);
         setError(null);
-        const res = await fetch(`https://shahriar.thetechverse.ir:3000/api/v1/comment?page=1&pageSize=1000`);
+        const res = await fetch(`https://shahriar.thetechverse.ir:3000/api/v1/comment?page=1&pageSize=10`);
 
         if (!res.ok) {
           throw new Error(`HTTP error! status: ${res.status}`);
