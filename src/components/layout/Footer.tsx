@@ -42,7 +42,7 @@ export default function Footer() {
               width={64}
               height={64}
               alt="CleanCity Logo"
-              className="bg-light rounded-xl h-16 w-16 md:h-20 md:w-20 p-1 mr-3 md:mr-5"
+              className="rounded-xl h-16 w-16 md:h-20 md:w-20 p-1 mr-3 md:mr-5"
               priority
             />
           </div>

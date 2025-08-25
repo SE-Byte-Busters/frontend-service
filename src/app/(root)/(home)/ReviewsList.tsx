@@ -93,7 +93,7 @@ export function ReviewsList({ reviewsPerPage = 4 }: { reviewsPerPage?: number })
       {!isLoading && !error && (
         <>
           <div
-            className={`grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6 md:gap-8 transition-opacity duration-300 ${
+            className={`grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8 transition-opacity duration-300 ${
               transitionStage === "fadeIn" ? "opacity-100" : "opacity-0"
             }`}
           >

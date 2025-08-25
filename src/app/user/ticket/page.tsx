@@ -87,8 +87,8 @@ const UserTicketPage = () => {
   }, []);
 
   return (
-    <div className="min-h-screen bg-white" dir="rtl">
-      <div className="container mx-auto px-4 mt-24">
+    <div className="min-h-screen bg-white pt-20 lg:pt-24">
+      <div className="container mx-auto px-4">
         <div className="max-w-4xl mx-auto">
           {/* Page Header */}
           <div className="mb-8">

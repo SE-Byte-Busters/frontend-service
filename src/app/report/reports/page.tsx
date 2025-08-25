@@ -104,14 +104,11 @@ export default function ProcessedReports() {
   }
 
   return (
-    <div className="bg-light min-h-screen flex flex-col items-center px-4 pb-12 lg:pt-24 lg:pb-10">
+    <div className="bg-light min-h-screen flex flex-col items-center px-4 pb-12 pt-10 lg:pt-20 lg:pb-10">
       <div className="flex flex-col items-center w-full max-w-6xl gap-12 mt-10">
-        {/* Top spacer */}
-        <div className="w-full h-16" />
-
         {/* Top 3 Approved Reports */}
         <div className="w-full">
-          <h2 className="text-xl font-semibold text-gray-900 mb-1 pb-2 flex items-center gap-2" dir="rtl">
+          <h2 className="text-xl font-semibold text-gray-900 mb-1 pb-2 flex items-center gap-2">
             <Image
               src="/images/icons/worldcrown.jpg"
               alt="Top reports icon"
