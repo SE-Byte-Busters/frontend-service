@@ -21,6 +21,7 @@ export function middleware(request: NextRequest) {
     "/leaderboard",
     "/report/reports",
     "/resources/aboutus",
+    "/resources/qa",
   ];
   const adminRoutes = [
     "/admin",
