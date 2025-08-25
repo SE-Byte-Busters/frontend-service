@@ -9,9 +9,9 @@ export default function Footer() {
     href: string;
     logo: LucideIconName;
   }> = [
-    { name: "درباره ما", href: "/about-us", logo: "Users" },
+    { name: "درباره ما", href: "/resources/about-us", logo: "Users" },
     { name: "تماس با ما", href: "/contact-us", logo: "Mail" },
-    { name: "سوالات متداول", href: "/faq", logo: "CircleHelp" },
+    { name: "سوالات متداول", href: "/resources/faq", logo: "CircleHelp" },
     { name: "سیاست‌های حفظ حریم خصوصی", href: "/privacy-policy", logo: "FileText" },
   ];
 
