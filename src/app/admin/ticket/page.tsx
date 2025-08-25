@@ -290,9 +290,9 @@ export default function AdminTicketsPage() {
   }
 
   return (
-    <div className="bg-white min-h-screen">
+    <div className="bg-white min-h-screen pt-24">
       {/* Header */}
-      <div className="bg-white shadow-sm border-b mt-24">
+      <div className="bg-white shadow-sm border-b">
         <div className="max-w-7xl mx-auto px-6 py-6">
           <div className="flex items-center gap-4">
             <div className="bg-blue-100 p-4 rounded-xl">

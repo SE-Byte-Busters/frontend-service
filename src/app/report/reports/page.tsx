@@ -16,7 +16,7 @@ export default function ProcessedReports() {
   useEffect(() => {
     const token = localStorage.getItem("token");
 
-/*     if (!token) {
+    /*     if (!token) {
       setShowAuthAlert(true);
       const timer = setTimeout(() => {
         router.push("/auth/sign-up");
@@ -104,26 +104,27 @@ export default function ProcessedReports() {
   }
 
   return (
-    <div className="bg-light min-h-screen flex flex-col items-center px-4 pb-12 lg:pt-24 lg:pb-10">
+    <div className="bg-light min-h-screen flex flex-col items-center px-4 pb-12 pt-10 lg:pt-20 lg:pb-10">
       <div className="flex flex-col items-center w-full max-w-6xl gap-12 mt-10">
-        {/* Top spacer */}
-        <div className="w-full h-16" />
-
         {/* Top 3 Approved Reports */}
         <div className="w-full">
-          <h2 className="text-xl font-semibold text-gray-900 mb-1 pb-2 flex items-center gap-2" dir="rtl">
-            <Image
-              src="/images/icons/worldcrown.jpg"
-              alt="Top reports icon"
-              width={24}
-              height={24}
-              className="shrink-0"
-            />
-            صدر لیست گزارشات محبوب
-          </h2>
-          <p className="text-m text-primary mb-4">
-            این گزارش‌ها بیشترین میزان پسند و مشارکت کاربران را داشته‌اند و در صدر توجه قرار گرفته‌اند.
-          </p>
+          <div className="flex flex-col items-center mb-4">
+            <div className="flex items-center gap-2 justify-center">
+              <Image
+                src="/images/icons/worldcrown.jpg"
+                alt="Top reports icon"
+                width={24}
+                height={24}
+                className="shrink-0"
+              />
+              <h2 className="text-xl font-semibold text-gray-900 text-center">
+                صدر لیست گزارشات محبوب
+              </h2>
+            </div>
+            <p className="text-m text-primary mb-4 text-center mt-2 max-w-2xl">
+              این گزارش‌ها بیشترین میزان پسند و مشارکت کاربران را داشته‌اند و در صدر توجه قرار گرفته‌اند.
+            </p>
+          </div>
           {loading ? (
             <div className="bg-gray-100 p-4 rounded-lg text-center text-gray-700">در حال بارگذاری...</div>
           ) : approvedReports.length > 0 ? (
@@ -135,21 +136,28 @@ export default function ProcessedReports() {
           )}
         </div>
 
+        {/* Divider */}
+        <div className="w-full border-t border-gray-300 my-2"></div>
+
         {/* Last 10 Approved Reports */}
         <div className="w-full">
-          <h2 className="text-xl font-semibold text-gray-900 mb-1 pb-2 flex items-center gap-2" dir="rtl">
-            <Image
-              src="/images/icons/handguy.jpg"
-              alt="Recent reports icon"
-              width={24}
-              height={24}
-              className="shrink-0"
-            />
-            آخرین گزارش‌های ثبت‌شده
-          </h2>
-          <p className="text-m text-primary mb-4">
-            گزارش‌هایی که همین حالا ارسال شدن—شاید مشکلی باشه که تو هم بتونی براش کاری بکنی!
-          </p>
+          <div className="flex flex-col items-center mb-6">
+            <div className="flex items-center gap-2 justify-center">
+              <Image
+                src="/images/icons/handguy.jpg"
+                alt="Recent reports icon"
+                width={24}
+                height={24}
+                className="shrink-0"
+              />
+              <h2 className="text-xl font-semibold text-gray-900 text-center">
+                آخرین گزارش‌های ثبت‌شده
+              </h2>
+            </div>
+            <p className="text-m text-primary mb-4 text-center mt-2 max-w-2xl">
+              گزارش‌هایی که همین حالا ارسال شدن—شاید مشکلی باشه که تو هم بتونی براش کاری بکنی!
+            </p>
+          </div>
           {loading ? (
             <div className="bg-gray-100 p-4 rounded-lg text-center text-gray-700">در حال بارگذاری...</div>
           ) : lastTenReports.length > 0 ? (

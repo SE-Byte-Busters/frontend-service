@@ -117,7 +117,7 @@ export default function DesktopHeader({ navItems }: { navItems: Array<{ name: st
             width={64}
             height={64}
             alt="CleanCity Logo"
-            className="h-12 w-12 sm:h-14 sm:w-14 bg-light rounded-lg my-2"
+            className="h-12 w-12 sm:h-14 sm:w-14 rounded-lg my-2"
             priority
           />
         </Link>

@@ -97,8 +97,8 @@ function SubmitTicketContent() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50" dir="rtl">
-      <div className="container mx-auto px-4 mt-24">
+    <div className="min-h-screen bg-gray-50 pt-24">
+      <div className="container mx-auto px-4">
         <div className="max-w-2xl mx-auto">
           {/* Page Header */}
           <div className="text-center mb-8">

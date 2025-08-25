@@ -82,7 +82,7 @@ function MobileHeaderFallback() {
           width={64}
           height={64}
           alt="CleanCity Logo"
-          className="h-12 w-12 bg-light rounded-lg"
+          className="h-12 w-12 rounded-lg"
           priority
         />
       </Link>

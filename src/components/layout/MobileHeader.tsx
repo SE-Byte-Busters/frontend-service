@@ -85,7 +85,7 @@ export default function MobileHeader({
             width={64}
             height={64}
             alt="CleanCity Logo"
-            className="h-12 w-12 bg-light rounded-lg transition-all duration-300"
+            className="h-12 w-12 rounded-lg transition-all duration-300"
             priority
           />
         </Link>
